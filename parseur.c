@@ -146,7 +146,7 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
                     tabFilsMilieu[l].tag="nombre";   
                     tabFilsMilieu[l].indice=j;
                     tabFilsMilieu[l].longueur=longTemp;
-                    void nombrefils(longTemp,&tabFilsMilieu[l], j)
+                    chiffre(longTemp, &tabFilsMilieu[l], j);
                     l++;
                     tabFilsMilieu[l].tag="separateur";   
                     tabFilsMilieu[l].indice=k;
@@ -178,15 +178,15 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
     }
 }
 
-void nombrefils(int longueurNombre,Noeud *tabFilsMilieu, int j){
-    Noeud *tabnombre=malloc(longueurNombre*sizeof(Noeud));
+void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j) {
+    Noeud *tabnombre=malloc(longueurNombre * sizeof(Noeud));
     for (int i=0;i<longueurNombre;i++){
         tabnombre[i].tag="DIGIT";
         tabnombre[i].indice=j+i;
         tabnombre[i].longueur=1;
-        tabnombre[i].nombrefils=0;
+        tabnombre[i].nombreFils=0;
         tabnombre[i].tab=NULL;
     }
-    tabFilsMilieu.nombreFils=longueurNombre;
-    tabFilsMilieu.tab=tabnombre;
+    tabFilsMilieu->nombreFils=longueurNombre;
+    tabFilsMilieu->tab=tabnombre;
 }
