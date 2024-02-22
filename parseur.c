@@ -226,3 +226,11 @@ void fin(char chaineMessage[], int indice){
     }
     return true;    
 }
+
+void ponct(Noeud *ne, int indice){
+    ne[indice].tag="Ponct";
+    ne[indice].indice=indice;
+    ne[indice].tab=NULL;
+    ne[indice].nombreFils=0;
+    ne[indice].longueur=1;
+}
