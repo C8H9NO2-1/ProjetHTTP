@@ -45,7 +45,7 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
         i++;
     isfin=fin(chaineMessage,i,tabFin);
     }
-    if (isfin==false){
+    if (!isfin){
         return false;
     }
     return true;
