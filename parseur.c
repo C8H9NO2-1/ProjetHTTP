@@ -210,3 +210,19 @@ void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j){
     tabFilsMilieu->nombreFils=longueurNombre;
     tabFilsMilieu->tab=tabnombre;
 }
+
+void fin(char chaineMessage[], int indice){
+    if (chaineMessage[indice] != 'F' && chaineMessage[indice] != 'f') {
+        return false;
+    }
+    if (chaineMessage[indice +1] != 'I' && chaineMessage[indice +1] != 'i') {
+        return false;
+    }
+    if (chaineMessage[indice +2] != 'N' && chaineMessage[indice +2] != 'n') {
+        return false;
+    }
+    if (chaineMessage[indice +3] != '\n') {
+        return false;
+    }
+    return true;    
+}
