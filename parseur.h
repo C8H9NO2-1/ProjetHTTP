@@ -25,3 +25,5 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
 void motFils(Noeud tabFilsMilieu[], int indice);
 
 void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j);
+
+void fin(char chaineMessage[], int indice);
