@@ -146,7 +146,7 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
                     tabFilsMilieu[l].tag="nombre";   
                     tabFilsMilieu[l].indice=j;
                     tabFilsMilieu[l].longueur=longTemp;
-                    nombrefils(longTemp,&tabFilsMilieu[l], j);
+                    chiffre(longTemp, &tabFilsMilieu[l], j);
                     l++;
                     tabFilsMilieu[l].tag="separateur";   
                     tabFilsMilieu[l].indice=k;
