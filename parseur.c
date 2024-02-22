@@ -160,6 +160,7 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
                     tabFilsMilieu[l].tag="mot";
                     tabFilsMilieu[l].indice=j;
                     tabFilsMilieu[l].longueur=longTemp;
+                    motFils(tabFilsMilieu, j);
                     l++;
                     tabFilsMilieu[l].tag="ponct";
                     tabFilsMilieu[l].indice=k;
@@ -175,4 +176,23 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
         longTemp=0;
         j=k;
     }
+}
+
+
+void motFils(Noeud tabFilsMilieu[], int indice){
+    int i=0;
+    Noeud *caractere= malloc(tabFilsMilieu[indice].longueur * sizeof(Noeud));
+    while (i < tabFilsMilieu[indice].longueur - 1){
+        caractere[i].tag="ALPHA";
+        caractere[i].longueur=1;
+        caractere[i].nombreFils=0;
+        caractere[i].tab=NULL;
+        i++;
+    }
+    caractere[i].tag="Separateur";
+    caractere[i].longueur=1;
+    caractere[i].nombreFils=0;
+    caractere[i].tab=NULL; 
+    tabFilsMilieu[indice].nombreFils=tabFilsMilieu[indice].longueur;
+    tabFilsMilieu[indice].tab=caractere;
 }

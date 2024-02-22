@@ -21,3 +21,5 @@ bool motponct(char chaineMessage[],int *i);
 bool nombresep(char chaineMessage[],int *i);
 
 void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMilieu[]);
+
+void motFils(Noeud tabFilsMilieu[], int indice);
