@@ -18,7 +18,7 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
     Noeud *filsDebut = malloc(sizeof(Noeud));
 
     if (!debut(chaineMessage, filsDebut)) {
-        nettoye1(filsDebut);
+        nettoie1(filsDebut);
         return false;
     }
     compteur++;

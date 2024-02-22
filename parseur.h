@@ -1,17 +1,20 @@
 #ifndef PARSEUR_H
 #define PARSEUR_H
 
-typedef struct {
+#include <stdbool.h>
+
+typedef struct Noeud Noeud;
+struct Noeud {
     int indice;
     int longueur;
 
     char *tag;
 
-    struct Noeud *tab;
+    Noeud *tab;
     int nombreFils;
 
     // struct Noeud *pere;
-} Noeud;
+};
 
 bool message(char chaineMessage[], int longueur, Noeud *racine);
 
