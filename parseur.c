@@ -24,6 +24,7 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
     compteur++;
     int i = 5;
     int compteurTrucs = 0;
+    Noeud *tabFilsMilieu = NULL;
     if (!compteMilieu(chaineMessage, &i, &compteurTrucs, longueur)){
         nettoie1(filsDebut);
         return false;
@@ -34,20 +35,43 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
             return false;
         }
         compteurTrucs *= 2;
-        Noeud *tabFilsMilieu=malloc(compteurTrucs * sizeof(Noeud));
+        compteur += compteurTrucs;
+        tabFilsMilieu=malloc(compteurTrucs * sizeof(Noeud));
         noeudMilieu(chaineMessage, i, compteurTrucs, tabFilsMilieu);
     }
     Noeud *tabFin=malloc(2*sizeof(Noeud));
+    Noeud *ponctoption= NULL;
     bool isfin;
     if (chaineMessage[i]=='.'||chaineMessage[i]==','||chaineMessage[i]=='!'||chaineMessage[i]=='?'||chaineMessage[i]==':'){
-        Noeud *ponctoption=malloc(sizeof(Noeud));
+        ponctoption = malloc(sizeof(Noeud));
         ponct(ponctoption, i);
         i++;
-    isfin=fin(chaineMessage,i,tabFin);
+        compteur++;
+        isfin=fin(chaineMessage,i,tabFin);
     }
     if (isfin==false){
         return false;
     }
+    compteur += 2;
+
+    Noeud *fils = malloc(compteur * sizeof(Noeud));
+    int l = 0;
+    fils[l] = *filsDebut;
+    for (int k = 0; k < compteurTrucs; k++) {
+        fils[k + 1] = tabFilsMilieu[k];
+    }
+    l += compteurTrucs;
+    if (ponctoption != NULL) {
+        fils[l] = *ponctoption;
+        l++;
+    }
+    fils[l] = tabFin[0];
+    l++;
+    fils[l] = tabFin[1];
+
+    racine->tab = fils;
+    racine->nombreFils = compteur;
+
     return true;
 }
 

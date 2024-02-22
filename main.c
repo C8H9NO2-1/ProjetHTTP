@@ -12,7 +12,9 @@ int main(int argc, char *argv[]) {
 
     bool test = message(chaineMessage, 20, racine);
 
-    printf("%s\n", racine->tag);
+    if (test) {
+        printf("%s\n", racine->tag);
+    }
 
     free(racine);
 
