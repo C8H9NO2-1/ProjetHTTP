@@ -1,3 +1,6 @@
+#ifndef PARSEUR_H
+#define PARSEUR_H
+
 typedef struct {
     int indice;
     int longueur;
@@ -29,3 +32,5 @@ void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j);
 bool fin(char chaineMessage[], int indice, Noeud *noeud);
 
 void ponct(Noeud *ne, int indice);
+
+#endif
