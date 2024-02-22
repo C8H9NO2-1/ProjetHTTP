@@ -49,7 +49,7 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
         compteur++;
         isfin=fin(chaineMessage,i,tabFin);
     }
-    if (isfin==false){
+    if (!isfin){
         return false;
     }
     compteur += 2;
