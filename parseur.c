@@ -34,7 +34,13 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
         Noeud *tabFilsMilieu=malloc(compteurTrucs * sizeof(Noeud));
         noeudMilieu(chaineMessage, i, compteurTrucs, tabFilsMilieu);
     }
-
+    Noeud *tabFin=malloc(2*sizeof(Noeud));
+    if (chaineMessage[i]=='.'||chaineMessage[i]==','||chaineMessage[i]=='!'||chaineMessage[i]=='?'||chaineMessage[i]==':'){
+        Noeud *ponctoption=malloc(sizeof(Noeud));
+        ponct(i, ponctoption);
+        i++;
+    fin(chaineMessage,i,tabFin)
+    }
     return true;
 }
 
