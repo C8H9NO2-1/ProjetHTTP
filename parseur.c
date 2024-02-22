@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include "parseur.h"
+#include "clean.h"
 
 bool message(char chaineMessage[], int longueur, Noeud *racine) {
 
@@ -17,17 +18,19 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
     Noeud *filsDebut = malloc(sizeof(Noeud));
 
     if (!debut(chaineMessage, filsDebut)) {
-        free(filsDebut);
+        nettoye1(filsDebut);
         return false;
     }
     compteur++;
     int i = 5;
     int compteurTrucs = 0;
     if (!compteMilieu(chaineMessage, &i, &compteurTrucs, longueur)){
+        nettoie1(filsDebut);
         return false;
     }
     else {
         if(compteurTrucs < 2){
+            nettoie1(filsDebut);
             return false;
         }
         compteurTrucs *= 2;

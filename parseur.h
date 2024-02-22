@@ -1,27 +1,31 @@
-typedef struct {
-    int indice;
-    int longueur;
+#ifndef PARSEUR_H
+#define PARSEUR_H
+    typedef struct {
+        int indice;
+        int longueur;
 
-    char *tag;
+        char *tag;
 
-    struct Noeud *tab;
-    int nombreFils;
+        struct Noeud *tab;
+        int nombreFils;
 
-    // struct Noeud *pere;
-} Noeud;
+        // struct Noeud *pere;
+    } Noeud;
 
-bool message(char chaineMessage[], int longueur, Noeud *racine);
+    bool message(char chaineMessage[], int longueur, Noeud *racine);
 
-bool debut(char chaineMessage[], Noeud *noeud);
+    bool debut(char chaineMessage[], Noeud *noeud);
 
-bool compteMilieu(char chaineMessage[],int *i, int *compteurTrucs, int longueur);
+    bool compteMilieu(char chaineMessage[],int *i, int *compteurTrucs, int longueur);
 
-bool motponct(char chaineMessage[],int *i);
+    bool motponct(char chaineMessage[],int *i);
 
-bool nombresep(char chaineMessage[],int *i);
+    bool nombresep(char chaineMessage[],int *i);
 
-void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMilieu[]);
+    void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMilieu[]);
 
-void motFils(Noeud tabFilsMilieu[], int indice);
+    void motFils(Noeud tabFilsMilieu[], int indice);
 
-void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j);
+    void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j);
+
+#endif
