@@ -37,7 +37,13 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
         Noeud *tabFilsMilieu=malloc(compteurTrucs * sizeof(Noeud));
         noeudMilieu(chaineMessage, i, compteurTrucs, tabFilsMilieu);
     }
-
+    Noeud *tabFin=malloc(2*sizeof(Noeud));
+    if (chaineMessage[i]=='.'||chaineMessage[i]==','||chaineMessage[i]=='!'||chaineMessage[i]=='?'||chaineMessage[i]==':'){
+        Noeud *ponctoption=malloc(sizeof(Noeud));
+        ponct(i, ponctoption);
+        i++;
+    fin(chaineMessage,i,tabFin)
+    }
     return true;
 }
 
@@ -212,4 +218,40 @@ void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j){
     }
     tabFilsMilieu->nombreFils=longueurNombre;
     tabFilsMilieu->tab=tabnombre;
+}
+
+void fin(char chaineMessage[], int indice, Noeud *noeud){
+    noeud[0].indice = indice;
+    noeud[0].longueur = 3;
+    noeud[0].tag = "fin";
+    noeud[0].tab = NULL;
+    noeud[0].nombreFils = 0;
+
+    noeud[1].indice = indice+3;
+    noeud[1].longueur = 1;
+    noeud[1].tag = "LF";
+    noeud[1].tab = NULL;
+    noeud[1].nombreFils = 0;
+
+    if (chaineMessage[indice] != 'F' && chaineMessage[indice] != 'f') {
+        return false;
+    }
+    if (chaineMessage[indice +1] != 'I' && chaineMessage[indice +1] != 'i') {
+        return false;
+    }
+    if (chaineMessage[indice +2] != 'N' && chaineMessage[indice +2] != 'n') {
+        return false;
+    }
+    if (chaineMessage[indice +3] != 0x0A) {
+        return false;
+    }
+    return true;    
+}
+
+void ponct(Noeud *ne, int indice){
+    ne[indice].tag="Ponct";
+    ne[indice].indice=indice;
+    ne[indice].tab=NULL;
+    ne[indice].nombreFils=0;
+    ne[indice].longueur=1;
 }
