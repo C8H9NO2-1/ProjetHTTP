@@ -25,7 +25,7 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
     *i=5;
     int *compteurTrucs;
     *compteurTrucs=0;
-    if (!compteMilieu(chaineMessage,i,compteurTrucs, longueur)) {
+    if (!compteMilieu(chaineMessage,i,compteurTrucs, longueur)){
         return false;
     }
     else {
@@ -67,9 +67,9 @@ bool debut(char chaineMessage[], Noeud *noeud) {
     return true;
 }
 
-bool compteMilieu(char chaineMessage[],int *i, int *compteurTrucs, int longueur) {
+bool compteMilieu(char chaineMessage[],int *i, int *compteurTrucs, int longueur){
     char c;
-    while (*i < longueur) {
+    while (*i<longueur){
         bool b=false;
         c=chaineMessage[*i];
         if ((c>=65 && c<=90) || (c>=97 && c<=122)){
@@ -100,7 +100,7 @@ bool motponct(char chaineMessage[],int *i){
         k++;
         c=chaineMessage[k];
     }
-    if (c==32 || c==9 || c=='-' || c=='_') {
+    if (c==32 || c==9 || c=='-' || c=='_'){
         k++;
         c=chaineMessage[k];
         if (c==',' || c=='.' || c=='!' || c=='?' || c==':') {
@@ -157,7 +157,17 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
 
                 }
                 else{
+                    longTemp++;
+                    k++;
                     tabFilsMilieu[l].tag="mot";
+                    tabFilsMilieu[l].indice=j;
+                    tabFilsMilieu[l].longueur=longTemp;
+                    l++;
+                    tabFilsMilieu[l].tag="ponct";
+                    tabFilsMilieu[l].indice=k;
+                    tabFilsMilieu[l].longueur=1;
+                    tabFilsMilieu[l].nombreFils=0;
+                    tabFilsMilieu[l].tab=NULL;
                 }
             }
             longTemp++;
