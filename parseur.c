@@ -37,9 +37,9 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
     Noeud *tabFin=malloc(2*sizeof(Noeud));
     if (chaineMessage[i]=='.'||chaineMessage[i]==','||chaineMessage[i]=='!'||chaineMessage[i]=='?'||chaineMessage[i]==':'){
         Noeud *ponctoption=malloc(sizeof(Noeud));
-        ponct(i, ponctoption);
+        ponct(ponctoption,i);
         i++;
-    fin(chaineMessage,i,tabFin)
+        fin(chaineMessage,i,tabFin);
     }
     return true;
 }
@@ -217,7 +217,7 @@ void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j){
     tabFilsMilieu->tab=tabnombre;
 }
 
-void fin(char chaineMessage[], int indice, Noeud *noeud){
+bool fin(char chaineMessage[], int indice, Noeud *noeud){
     noeud[0].indice = indice;
     noeud[0].longueur = 3;
     noeud[0].tag = "fin";

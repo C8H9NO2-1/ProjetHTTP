@@ -26,6 +26,6 @@ void motFils(Noeud tabFilsMilieu[], int indice);
 
 void chiffre(int longueurNombre,Noeud *tabFilsMilieu, int j);
 
-void fin(char chaineMessage[], int indice);
+bool fin(char chaineMessage[], int indice, Noeud *noeud);
 
 void ponct(Noeud *ne, int indice);
