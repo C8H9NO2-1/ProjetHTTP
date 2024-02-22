@@ -21,20 +21,18 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
         return false;
     }
     compteur++;
-    int *i;
-    *i=5;
-    int *compteurTrucs;
-    *compteurTrucs=0;
-    if (!compteMilieu(chaineMessage,i,compteurTrucs, longueur)){
+    int i = 5;
+    int compteurTrucs = 0;
+    if (!compteMilieu(chaineMessage,&i,&compteurTrucs, longueur)){
         return false;
     }
     else {
-        if(*compteurTrucs < 2){
+        if(compteurTrucs < 2){
             return false;
         }
-        *compteurTrucs *= 2;
-        Noeud *tabFilsMilieu=malloc(*compteurTrucs*sizeof(Noeud));
-        noeudMilieu(chaineMessage, *i, *compteurTrucs, tabFilsMilieu);
+        compteurTrucs *= 2;
+        Noeud *tabFilsMilieu=malloc(compteurTrucs*sizeof(Noeud));
+        noeudMilieu(chaineMessage, i, compteurTrucs, tabFilsMilieu);
     }
 
     return true;
