@@ -41,13 +41,15 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
     }
     Noeud *tabFin=malloc(2*sizeof(Noeud));
     Noeud *ponctoption= NULL;
-    bool isfin;
+    bool isfin = false;
     if (chaineMessage[i]=='.'||chaineMessage[i]==','||chaineMessage[i]=='!'||chaineMessage[i]=='?'||chaineMessage[i]==':'){
         ponctoption = malloc(sizeof(Noeud));
         ponct(ponctoption, i);
         i++;
         compteur++;
         isfin=fin(chaineMessage,i,tabFin);
+    } else {
+        isfin = fin(chaineMessage, i, tabFin);
     }
     if (!isfin){
         return false;
@@ -65,6 +67,7 @@ bool message(char chaineMessage[], int longueur, Noeud *racine) {
         fils[l] = *ponctoption;
         l++;
     }
+    l++;
     fils[l] = tabFin[0];
     l++;
     fils[l] = tabFin[1];
@@ -125,6 +128,7 @@ bool compteMilieu(char chaineMessage[],int *i, int *compteurTrucs, int longueur)
             (*compteurTrucs)++;
         }
     }
+
     return false;
 }
 
@@ -198,7 +202,7 @@ void noeudMilieu(char chaineMessage[], int i, int compteurTrucs, Noeud tabFilsMi
                     tabFilsMilieu[l].tag="mot";
                     tabFilsMilieu[l].indice=j;
                     tabFilsMilieu[l].longueur=longTemp;
-                    motFils(tabFilsMilieu, j);
+                    motFils(tabFilsMilieu, l);
                     l++;
                     tabFilsMilieu[l].tag="ponct";
                     tabFilsMilieu[l].indice=k;
@@ -221,12 +225,14 @@ void motFils(Noeud tabFilsMilieu[], int indice){
     int i=0;
     Noeud *caractere= malloc(tabFilsMilieu[indice].longueur * sizeof(Noeud));
     while (i < tabFilsMilieu[indice].longueur - 1){
+        caractere[i].indice = tabFilsMilieu[indice].indice + i;
         caractere[i].tag="ALPHA";
         caractere[i].longueur=1;
         caractere[i].nombreFils=0;
         caractere[i].tab=NULL;
         i++;
     }
+    caractere[i].indice = tabFilsMilieu[indice].indice + i;
     caractere[i].tag="Separateur";
     caractere[i].longueur=1;
     caractere[i].nombreFils=0;
