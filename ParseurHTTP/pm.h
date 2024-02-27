@@ -11,7 +11,11 @@ bool checkPctEncoded(const char requete[], int i);
 bool checkSubDelims(const char requete[], int i);
 //! Fonction utile pour la création de feuilles dans l'arbre
 void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
+//! Fonction qui permet de vérifier et de créer un token
+bool checkToken(const char requete[], int *i, const int longueur, Noeud *noeud, char nom[]); //? token = 1*tchar
 
+//!====================================================================================================
+//? Fonctions utiles pour parser la start-line
 /**
  * @brief Vériie si une chaîne est bien la start-line d'une requête HTTP
  * 
@@ -34,7 +38,7 @@ bool checkStartLine(const char requete[], int *i, int longueur, Noeud *noeud); /
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkMethod(const char requete[], int *i, const int longueur, Noeud *noeud); //? method = 1*tchar
+bool checkMethod(const char requete[], int *i, const int longueur, Noeud *noeud); //? method = token
 
 /**
  * @brief Vérifie si un caractère est bien un tchar
@@ -118,5 +122,18 @@ bool checkQuery(const char requete[], int *i, const int longueur, Noeud *noeud);
  * @return false Sinon
  */
 bool checkHTTPVersion(const char requete[], int *i, const int longueur, Noeud *noeud); //? HTTP-version = HTTP-name "/" DIGIT "." DIGIT
+
+//!====================================================================================================
+//? Fonctions utiles pour parser le connection-header
+
+bool checkConnectionHeader(const char requete[], int *i, const int longueur, Noeud *noeud); //? Connection-header = "Connection" ":" OWS Connection OWS
+
+bool checkConnectionString(const char requete[], int *i, Noeud *noeud); //? "Connection"
+
+bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud); //? OWS = *( SP / HTAB )
+
+bool checkConnection(const char requete[], int *i, const int longueur, Noeud *noeud); //? *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] )
+
+bool checkConnectionOption(const char requete[], int *i, const int longueur, Noeud *noeud); //? connection-option = token
 
 #endif
