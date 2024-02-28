@@ -1,5 +1,5 @@
-#ifndef ELISA_H
-#define ELISA_H
+#ifndef ELISA1_H
+#define ELISA1_H
 
 /**
  * @brief Vériie si une chaîne est bien l'en-tête cookie d'une requête HTTP
@@ -13,7 +13,7 @@
  */
 bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud);//? "Cookie" ":" OWS cookie-string OWS
 
-bool checkCookie(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkCookie(const char cookie[], Noeud *noeud);
 
 bool checkOWS(const char cookie[], int *i, int longueur, Noeud *noeud);
 
@@ -25,10 +25,11 @@ bool checkCookieName(const char cookie[], int *i, int longueur, Noeud *noeud);
 
 bool checkTChar(const char requete[], int i, Noeud *noeud);
 
-bool cookieValue(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkCookieValue(const char cookie[], int *i, int longueur, Noeud *noeud);
 
 bool checkCookieOctet(const char cookie[], int *i);
 
 bool checkAlpha(const char requete[], int i);
 bool checkDigit(const char requete[], int i);
+void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
 #endif
