@@ -43,6 +43,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
         *i = indice;
         return false;
     }
+    (*i)++;
 
     Noeud *filsOWS1 = malloc(sizeof(Noeud));
     if (!checkOWS(cookie, i, longueur, filsOWS1)){
@@ -50,6 +51,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
         *i = indice;
         return false;
     }
+
 
     Noeud *filsCookieString = malloc(sizeof(Noeud));
     if (!checkCookieString(cookie, i, longueur, filsCookieString)){
@@ -60,6 +62,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 
     Noeud *filsOWS2 = malloc(sizeof(Noeud));
     if (!checkOWS(cookie, i, longueur, filsOWS2)){
+        int d=*i;
         free(noeud);
         *i = indice;
         return false;
@@ -124,32 +127,27 @@ bool checkCookie(const char cookie[], Noeud *noeud){
 bool checkOWS(const char cookie[], int *i, int longueur, Noeud *noeud) { //OWS = *( SP / HTAB )
     int compteur = 0;
     const int indice = *i;
-    while ((cookie[*i]==32 || cookie[*i]==9)&& *i<longueur){
+    while ((cookie[*i]==32 || cookie[*i]==9)&&(*i<longueur)){
         (*i)++;
         compteur++;
     }
-
     noeud->indice = indice;
     noeud->longueur = *i - indice;
     noeud->tag = "OWS";
-    noeud->fils = malloc(compteur * sizeof(Noeud));
+    if (compteur > 0) {
+        noeud->fils = malloc(compteur * sizeof(Noeud));
+    }
     noeud->nombreFils = compteur;
 
     // On réinitialise l'indice i pour la suite de la fonction
     *i = indice;
-
     // On remplit le tableau des fils du noeud OWS
     for (int j = 0; j < compteur; j++) {
-        Noeud *noeud = &noeud->fils[j];
-        noeud->fils = NULL;
-        noeud->indice = *i;
-        noeud->longueur = 1;
-        noeud->nombreFils = 0;
         if (cookie[*i]==32){
-        noeud->tag = "SP";
+            createFilsSimple("SP", *i, 1, &noeud->fils[j]);
         }
         else {
-        noeud->tag = "HTAB"; 
+            createFilsSimple("HTAB", *i, 1, &noeud->fils[j]);
         }
         (*i)++;
     }
@@ -159,8 +157,7 @@ bool checkOWS(const char cookie[], int *i, int longueur, Noeud *noeud) { //OWS =
 
 bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){ //cookie-pair *( ";" SP cookie-pair )
     const int indice=*i;
-    int compteur=0;
-
+    int compteur=0;;
     Noeud *filsCookiePair1 = malloc(sizeof(Noeud));
     if (!checkCookiePair(cookie, i, longueur, filsCookiePair1)){
         free(noeud);
@@ -203,12 +200,13 @@ bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){
         noeud->nombreFils = 1;
         noeud->fils[0]=*filsCookiePair1;
     }
-
+    return true;
 }
 
 bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ //cookie-pair = cookie-name "=" cookie-value
     const int indice=*i;
     Noeud *filsCookieName = malloc(sizeof(Noeud));
+
     if (!checkCookieName(cookie, i, longueur, filsCookieName)){
         free(noeud);
         *i = indice;
@@ -219,6 +217,8 @@ bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         *i = indice;
         return false;
     }
+    (*i)++;
+    
     Noeud *filsCookieValue = malloc(sizeof(Noeud));
     if (!checkCookieValue(cookie, i, longueur, filsCookieValue)){
         free(noeud);
@@ -226,6 +226,10 @@ bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         return false;
     }
 
+    if (noeud==NULL){
+        free(filsCookieName);
+        free(filsCookieValue);
+    }
     if (noeud!=NULL){
         noeud->fils = malloc(3 * sizeof(Noeud));
         noeud->indice = indice;
@@ -237,19 +241,19 @@ bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         
         noeud->fils[0] = *filsCookieName;
         (*i) += noeud->fils[0].longueur;
-        
+
         createFilsSimple("=", *i, 1, &noeud->fils[1]);
         (*i)++;
 
         noeud->fils[2] = *filsCookieValue;
         (*i) += noeud->fils[2].longueur;
     }
+    return true;
 }
 
 bool checkCookieName(const char cookie[], int *i, int longueur, Noeud *noeud){ //cookie-name = 1*tchar
     int compteur = 0;
-    const int indice = *i;
-
+    int indice = *i;
     // On compte le nombre de caractères dans le champ courant
     while (*i < longueur && checkTChar(cookie, *i, NULL)) {
         (*i)++;
@@ -261,23 +265,23 @@ bool checkCookieName(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         free(noeud);
         return false;
     }
+    if (noeud!=NULL){
+        // On stocke les données nécessaires pour le noeud courant
+        noeud->indice = indice;
+        noeud->longueur = *i - indice;
+        noeud->tag = "cookie-name";
+        noeud->fils = malloc(compteur * sizeof(Noeud));
+        noeud->nombreFils = compteur;
 
-    // On stocke les données nécessaires pour le noeud courant
-    noeud->indice = indice;
-    noeud->longueur = *i - indice;
-    noeud->tag = "cookie-name";
-    noeud->fils = malloc(compteur * sizeof(Noeud));
-    noeud->nombreFils = compteur;
+        // On réinitialise l'indice i pour la suite de la fonction
+        *i = indice;
 
-    // On réinitialise l'indice i pour la suite de la fonction
-    *i = indice;
-
-    // On remplit le tableau des fils du noeud cookie-name
-    for (int j = 0; j < compteur; j++) {
-        checkTChar(cookie, *i, &noeud->fils[j]); 
-        (*i)++;
+        // On remplit le tableau des fils du noeud cookie-name
+        for (int j = 0; j < compteur; j++) {
+            checkTChar(cookie, *i, &noeud->fils[j]); 
+            (*i)++;
+        }
     }
-    
     return true;
 }
 
@@ -358,36 +362,35 @@ bool checkCookieValue(const char cookie[], int *i, int longueur, Noeud *noeud){ 
             (*i)++;
         }
     }
-    // On stocke les données nécessaires pour le noeud courant
-    noeud->indice = indice;
-    noeud->longueur = *i - indice;
-    noeud->tag = "cookie-value";
-    noeud->fils = malloc(compteur * sizeof(Noeud));
-    noeud->nombreFils = compteur;
+    if (noeud!=NULL){
+        // On stocke les données nécessaires pour le noeud courant
+        noeud->indice = indice;
+        noeud->longueur = *i - indice;
+        noeud->tag = "cookie-value";
+        noeud->fils = malloc(compteur * sizeof(Noeud));
+        noeud->nombreFils = compteur;
 
-    // On réinitialise l'indice i pour la suite de la fonction
-    *i = indice;
+        // On réinitialise l'indice i pour la suite de la fonction
+        *i = indice;
 
-    // On remplit le tableau des fils du noeud cookie-value
-    for (int j = 0; j < compteur; j++) {
-        Noeud *noeud = &noeud->fils[j];
-        noeud->fils = NULL;
-        noeud->indice = *i;
-        noeud->longueur = 1;
-        noeud->nombreFils = 0;
-        if (cookie[*i]==34){
-            noeud->tag="DQUOTE";
-        }
-        else {
-            noeud->tag="cookie-octet";
-        }
-        (*i)++;
-    }  
+        // On remplit le tableau des fils du noeud cookie-value
+        for (int j = 0; j < compteur; j++) {
+            if (cookie[*i]==34){
+                createFilsSimple("DQUOTE", *i, 1, &noeud->fils[j]);
+            }
+            else {
+                createFilsSimple("cookie-octet", *i, 1, &noeud->fils[j]);
+            }
+            (*i)++;
+        } 
+    } 
     return true;
 }
 
 bool checkCookieOctet(const char cookie[], int *i){ //cookie-octet = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E
-    if (cookie[*i]==33 || (cookie[*i]>=35 && cookie[*i]<=43) || (cookie[*i]>=45 && cookie[*i]<=58) || (cookie[*i]>=60 && cookie[*i]<=91)){
+    int d =*i;
+
+    if (cookie[*i]==33 || (cookie[*i]>=35 && cookie[*i]<=43) || (cookie[*i]>=45 && cookie[*i]<=58) || (cookie[*i]>=60 && cookie[*i]<=91)|| (cookie[*i]>=93 && cookie[*i]<=126)){
         return true;
     }
     else {
