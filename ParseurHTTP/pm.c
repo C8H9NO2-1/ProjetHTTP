@@ -39,10 +39,8 @@ bool checkDigit(const char requete[], int i) {
 }
 
 bool checkHexdig(const char requete[], int i) {
-    if (requete[i] == '%') {
-        if (((requete[i + 1] >= 'a' && requete[i + 1] <= 'f') || (requete[i + 1] >= 'A' && requete[i + 1] <= 'F')) && ((requete[i + 2] >= 'a' && requete[i + 2] <= 'f') || (requete[i + 2] >= 'A' && requete[i + 2] <= 'F'))) {
-            return true;
-        }
+    if ((requete[i] >= 'a' && requete[i] <= 'f') || (requete[i] >= 'A' && requete[i] <= 'F') || (requete[i] >= '0' && requete[i] <= '9')) {
+        return true;
     }
     return false;
 }
@@ -392,7 +390,7 @@ bool checkPChar(const char requete[], int *i, const int longueur, Noeud *noeud) 
     //! Même formule qu'avec checkTChar, il y a deux éxécutions différentes, en fonction de la valeur de noeud
 
     // On a deux cas, soit c'est un nombre encodé en hexadécimal, soit ça n'en est pas un
-    if (((*i + 2) < longueur) && (checkHexdig(requete, *i))) {
+    if (((*i + 2) < longueur) && (checkPctEncoded(requete, *i))) {
         // On stocke les données nécessaires pour le noeud courant
         printf("Test hexa\n");
         if (noeud != NULL) {
