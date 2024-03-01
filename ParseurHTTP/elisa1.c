@@ -79,7 +79,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
     noeud->fils[0] = *filsCookie;
     (*i) += noeud->fils[0].longueur;
     
-    createFilsSimple(":", *i, 1, &noeud->fils[1]);
+    createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[1]);
     (*i)++;
     
     noeud->fils[2] = *filsOWS1;
@@ -242,7 +242,7 @@ bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         noeud->fils[0] = *filsCookieName;
         (*i) += noeud->fils[0].longueur;
 
-        createFilsSimple("=", *i, 1, &noeud->fils[1]);
+        createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[1]);
         (*i)++;
 
         noeud->fils[2] = *filsCookieValue;
