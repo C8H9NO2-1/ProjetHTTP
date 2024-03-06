@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     
-    char transferEncoding[] = "Transfer-Encoding: chunked";
+    char transferEncoding[] = "Transfer-Encoding: ,   ";
 
     Noeud *test = malloc(sizeof(Noeud));
 

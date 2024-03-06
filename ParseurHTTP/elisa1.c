@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     
-    char cookie[] = "Cookie: theme=light";
+    char cookie[] = "Cookie: delicieux_cookie=choco; savoureux_cookie=menthe";
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
@@ -32,6 +32,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 
     Noeud *filsCookie = malloc(sizeof(Noeud));
     if (!checkCookie(cookie, filsCookie)) {
+        printf("not checkcookie");
         free(noeud);
         *i = indice;
         return false;
@@ -39,6 +40,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
     *i=6;
 
     if (cookie[*i] != 58) { //? ":" = 58
+        printf("not :");
         free(noeud);
         *i = indice;
         return false;
@@ -46,27 +48,19 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
     (*i)++;
 
     Noeud *filsOWS1 = malloc(sizeof(Noeud));
-    if (!checkOWS(cookie, i, longueur, filsOWS1)){
-        free(noeud);
-        *i = indice;
-        return false;
-    }
+    checkOWS(cookie, i, longueur, filsOWS1);
 
 
     Noeud *filsCookieString = malloc(sizeof(Noeud));
     if (!checkCookieString(cookie, i, longueur, filsCookieString)){
+        printf("not checkcookiestring");
         free(noeud);
         *i = indice;
         return false;
     }
 
     Noeud *filsOWS2 = malloc(sizeof(Noeud));
-    if (!checkOWS(cookie, i, longueur, filsOWS2)){
-        int d=*i;
-        free(noeud);
-        *i = indice;
-        return false;
-    }
+    checkOWS(cookie, i, longueur, filsOWS2);
    
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
     noeud->indice = indice;
@@ -102,7 +96,8 @@ bool checkCookie(const char cookie[], Noeud *noeud){
     noeud->fils = NULL;
     noeud->nombreFils = 0;
 
-    if (cookie[0] != 'C') {
+    if (cookie[0] != 'C' && cookie[0] !='c' ) {
+        printf("not c");
         return false;
     }
     if (cookie[1] != 'o') {
@@ -136,6 +131,9 @@ bool checkOWS(const char cookie[], int *i, int longueur, Noeud *noeud) { //OWS =
     noeud->tag = "OWS";
     if (compteur > 0) {
         noeud->fils = malloc(compteur * sizeof(Noeud));
+    }
+    else {
+        noeud->fils = NULL;
     }
     noeud->nombreFils = compteur;
 
@@ -185,12 +183,10 @@ bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){
 
         // On réinitialise l'indice i pour la suite de la fonction
         *i = indice;
-
         // On remplit le tableau des fils du noeud cookie-string
         noeud->fils[0]=*filsCookiePair1;
-        for (int j = 1; j < compteur; j++) {
-            checkCookiePair(cookie,i, longueur, &noeud->fils[j]);
-        }
+        (*i) += noeud->fils[0].longueur;
+        checkCookiePair(cookie, i, longueur, &noeud->fils[1]);
     }
     else {
         noeud->indice = indice;
@@ -200,7 +196,7 @@ bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){
         noeud->nombreFils = 1;
         noeud->fils[0]=*filsCookiePair1;
     }
-    return true;
+    return true ;
 }
 
 bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ //cookie-pair = cookie-name "=" cookie-value
@@ -226,10 +222,6 @@ bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         return false;
     }
 
-    if (noeud==NULL){
-        free(filsCookieName);
-        free(filsCookieValue);
-    }
     if (noeud!=NULL){
         noeud->fils = malloc(3 * sizeof(Noeud));
         noeud->indice = indice;
@@ -331,7 +323,6 @@ bool checkTChar(const char requete[], int i, Noeud *noeud) {
     if (noeud != NULL) {
         free(noeud);
     }
-
     return false;
 }
 
@@ -388,7 +379,6 @@ bool checkCookieValue(const char cookie[], int *i, int longueur, Noeud *noeud){ 
 }
 
 bool checkCookieOctet(const char cookie[], int *i){ //cookie-octet = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E
-    int d =*i;
 
     if (cookie[*i]==33 || (cookie[*i]>=35 && cookie[*i]<=43) || (cookie[*i]>=45 && cookie[*i]<=58) || (cookie[*i]>=60 && cookie[*i]<=91)|| (cookie[*i]>=93 && cookie[*i]<=126)){
         return true;
