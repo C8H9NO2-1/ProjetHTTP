@@ -9,14 +9,14 @@
 
 int main(int argc, char *argv[]) {
     
-    char requete[] = "GET /index.html HTTP/1.0\r\n";
-    // char requete[] = "Connection: , Keep-alive,     	keep-alive, 	close,	test,";
+    // char requete[] = "GET /index.html HTTP/1.0\r\n";
+    char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,";
 
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
 
-    if (!checkStartLine(requete, &i, strlen(requete), test)) {
+    if (!checkConnectionHeader(requete, &i, strlen(requete), test)) {
         printf("Hello world\n");
         test = NULL;
     }
@@ -128,6 +128,21 @@ bool checkToken(const char requete[], int *i, int longueur, Noeud *noeud, char n
     }
     
     return true;
+}
+
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
+    int diff = 'a' - 'A';
+    int n = strlen(chaine1);
+    for (int k = i; k < j; k++) {
+        if (k < n) {
+            if (chaine1[k] >= 'A' && chaine1[k] <= 'Z') {
+                chaine2[k - i] = chaine1[k] + diff;
+            } else {
+                chaine2[k - i] = chaine1[k];
+            }
+        }
+    }
+    chaine2[j - i] = '\0';
 }
 
 //!===============================================================================
@@ -244,7 +259,7 @@ bool checkRequestTarget(const char requete[], int *i, const int longueur, Noeud 
     if (requete[*i] == '?') {
         filsQuery1 = malloc(sizeof(Noeud));
         filsQuery2 = malloc(sizeof(Noeud));
-        createFilsSimple("case-insensitive-string", *i, 1, filsQuery1);
+        createFilsSimple("case_insensitive_string", *i, 1, filsQuery1);
         (*i)++;
         checkQuery(requete, i, longueur, filsQuery2);
         noeud->nombreFils = 3;
@@ -343,7 +358,7 @@ bool checkAbsolutePath(const char requete[], int *i, const int longueur, Noeud *
     // On remplit le tableau des fils du noeud
     for (int j = 0; j < 2 * compteur; j += 2) {
         // On crée le fils contenant juste le caractère '/'
-        createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
         (*i)++;
         checkSegment(requete, i, longueur, &noeud->fils[j + 1]); // On a pas besoin de récupérer la valeur de retour cette fois-ci
     }
@@ -462,7 +477,7 @@ bool checkQuery(const char requete[], int *i, const int longueur, Noeud *noeud) 
     // On remplit le tableau des fils du noeud
     for (int j = 0; j < compteur; j++) {
         if (requete[*i] == '/' || requete[*i] == '?') {
-            createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+            createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
         }
         checkPChar(requete, i, longueur, &noeud->fils[j]);
         (*i)++;
@@ -531,9 +546,9 @@ bool checkHTTPVersion(const char requete[], int *i, const int longueur, Noeud *n
     noeud->fils[0].nombreFils = 0;
     noeud->fils[0].tag = "HTTP-name";
 
-    createFilsSimple("case-insensitive-string", indice + 4, 1, &noeud->fils[1]);
+    createFilsSimple("case_insensitive_string", indice + 4, 1, &noeud->fils[1]);
     createFilsSimple("DIGIT", indice + 5, 1, &noeud->fils[2]);
-    createFilsSimple("case-insensitive-string", indice + 6, 1, &noeud->fils[3]);
+    createFilsSimple("case_insensitive_string", indice + 6, 1, &noeud->fils[3]);
     createFilsSimple("DIGIT", indice + 7, 1, &noeud->fils[4]);
 
     return true;
@@ -573,7 +588,7 @@ bool checkConnectionHeader(const char requete[], int *i, const int longueur, Noe
         *i = indice;
         return false;
     } else {
-        createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
         (*i)++;
     }
     j++;
@@ -601,66 +616,20 @@ bool checkConnectionHeader(const char requete[], int *i, const int longueur, Noe
 
 bool checkConnectionString(const char requete[], int *i, Noeud *noeud) {
     const int indice = *i; // On conserve l'indice de début
-    if (requete[*i] != 'C' && requete[*i] != 'c') {
+    int n = 10; // Taille de la sous-chaîne qui contient potentiellement "Connection"
+    char *chaineConnection = malloc((n + 1) * sizeof(char)); // On ajoute un caractère pour le \0
+
+    sousChaineMinuscule(requete, chaineConnection, *i, *i + n);
+
+    if (strcmp(chaineConnection, "connection") != 0) {
         free(noeud);
+        free(chaineConnection);
         *i = indice;
         return false;
     }
-    (*i)++;
-    if (requete[*i] != 'O' && requete[*i] != 'o') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'N' && requete[*i] != 'n') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'N' && requete[*i] != 'n') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'E' && requete[*i] != 'e') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'C' && requete[*i] != 'c') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'T' && requete[*i] != 't') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'I' && requete[*i] != 'i') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'O' && requete[*i] != 'o') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
-    if (requete[*i] != 'N' && requete[*i] != 'n') {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-    (*i)++;
+
+    (*i) += n;
+    free(chaineConnection);
 
     // Si tout s'est bien passé, on créé le noeud contenant "Connection"
     noeud->fils = NULL;
@@ -785,7 +754,7 @@ bool checkConnection(const char requete[], int *i, const int longueur, Noeud *no
     int j = 0; // On l'utilise pour compter le nombre de fils
     // On remplit les premiers fils
     while (*i < longueur && requete[*i] == ',') {
-        createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
         (*i)++;
         j++;
         checkOWS(requete, i, longueur, &noeud->fils[j]);
@@ -805,7 +774,7 @@ bool checkConnection(const char requete[], int *i, const int longueur, Noeud *no
     //! Dans cette boucle on fait attention car il se peut qu'on atteigne un j trop grand
     //! On met donc des if partout
     while (*i < longueur && requete[*i] == ',') {
-        createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
         (*i)++;
         j++;
         if (j < compteur) {

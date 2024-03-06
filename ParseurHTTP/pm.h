@@ -13,6 +13,8 @@ bool checkSubDelims(const char requete[], int i);
 void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
 //! Fonction qui permet de vérifier et de créer un token
 bool checkToken(const char requete[], int *i, const int longueur, Noeud *noeud, char nom[]); //? token = 1*tchar
+//! Fonction qui transforme une sous chaîne en minuscule pour pouvoir comparer les chaînes non sensibles à la casse
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
 
 //!====================================================================================================
 //? Fonctions utiles pour parser la start-line
