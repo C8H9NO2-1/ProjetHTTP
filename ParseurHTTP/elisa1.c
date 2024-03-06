@@ -100,19 +100,19 @@ bool checkCookie(const char cookie[], Noeud *noeud){
         printf("not c");
         return false;
     }
-    if (cookie[1] != 'o') {
+    if (cookie[1] != 'o' && cookie[1]!='O') {
         return false;
     }
-    if (cookie[2] != 'o') {
+    if (cookie[2] != 'o' && cookie[2]!='O') {
         return false;
     }
-    if (cookie[3] != 'k') {
+    if (cookie[3] != 'k' && cookie[3]!='K') {
         return false;
     }
-    if (cookie[4] != 'i') {
+    if (cookie[4] != 'i' && cookie[4]!='I') {
         return false;
     }
-    if (cookie[5] != 'e') {
+    if (cookie[5] != 'e' && cookie[5] != 'E') {
         return false;
     }
 

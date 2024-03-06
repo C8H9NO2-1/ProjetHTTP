@@ -108,43 +108,43 @@ bool checkTransferEncodingMot(const char transferEncoding[], Noeud *noeud){
     noeud->fils = NULL;
     noeud->nombreFils = 0;
 
-    if (transferEncoding[0] != 'T') {
+    if (transferEncoding[0] != 'T' || transferEncoding[0] != 't') {
         return false;
     }
-    if (transferEncoding[1] != 'r') {
+    if (transferEncoding[1] != 'r' || transferEncoding[1] != 'R') {
         return false;
     }
-    if (transferEncoding[2] != 'a') {
+    if (transferEncoding[2] != 'a' || transferEncoding[2] != 'A') {
         return false;
     }
-    if (transferEncoding[3] != 'n') {
+    if (transferEncoding[3] != 'n' || transferEncoding[3] != 'N') {
         return false;
     }
-    if (transferEncoding[4] != 's') {
+    if (transferEncoding[4] != 's' || transferEncoding[4] != 'S') {
         return false;
     }
-    if (transferEncoding[5] != 'f') {
+    if (transferEncoding[5] != 'f' || transferEncoding[5] != 'F') {
         return false;
     }  
-    if (transferEncoding[6] != 'e') {
+    if (transferEncoding[6] != 'e' || transferEncoding[6] != 'E') {
         return false;
     }
-    if (transferEncoding[7] != 'r') {
+    if (transferEncoding[7] != 'r' || transferEncoding[7] != 'R') {
         return false;
     }
     if (transferEncoding[8] != '-') {
         return false;
     }
-    if (transferEncoding[9] != 'E') {
+    if (transferEncoding[9] != 'E' || transferEncoding[9] != 'e') {
         return false;
     }  
-    if (transferEncoding[10] != 'n') {
+    if (transferEncoding[10] != 'n' || transferEncoding[10] != 'N') {
         return false;
     }
-    if (transferEncoding[11] != 'c') {
+    if (transferEncoding[11] != 'c' || transferEncoding[11] != 'C') {
         return false;
     }
-    if (transferEncoding[12] != 'o') {
+    if (transferEncoding[12] != 'o' || transferEncoding[12] != 'O') {
         return false;
     }  
     if (transferEncoding[13] != 'd') {
