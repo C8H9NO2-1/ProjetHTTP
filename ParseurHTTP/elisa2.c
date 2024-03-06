@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     
-    char transferEncoding[] = "Transfer-Encoding: ,   ";
+    char transferEncoding[] = "Transfer-Encoding:";
 
     Noeud *test = malloc(sizeof(Noeud));
 
@@ -147,16 +147,16 @@ bool checkTransferEncodingMot(const char transferEncoding[], Noeud *noeud){
     if (transferEncoding[12] != 'o' || transferEncoding[12] != 'O') {
         return false;
     }  
-    if (transferEncoding[13] != 'd') {
+    if (transferEncoding[13] != 'd'|| transferEncoding[13] != 'D') {
         return false;
     }
-    if (transferEncoding[14] != 'i') {
+    if (transferEncoding[14] != 'i' || transferEncoding[14] != 'i') {
         return false;
     }
-    if (transferEncoding[15] != 'n') {
+    if (transferEncoding[15] != 'n' || transferEncoding[15] != 'N') {
         return false;
     }  
-    if (transferEncoding[16] != 'g') {
+    if (transferEncoding[16] != 'g' || transferEncoding[16] != 'G') {
         return false;
     }
     return true;
