@@ -1,0 +1,105 @@
+Ceci est un fichier contenant des tests potentiels pour chaque header
+
+Tests pour la start-line:
+
+    KGdc%wH$n%esc1O /uh02lbLyL5$8Yvc/URpfKCJ0fk.4*MY?M8wYdwd4~YP@*S/ HTTP/2.7\r\n
+    QTME9vn#4TC05cw /y)Q!kKQ~A2$30lj/%c1/u@RG62ej'0Nq0K7?*:gy*~pR,9s!+Jx HTTP/8.9\r\n
+    i!~e5-nVhVcJ0o$ /7,AH!HYDSJPkMmx HTTP/8.5\r\n
+    hp~Qb4yUE1bRfJr /bL1yuLgqiY=Sc4=/J0x9sAto-L=n$!. HTTP/9.9\r\n
+    EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n
+    L~Y#6v'&RCV3vhk /&A_71ZHwOhnfi)g/ecAPk&RguL3Mq1-/,CiB)g1dcH)*YVa/%45 HTTP/7.3\r\n
+    ho`+i3qp4H7'#mE /S0A$JQUK+w_iopo/pGY~eEeFkxo9E79/W2)cf3JQ7mJ.Ex$ HTTP/8.9\r\n
+    XR8wdJSqKTnkytD /%8A/'7Fi4FB,cPv7@v! HTTP/7.9\r\n
+    RdFfMiW~~9LwmcI /dL_y4Z1PB'aUemE/)nx!tv8r*(T0C*$/Aa6_*FBh4;)_$U&?:A@7q:3nL.Q=Xv& HTTP/4.2\r\n
+    KxLx_xCuXib~Zk9 /%e9?iUl2@7enSxC'0Zb HTTP/6.9\r\n
+
+
+Tests pour le Connection-header:
+
+    CONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,
+    cONNEcTiOn: ,	 D.E9Ag7Nfx~0Flw
+    cONneCtion:			  iuYlKmnz&ODppri	 , bdGs_7i|Ik2Ul%y	,	p~TuU2FuerMHNq*,	 
+    cONnECtIoN:	r'zoY*5xU#MN+d#				
+    cONnECTiOn:  	,	 ,   	P#Y36mLGO|vvWBu, As^NUN`.H'p&POI
+
+
+Tests pour le Content-Length-header:
+
+	cONtent-lENGTh:10856		
+	cONtENt-LenGTH:   40105 			
+	CoNtENt-LEnGtH: 	 17965
+	coNTENt-lEngth:					56788
+	ContENT-LENGTh:   66805  	
+
+
+Tests pour le Content-Type-header:
+
+	cOntENt-TYPe: YBEK|0wL|xpL|UF/t.`~I0GgfvR'cbe    	    
+	cOnTenT-TYpE:6vqnO^.P/CVje%K#ZZ% 	;y%WzWsdbjmA6$NJ=*68WssBT6B#O3U7;yHnIvFr6-4Q0kS+=3_NNjJxOw'wFJ$K
+	cOnTeNt-type:		#5Bz`#$p6AKxOHN/lb!!rdK*IVt^_Da  ;   ktUc~4H`pwH4.!G="`W #_		'bz\P &wRV%"				
+	cONtEnT-TYpe: 		.Kaj!%.t.V#'8tR/D8KuRW3i%c8|vom; 	ehUtgqX6Ikt!x~e=tfFAz7So%1Sx^c%;W2Pz-aD`.Q9p5*H="i3Z#	^v!r#yxS[vV"
+	cOntenT-TYpE:     XWsaqXcenry0vyS/Ey!g3$TdM_WdMB%; SL`Nr-LeQ!ygkKS=^ZvA4%%QuytrP0%  	
+
+
+Tests pour le Cookie-header:
+
+	COoKiE: 	  n+q#_iP&W9EoHoE="/{i>}uPeh9TZ9]V"; 4qdK8ZQdCyBMF.k="#j.=cFZ@$?^&-$4"; k1KU^_X&opaKHta=:]xa&s<TDKnZPM*; zN&yiA`MFeSoGaa=*wwlhxR28?L![32
+	cookIE:fF0o7E|5U#YVgPA=vSMa}b1K[+!@dEl; IBBud*CySI&FW'B=WPz^pB[w<XhSm6>	 		
+	COoKie:	'Ym!%pdVb-s~Ue6=".vl/vjesB-<bn0q"
+	CooKiE:  |#8R_5nPq_xvPiJ="7O?p8c!0BmL9~yL"; ~XdS#cr|!gFJwcv=jU2dI]*e83g^>GB   
+	COoKie:  	ilfa4C~dioz32-8=:bnizC/+~h[&xCT; 4QoxoZ+2q'rPw&9=:^s0~(tao%Bo5@7; j2E|rQrEdQg5..t='ZzgCA|+VsSqiB[	
+
+
+Tests pour le Transfer-Encoding-header:
+
+	traNsfer-EnCodINg:	  ,, ,	cHUnKed
+	TrAnSfEr-encoDInG:,	,ComPRESs 	, chuNKED, 	
+	TraNsfER-ENcOdiNg:    	dEflaTE	 ,  P4lVdK%%we_#X!m
+	TrANsfEr-eNcOdinG:				,GZiP ,		Fp#SAbMJPw8wTz- ;Z#QT~h4p#u|PPK5= nKi|kxaOW$uKHke 	; z-^6'FzCNW_WJ3w =""
+	TRaNSFEr-enCODiNG:  ,20Kmy%d_Yg8t.MS; 	eh6owY1JpoLr99n="k_*	lx:H~ rV\-\R\	!Pa,v"
+
+
+Tests pour le Expect-header:
+
+	ExpECt:	    	100-contiNUE		
+	Expect:100-CoNTinUe 	
+	ExPecT:			 100-cONTInUe  
+	exPect:   100-CoNtinUE		
+	EXPEct: 100-ContiNuE 
+
+
+Tests pour le Host-header:
+
+	hoSt:[f731:542:6e:57c5:c3a:d3:e6f:e]		
+	hOsT: 			138.199.75.219:84766 
+	Host: [Ve2509c.1oGFNz9rfZi+;*=)*+:++*:$&($+K7B6]  
+	hosT:    *;('*==S~7nGt.a+='!$'$*NxQWy%bAmV%6C
+	hosT:[1f2f:2532:922f:93d6:8fc:4605:239.44.246.129]:0176
+	HOST:[::b886:ec3f:f56:a366:c3e:f1bd:1ce]:9164 	 
+	HOsT:[::c83c:7e0c:2b58:cf7c:aea1:166.202.243.242]
+	hOSt:[21::d7c0:2ab:34ca:f88:4616]:3663 		
+	HoST:[8748::5790:9b7c:203.221.115.212]
+
+
+========== Utiles pour le générateur automatique ==========
+
+tchar = 
+    0123456789qwfpgjluyarstdhneiozxcvbkmQWFPGJLUYARSTDHNEIOZXCVBKM!#$%&'*+-.^_`|~
+
+unreserved =
+    0123456789qwfpgjluyarstdhneiozxcvbkmQWFPGJLUYARSTDHNEIOZXCVBKM-._~
+
+HEXDIG =
+    0123456789abcdefABCDEF
+
+sub-delims = 
+    !$&'()*+,;=
+
+cookie-octet =
+	!#$%&'()*+-./0123456789:<=>?@QWFPGJLUYARSTDHNEIOZXCVBKM[]^_`qwfpgjluyarstdhneiozxcvbkm{}|~
+
+qdtext = HTAB + SP +
+	!#$%&'()*+,-./0123456789:<;=>?@QWFPGJLUYARSTDHNEIOZXCVBKM[]^_`qwfpgjluyarstdhneiozxcvbkm{}|~
+
+quoted-pair = HTAB + SP +
+	every printable character

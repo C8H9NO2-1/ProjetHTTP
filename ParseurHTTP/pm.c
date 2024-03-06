@@ -8,9 +8,13 @@
 #include "affichage.h"
 
 int main(int argc, char *argv[]) {
+
+    printf("%c\n", 94);
     
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
-    char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,";
+    // char requete[] = "KxLx_xCuXib~Zk9 /%e9?iUl2@7enSxC'0Zb HTTP/6.9\r\n";
+    // char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,";
+    char requete[] = "cONnECTiOn:  	,	 ,   	P#Y36mLGO|vvWBu, As^NUN`.H'p&POI";
 
     Noeud *test = malloc(sizeof(Noeud));
 
