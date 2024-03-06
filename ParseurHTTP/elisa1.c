@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     
-    char cookie[] = "Cookie: delicieux_cookie=choco; savoureux_cookie=menthe";
+    char cookie[] = "Cookie: delicieux_cookie=choco; savoureux_cookie=menthe; test=otherTest";
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
@@ -155,17 +155,16 @@ bool checkOWS(const char cookie[], int *i, int longueur, Noeud *noeud) { //OWS =
 
 bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){ //cookie-pair *( ";" SP cookie-pair )
     const int indice=*i;
-    int compteur=0;;
+    int compteur=0;
     Noeud *filsCookiePair1 = malloc(sizeof(Noeud));
     if (!checkCookiePair(cookie, i, longueur, filsCookiePair1)){
         free(noeud);
         *i = indice;
         return false;
     }
-    else {
-        compteur++;
-    }
-    while (cookie[*i]==59){ //";"=59
+    compteur++;
+
+    while (*i < longueur && cookie[*i]==59){ //";"=59
         (*i)+=2;
         if(cookie[(*i)-1]!=32 || !checkCookiePair(cookie, i, longueur, NULL)){
             free(noeud);
@@ -174,6 +173,7 @@ bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){
         }
         compteur+=3;
     }
+
     if (compteur>1){ // Il y a au moins un "( ";" SP cookie-pair )"
         noeud->indice = indice;
         noeud->longueur = *i - indice;
@@ -183,10 +183,26 @@ bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){
 
         // On réinitialise l'indice i pour la suite de la fonction
         *i = indice;
+        int j = 0;
         // On remplit le tableau des fils du noeud cookie-string
-        noeud->fils[0]=*filsCookiePair1;
-        (*i) += noeud->fils[0].longueur;
-        checkCookiePair(cookie, i, longueur, &noeud->fils[1]);
+        // On remplit le premier fils cookie-pair
+        noeud->fils[j]=*filsCookiePair1;
+        (*i) += noeud->fils[j].longueur;
+        j++;
+
+        while (*i < longueur && cookie[*i]==59 && j < compteur){ //";"=59
+            createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+            j++;
+            (*i)+=2;
+            createFilsSimple("SP", (*i) - 1, 1, &noeud->fils[j]);
+            j++;
+            if(cookie[(*i)-1]!=32 || !checkCookiePair(cookie, i, longueur, &noeud->fils[j])){
+                free(noeud);
+                *i = indice;
+                return false;
+            }
+            j++;
+        }
     }
     else {
         noeud->indice = indice;
