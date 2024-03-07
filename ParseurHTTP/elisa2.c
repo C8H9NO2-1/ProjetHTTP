@@ -46,8 +46,6 @@ bool checkTransferEncodingHeader(const char transferEncoding[], int *i, int long
     Noeud *filsOWS1 = malloc(sizeof(Noeud));
     checkOWS(transferEncoding, i, longueur, filsOWS1);
 
-    printf("%d\n", *i);
-
     Noeud *filsTransferEncoding = malloc(sizeof(Noeud));
     if (!checkTransferEncoding(transferEncoding, i, longueur, filsTransferEncoding)){
         free(noeud);
@@ -96,7 +94,7 @@ void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud) {
 bool checkTransferEncodingMot(const char transferEncoding[], Noeud *noeud){
     noeud->indice = 0;
     noeud->longueur = 17;
-    noeud->tag = "Transfer-Encoding-Mot";
+    noeud->tag = "case_insensitive_string";
     noeud->fils = NULL;
     noeud->nombreFils = 0;
     char transferEncodingMinuscule[18];
@@ -142,7 +140,6 @@ bool checkOWS(const char transferEncoding[], int *i, int longueur, Noeud *noeud)
 }
 
 bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
-    printf("je suis dans transfer encoding \n");
     //Transfer-Encoding = *( "," OWS ) transfer-coding *( OWS "," [ OWS transfer-coding ] )
     int compteur=0;
     int const indice=*i;
@@ -155,13 +152,11 @@ bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, 
     if (!checkTransferCoding(transferEncoding, i, longueur, NULL)){
             free(noeud);
             *i = indice;
-            printf("je sors de transfer encoding avec false \n");
             return false;
     }
 
     // (*i)++;
     compteur++;
-    printf("compteur = %d\n", compteur);
     checkOWS(transferEncoding, i, longueur, NULL);
     while (*i<longueur && transferEncoding[*i]==44){
         compteur+=2;
@@ -183,7 +178,6 @@ bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, 
     noeud->tag = "transfer-encoding";
     noeud->fils = malloc(compteur * sizeof(Noeud));
     noeud->nombreFils =compteur;
-    printf("compteur = %d\n", compteur);
 
     // On réinitialise l'indice i pour la suite de la fonction
     *i = indice;
@@ -191,9 +185,8 @@ bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, 
     // On remplit le tableau des fils du noeud method
     for (int j = 0; j < compteur; j++) {
         int iTemp=*i;
-        printf("%d\n", *i);
         if(transferEncoding[*i]==44){
-            createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+            createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
             (*i)++;
             j++;
             checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
@@ -206,7 +199,6 @@ bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, 
             checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
         }
     }
-    printf("je sors de transfer encoding avec true \n");
     return true;  
 }
 
@@ -280,17 +272,13 @@ bool checkTransferCoding(const char transferEncoding[], int *i, int longueur, No
     else{
         free(noeud);
         (*i)=indice;
-        printf("je sors de transfer coding avec false \n");
         return false;
     }
-    printf("je sors de transfer coding avec true \n");
     return true;
 }
 
 bool checktransferextension(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
     //transfer-extension = token *( OWS ";" OWS transfer-parameter )
-    printf("je suis dans transfer extension \n");
-    printf("au début de transfer extension *i=%d et c=%c \n", *i, transferEncoding[*i]);
     int compteur=0;
     int const indice=*i;
     int point_virgule=longueur;
@@ -301,11 +289,9 @@ bool checktransferextension(const char transferEncoding[], int *i, int longueur,
     if (compteur==0){
         free(noeud);
         (*i)=indice;
-        printf("je sors de transfer extension avec false \n");
         return false;
     }
     checkOWS(transferEncoding, i, longueur, NULL);
-    printf("juste avant de rentrer dans la boucle *i=%d et c=%c \n",*i,transferEncoding[*i]);
     if (transferEncoding[*i]==59){
         point_virgule=*i;
     }
@@ -320,7 +306,6 @@ bool checktransferextension(const char transferEncoding[], int *i, int longueur,
         }   
     }
     if (noeud!=NULL){
-        printf("mon noeud n'est pas nulle \n");
         noeud->indice = indice;
         noeud->longueur = *i - indice;
         noeud->tag = "Transfer-Extension";
@@ -350,15 +335,12 @@ bool checktransferextension(const char transferEncoding[], int *i, int longueur,
             }
         }
     }
-    printf("je sors de transfer extension avec true\n");
     return true;
 }
 
 bool checkTransferParameter(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
     //transfer-parameter = token BWS "=" BWS ( token / quoted-string )
     //BWS=OWS
-    printf("je suis dans transfer parameter \n");
-    printf("au début de transfer parameter *i=%d et c=%c \n", *i, transferEncoding[*i]);
     int compteur=0;
     const int indice=*i;
     while ((*i)<longueur && checkTChar(transferEncoding, *i, NULL)){
@@ -368,16 +350,13 @@ bool checkTransferParameter(const char transferEncoding[], int *i, int longueur,
     if (compteur<0){
         free(noeud);
         *i=indice;
-        printf("je sors de transfer parameter avec faux \n");
         return false;
     }
     checkOWS(transferEncoding, i, longueur, NULL);
-    printf("i = %d\n", *i);
     compteur++;
     if (transferEncoding[*i]!=61){
         free(noeud);
         *i=indice;
-        printf("je sors de transfer parameter avec faux \n");
         return false;
     }
     (*i)++;
@@ -395,7 +374,6 @@ bool checkTransferParameter(const char transferEncoding[], int *i, int longueur,
         if (compteur==0){
             free(noeud);
             *i=indice;
-            printf("je sors de transfer parameter avec false \n");
             return false;
         }
     }
@@ -410,12 +388,9 @@ bool checkTransferParameter(const char transferEncoding[], int *i, int longueur,
         *i = indice;
 
         for (int j=0;j<compteur;j++){
-            printf("**** je suis dans la boucle for de transfer parameter **** \n");
-            printf("*i=%d et c=%c", *i, transferEncoding[*i]);
             int iTemp=*i;
             if (checkTChar(transferEncoding, *i, NULL)){
                 checkTChar(transferEncoding, *i, &noeud->fils[j]);
-                printf("je suis un tchar \n");
                 (*i)++;
             }
             // else if (transferEncoding[*i]==61){
@@ -430,15 +405,12 @@ bool checkTransferParameter(const char transferEncoding[], int *i, int longueur,
             else if (checkQuotedString(transferEncoding, i, longueur, NULL)){
                 *i=iTemp;
                 checkQuotedString(transferEncoding, i, longueur, &noeud->fils[j]);
-                printf("je suis un quoted string \n");
             }
             else {
                 (*i)=iTemp;
                 checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
-                printf("je suis un OWS \n");
                 j++;
                 createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
-                printf("je suis un égal \n");
                 (*i)++;
                 j++;
                 checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
@@ -446,7 +418,6 @@ bool checkTransferParameter(const char transferEncoding[], int *i, int longueur,
             // (*i)++;
         }
     }
-    printf("je sors de transfer parameter avec true et i = %d \n", *i);
     return true;
 }
 
@@ -479,8 +450,6 @@ bool checkQuotedString(const char transferEncoding[], int *i, int longueur, Noeu
         noeud->tag = "quoted-string";
         noeud->fils = malloc(compteur * sizeof(Noeud));
         noeud->nombreFils =compteur;
-
-        printf("\n\n\n\nnombreFils = %d\n\n\n\n", compteur);
 
         *i = indice;
 
