@@ -9,10 +9,9 @@
 
 int main(int argc, char *argv[]) {
     
-    char transferEncoding[] = "Transfer-Encoding:";
+    char transferEncoding[] = "TRaNSFEr-enCODiNG:  ,20Kmy%d_Yg8t.MS; 	eh6owY1JpoLr99n=\"k_*	lx:H~ rV\\-\\R\\	!Pa,v\"";
 
     Noeud *test = malloc(sizeof(Noeud));
-
     int i = 0;
 
     if (!checkTransferEncodingHeader(transferEncoding, &i, strlen(transferEncoding), test)) {
@@ -30,7 +29,6 @@ int main(int argc, char *argv[]) {
 bool checkTransferEncodingHeader(const char transferEncoding[], int *i, int longueur, Noeud *noeud){//Transfer-Encoding-header = "Transfer-Encoding" ":" OWS Transfer-Encoding OWS
     int nombreFils = 5;
     const int indice = *i;
-
     Noeud *filsTransferEncodingMot = malloc(sizeof(Noeud));
     if (!checkTransferEncodingMot(transferEncoding, filsTransferEncodingMot)) {
         free(noeud);
@@ -46,11 +44,9 @@ bool checkTransferEncodingHeader(const char transferEncoding[], int *i, int long
     (*i)++;
 
     Noeud *filsOWS1 = malloc(sizeof(Noeud));
-    if (!checkOWS(transferEncoding, i, longueur, filsOWS1)){
-        free(noeud);
-        *i = indice;
-        return false;
-    }
+    checkOWS(transferEncoding, i, longueur, filsOWS1);
+
+    printf("%d\n", *i);
 
     Noeud *filsTransferEncoding = malloc(sizeof(Noeud));
     if (!checkTransferEncoding(transferEncoding, i, longueur, filsTransferEncoding)){
@@ -60,11 +56,7 @@ bool checkTransferEncodingHeader(const char transferEncoding[], int *i, int long
     }
 
     Noeud *filsOWS2 = malloc(sizeof(Noeud));
-    if (!checkOWS(transferEncoding, i, longueur, filsOWS2)){
-        free(noeud);
-        *i = indice;
-        return false;
-    }
+    checkOWS(transferEncoding, i, longueur, filsOWS2);
 
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
     noeud->indice = indice;
@@ -77,7 +69,7 @@ bool checkTransferEncodingHeader(const char transferEncoding[], int *i, int long
     noeud->fils[0] = *filsTransferEncodingMot;
     (*i) += noeud->fils[0].longueur;
     
-    createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[1]);
+    createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[1]);
     (*i)++;
     
     noeud->fils[2] = *filsOWS1;
@@ -107,57 +99,12 @@ bool checkTransferEncodingMot(const char transferEncoding[], Noeud *noeud){
     noeud->tag = "Transfer-Encoding-Mot";
     noeud->fils = NULL;
     noeud->nombreFils = 0;
-
-    if (transferEncoding[0] != 'T' || transferEncoding[0] != 't') {
-        return false;
-    }
-    if (transferEncoding[1] != 'r' || transferEncoding[1] != 'R') {
-        return false;
-    }
-    if (transferEncoding[2] != 'a' || transferEncoding[2] != 'A') {
-        return false;
-    }
-    if (transferEncoding[3] != 'n' || transferEncoding[3] != 'N') {
-        return false;
-    }
-    if (transferEncoding[4] != 's' || transferEncoding[4] != 'S') {
-        return false;
-    }
-    if (transferEncoding[5] != 'f' || transferEncoding[5] != 'F') {
-        return false;
-    }  
-    if (transferEncoding[6] != 'e' || transferEncoding[6] != 'E') {
-        return false;
-    }
-    if (transferEncoding[7] != 'r' || transferEncoding[7] != 'R') {
-        return false;
-    }
-    if (transferEncoding[8] != '-') {
-        return false;
-    }
-    if (transferEncoding[9] != 'E' || transferEncoding[9] != 'e') {
-        return false;
-    }  
-    if (transferEncoding[10] != 'n' || transferEncoding[10] != 'N') {
-        return false;
-    }
-    if (transferEncoding[11] != 'c' || transferEncoding[11] != 'C') {
-        return false;
-    }
-    if (transferEncoding[12] != 'o' || transferEncoding[12] != 'O') {
-        return false;
-    }  
-    if (transferEncoding[13] != 'd'|| transferEncoding[13] != 'D') {
-        return false;
-    }
-    if (transferEncoding[14] != 'i' || transferEncoding[14] != 'i') {
-        return false;
-    }
-    if (transferEncoding[15] != 'n' || transferEncoding[15] != 'N') {
-        return false;
-    }  
-    if (transferEncoding[16] != 'g' || transferEncoding[16] != 'G') {
-        return false;
+    char transferEncodingMinuscule[18];
+    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, 0, 17);
+    int a=strcmp("transfer-encoding", transferEncodingMinuscule);
+    if (a!=0){
+        free(noeud);
+        return false ;
     }
     return true;
 }
@@ -165,7 +112,7 @@ bool checkTransferEncodingMot(const char transferEncoding[], Noeud *noeud){
 bool checkOWS(const char transferEncoding[], int *i, int longueur, Noeud *noeud) { //OWS = *( SP / HTAB )
     int compteur = 0;
     const int indice = *i;
-    while ((transferEncoding[*i]==32 || transferEncoding[*i]==9)&&(*i<longueur)){
+    while ((*i<longueur)&&(transferEncoding[*i]==32 || transferEncoding[*i]==9)){
         (*i)++;
         compteur++;
     }
@@ -195,58 +142,48 @@ bool checkOWS(const char transferEncoding[], int *i, int longueur, Noeud *noeud)
 }
 
 bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
+    printf("je suis dans transfer encoding \n");
     //Transfer-Encoding = *( "," OWS ) transfer-coding *( OWS "," [ OWS transfer-coding ] )
     int compteur=0;
     int const indice=*i;
-    while (transferEncoding[*i]==44){
+    while ((*i)<longueur && transferEncoding[*i]==44){
         (*i)++;
         compteur++;
-        if (!checkOWS(transferEncoding, i, longueur, NULL)){
-            free(noeud);
-            *i = indice;
-            return false;
-        }
-        else{
-            (*i)++;
-            compteur++;
-        }
+        checkOWS(transferEncoding, i, longueur, NULL);
+        compteur++;
     }
     if (!checkTransferCoding(transferEncoding, i, longueur, NULL)){
             free(noeud);
             *i = indice;
+            printf("je sors de transfer encoding avec false \n");
             return false;
     }
+
+    // (*i)++;
     compteur++;
-    (*i)++;
-    while (checkOWS(transferEncoding, i, longueur, NULL)){
+    printf("compteur = %d\n", compteur);
+    checkOWS(transferEncoding, i, longueur, NULL);
+    while (*i<longueur && transferEncoding[*i]==44){
+        compteur+=2;
         (*i)++;
-        compteur++;
-        if (transferEncoding[*i]==44){
-            (*i)++;
-            compteur++;
-            int iTemp=(*i);
-            checkOWS(transferEncoding, i, longueur, NULL);
-            compteur++;
-            if(checkTransferCoding(transferEncoding, i, longueur, NULL)){
+        int iTemp=(*i);
+        checkOWS(transferEncoding, i, longueur, NULL);
+        if(checkTransferCoding(transferEncoding, i, longueur, NULL)){
+                if (*i>=longueur) {
+                    compteur+=2;
+                    break;
+                }
                 (*i)++;
-                compteur++;
-            }
-            else{
-                (*i)=iTemp;
-                compteur-=1;
-            }
-        }
-        else {
-            (*i)-=1;
-            compteur-=1;
-            break;
+                compteur+=2;
         }
     }
+
     noeud->indice = indice;
     noeud->longueur = *i - indice;
     noeud->tag = "transfer-encoding";
     noeud->fils = malloc(compteur * sizeof(Noeud));
     noeud->nombreFils =compteur;
+    printf("compteur = %d\n", compteur);
 
     // On réinitialise l'indice i pour la suite de la fonction
     *i = indice;
@@ -254,31 +191,83 @@ bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, 
     // On remplit le tableau des fils du noeud method
     for (int j = 0; j < compteur; j++) {
         int iTemp=*i;
+        printf("%d\n", *i);
         if(transferEncoding[*i]==44){
-            createFilsSimple(",", *i, 1, &noeud->fils[j]);
+            createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+            (*i)++;
+            j++;
+            checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
         }
-        if (checkTransferCoding(transferEncoding, i, longueur, NULL)){
+        else if (checkTransferCoding(transferEncoding, i, longueur, NULL)){
             *i=iTemp;
             checkTransferCoding(transferEncoding, i, longueur, &noeud->fils[j]);
         }
         else {
             checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
         }
-        (*i)++;
     }
+    printf("je sors de transfer encoding avec true \n");
     return true;  
 }
 
 bool checkTransferCoding(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
     //transfer-coding = "chunked" / "compress" / "deflate" / "gzip" / transfer-extension
     const int indice=*i;
+
     if (noeud!=NULL){
         noeud->indice = indice;
         noeud->tag = "transfer-coding";
         noeud->fils = malloc(sizeof(Noeud));
         noeud->nombreFils = 1;
     }
+
+    (*i)=indice;
+    char transferEncodingMinuscule[9];
+    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, *i, (*i)+7);
+    if (strcmp("chunked", transferEncodingMinuscule)==0){
+        if (noeud!=NULL){
+            noeud->longueur = 7;
+            (*i)=indice;
+            createFilsSimple("case_insensitive_string", *i, 7, &noeud->fils[0]);
+        }
+        (*i)+=7;
+        return true;
+    }
+
+    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, *i, (*i)+8);
+    if (strcmp("compress", transferEncodingMinuscule)==0){
+        if (noeud!=NULL){
+            noeud->longueur = 8;
+            (*i)=indice;
+            createFilsSimple("case_insensitive_string", *i, 8, &noeud->fils[0]);
+        }
+        (*i)+=8;
+        return true;
+    }
+
+    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, *i, (*i)+7);
+    if (strcmp("deflate", transferEncodingMinuscule)==0){
+        if (noeud!=NULL){
+            noeud->longueur = 7;
+            (*i)=indice;
+            createFilsSimple("case_insensitive_string", *i, 7, &noeud->fils[0]);
+        }
+        (*i)+=7;
+        return true;
+    }
+
+    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, *i, (*i)+4);
+    if (strcmp("gzip", transferEncodingMinuscule)==0){
+        if (noeud!=NULL){
+            noeud->longueur = 4;
+            (*i)=indice;
+            createFilsSimple("case_insensitive_string", *i, 4, &noeud->fils[0]);
+        }
+        (*i)+=4;
+        return true;
+    }
     if (checktransferextension(transferEncoding, i, longueur, NULL)){
+        *i=indice;
         Noeud *filsTransferExtension=malloc(sizeof(Noeud));
         checktransferextension(transferEncoding, i, longueur, filsTransferExtension);
         if (noeud!=NULL){
@@ -288,108 +277,50 @@ bool checkTransferCoding(const char transferEncoding[], int *i, int longueur, No
         return true;
     }
 
-    (*i)=indice;
-    if (transferEncoding[*i]=='c'){
-    (*i)++;
-        if (transferEncoding[*i]=='h'){
-            (*i)++;
-            if ((transferEncoding[(*i)]=='u') && (transferEncoding[(*i)+1]=='n') && (transferEncoding[(*i)+2]=='k') && (transferEncoding[(*i)+3]=='e') && (transferEncoding[(*i)+4]=='d')){
-                (*i)+=4;
-                if (noeud!=NULL){
-                    noeud->longueur = 7;
-                    (*i)=indice;
-                    createFilsSimple("chunked", *i, 7, &noeud->fils[0]);
-                    (*i)+=7;
-                }
-                return true;
-            }
-            else{
-                free(noeud);
-                (*i)=indice;
-                return false;
-            }
-        }
-        else if (transferEncoding[*i]=='o'){
-            (*i)++;
-            if ((transferEncoding[(*i)]=='m') && (transferEncoding[(*i)+1]=='p') && (transferEncoding[(*i)+2]=='r') && (transferEncoding[(*i)+3]=='e') && (transferEncoding[(*i)+4]=='s') && (transferEncoding[(*i)+5]=='s')){
-                (*i)+=5;
-                if (noeud!=NULL){
-                    (*i)=indice;
-                    noeud->longueur = 8;
-                    createFilsSimple("compress", *i, 8, &noeud->fils[0]);
-                    (*i)+=8;
-                }
-                return true;
-            }
-            else{
-                free(noeud);
-                (*i)=indice;
-                return false;
-            }    
-        }
-    }
-    else if ((transferEncoding[(*i)]=='d')&&(transferEncoding[(*i)+1]=='e')&&(transferEncoding[(*i)+2]=='f')&&(transferEncoding[(*i)+3]=='l')&&(transferEncoding[(*i)+4]=='a')&&(transferEncoding[(*i)+5]=='t')&&(transferEncoding[(*i)+6]=='e')){
-        (*i)+=6;
-        if (noeud!=NULL){
-            (*i)=indice;
-            noeud->longueur = 7;
-            createFilsSimple("compress", *i, 7, &noeud->fils[0]);
-            (*i)+=7;
-        }
-        return true;
-    }
-    else if ((transferEncoding[(*i)]=='g')&&(transferEncoding[(*i)+1]=='z')&&(transferEncoding[(*i)+2]=='i')&&(transferEncoding[(*i)+3]=='p')){
-        (*i)+=3;
-        if (noeud!=NULL){
-            (*i)=indice;
-            noeud->longueur = 4;
-            createFilsSimple("gzip", *i, 4, &noeud->fils[0]);
-            (*i)+=4;
-        }
-        return true;
-    }
     else{
         free(noeud);
         (*i)=indice;
+        printf("je sors de transfer coding avec false \n");
         return false;
     }
+    printf("je sors de transfer coding avec true \n");
     return true;
 }
 
 bool checktransferextension(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
     //transfer-extension = token *( OWS ";" OWS transfer-parameter )
+    printf("je suis dans transfer extension \n");
+    printf("au début de transfer extension *i=%d et c=%c \n", *i, transferEncoding[*i]);
     int compteur=0;
     int const indice=*i;
-    while ((checkTChar(transferEncoding, *i, NULL))&&((*i)<longueur)){
+    int point_virgule=longueur;
+    while (((*i)<longueur)&&(checkTChar(transferEncoding, *i, NULL))){
         compteur++;
         (*i)++; 
     }
     if (compteur==0){
         free(noeud);
         (*i)=indice;
+        printf("je sors de transfer extension avec false \n");
         return false;
     }
-    while (checkOWS(transferEncoding, i, longueur, NULL)){
-        if (transferEncoding[*i]==59){
+    checkOWS(transferEncoding, i, longueur, NULL);
+    printf("juste avant de rentrer dans la boucle *i=%d et c=%c \n",*i,transferEncoding[*i]);
+    if (transferEncoding[*i]==59){
+        point_virgule=*i;
+    }
+    while (*i<longueur && transferEncoding[*i]==59){
+        compteur+=2;
+        (*i)++;
+        checkOWS(transferEncoding, i, longueur, NULL);
+        if (checkTransferParameter(transferEncoding, i, longueur, NULL)){
+            compteur+=2;
             (*i)++;
-            if (checkOWS(transferEncoding, i, longueur, NULL)){
-                if(checkTransferParameter(transferEncoding, i, longueur, NULL)){
-                    compteur+=4;
-                }
-                else{
-                    free(noeud);
-                    (*i)=indice;
-                    return false;
-                }
-            }
-        }
-        else{
-            free(noeud);
-            (*i)=indice;
-            return false;
-        }
+        checkOWS(transferEncoding, i, longueur, NULL);
+        }   
     }
     if (noeud!=NULL){
+        printf("mon noeud n'est pas nulle \n");
         noeud->indice = indice;
         noeud->longueur = *i - indice;
         noeud->tag = "Transfer-Extension";
@@ -400,43 +331,53 @@ bool checktransferextension(const char transferEncoding[], int *i, int longueur,
         *i = indice;
         for (int j=0; j<compteur; j++){
             int iTemp=*i;
-            if (checkTChar(transferEncoding, *i, NULL)){
+            if (*i<point_virgule && checkTChar(transferEncoding, *i, NULL)){
                 checkTChar(transferEncoding, *i, &noeud->fils[j]);
+                (*i)++;
             }
             else if(transferEncoding[*i]==59){
-                createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+                createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
+                (*i)++;
             }
-            else if(checkOWS(transferEncoding, i, longueur, NULL)){
+            else if(checkTransferParameter(transferEncoding, i, longueur, NULL)){
+                *i=iTemp;
+                checkTransferParameter(transferEncoding, i, longueur, &noeud->fils[j]);
+                (*i)++;
+            }
+            else {
                 *i=iTemp;
                 checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
             }
-            else {
-                checkTransferParameter(transferEncoding, i, longueur, &noeud->fils[j]);
-            }
         }
     }
+    printf("je sors de transfer extension avec true\n");
     return true;
 }
 
 bool checkTransferParameter(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
     //transfer-parameter = token BWS "=" BWS ( token / quoted-string )
     //BWS=OWS
-    const int indice=*i;
+    printf("je suis dans transfer parameter \n");
+    printf("au début de transfer parameter *i=%d et c=%c \n", *i, transferEncoding[*i]);
     int compteur=0;
-    while (checkTChar(transferEncoding, *i, NULL)){
+    const int indice=*i;
+    while ((*i)<longueur && checkTChar(transferEncoding, *i, NULL)){
         (*i)++;
         compteur++;
     }
     if (compteur<0){
         free(noeud);
         *i=indice;
+        printf("je sors de transfer parameter avec faux \n");
         return false;
     }
     checkOWS(transferEncoding, i, longueur, NULL);
+    printf("i = %d\n", *i);
     compteur++;
     if (transferEncoding[*i]!=61){
         free(noeud);
         *i=indice;
+        printf("je sors de transfer parameter avec faux \n");
         return false;
     }
     (*i)++;
@@ -454,34 +395,58 @@ bool checkTransferParameter(const char transferEncoding[], int *i, int longueur,
         if (compteur==0){
             free(noeud);
             *i=indice;
+            printf("je sors de transfer parameter avec false \n");
             return false;
         }
     }
 
-    noeud->indice = indice;
-    noeud->longueur = *i - indice;
-    noeud->tag = "transfer-parameter";
-    noeud->fils = malloc(compteur * sizeof(Noeud));
-    noeud->nombreFils =compteur;
+    if (noeud!=NULL){
+        noeud->indice = indice;
+        noeud->longueur = *i - indice;
+        noeud->tag = "transfer-parameter";
+        noeud->fils = malloc(compteur * sizeof(Noeud));
+        noeud->nombreFils =compteur;
 
-    for (int j=0;j<compteur;j++){
-        int iTemp=*i;
-        if (checkTChar(transferEncoding, *i, NULL)){
-            checkTChar(transferEncoding, *i, &noeud->fils[j]);
+        *i = indice;
+
+        for (int j=0;j<compteur;j++){
+            printf("**** je suis dans la boucle for de transfer parameter **** \n");
+            printf("*i=%d et c=%c", *i, transferEncoding[*i]);
+            int iTemp=*i;
+            if (checkTChar(transferEncoding, *i, NULL)){
+                checkTChar(transferEncoding, *i, &noeud->fils[j]);
+                printf("je suis un tchar \n");
+                (*i)++;
+            }
+            // else if (transferEncoding[*i]==61){
+            //     checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
+            //     j++;
+            //     createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
+            //     printf("je suis un égal \n");
+            //     (*i)++;
+            //     j++;
+            //     checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
+            // }
+            else if (checkQuotedString(transferEncoding, i, longueur, NULL)){
+                *i=iTemp;
+                checkQuotedString(transferEncoding, i, longueur, &noeud->fils[j]);
+                printf("je suis un quoted string \n");
+            }
+            else {
+                (*i)=iTemp;
+                checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
+                printf("je suis un OWS \n");
+                j++;
+                createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
+                printf("je suis un égal \n");
+                (*i)++;
+                j++;
+                checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
+            }
+            // (*i)++;
         }
-        else if (transferEncoding[*i]==61){
-            createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
-        }
-        else if (checkQuotedString(transferEncoding, i, longueur, NULL)){
-            *i=iTemp;
-            checkQuotedString(transferEncoding, i, longueur, &noeud->fils[j]);
-        }
-        else {
-            (*i)=iTemp;
-            checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
-        }
-        (*i)++;
     }
+    printf("je sors de transfer parameter avec true et i = %d \n", *i);
     return true;
 }
 
@@ -494,7 +459,9 @@ bool checkQuotedString(const char transferEncoding[], int *i, int longueur, Noeu
         free(noeud);
         return false;
     }
-    while(checkQdtext(transferEncoding, *i, NULL)||checkQuotedPair(transferEncoding, i, longueur, NULL)){
+    (*i)++;
+    compteur++;
+    while(((*i)<longueur) && (checkQdtext(transferEncoding, *i, NULL)||checkQuotedPair(transferEncoding, i, longueur, NULL))){
         compteur++;
         (*i)++;
     }
@@ -503,24 +470,34 @@ bool checkQuotedString(const char transferEncoding[], int *i, int longueur, Noeu
         free(noeud);
         return false;
     }
+    (*i)++;
+    compteur++;
 
-    noeud->indice = indice;
-    noeud->longueur = *i - indice;
-    noeud->tag = "quoted-string";
-    noeud->fils = malloc(compteur * sizeof(Noeud));
-    noeud->nombreFils =compteur;
+    if (noeud!=NULL){
+        noeud->indice = indice;
+        noeud->longueur = *i - indice;
+        noeud->tag = "quoted-string";
+        noeud->fils = malloc(compteur * sizeof(Noeud));
+        noeud->nombreFils =compteur;
 
-    for (int j=0;j<compteur;j++){
-        if (transferEncoding[*i]==34){
-            createFilsSimple("dquote", *i, 1, &noeud->fils[j]);
+        printf("\n\n\n\nnombreFils = %d\n\n\n\n", compteur);
+
+        *i = indice;
+
+        for (int j=0;j<compteur;j++){
+            if (transferEncoding[*i]==34){
+                createFilsSimple("dquote", *i, 1, &noeud->fils[j]);
+                (*i)++;
+            }
+            else if (checkQdtext(transferEncoding, *i, NULL)){
+                checkQdtext(transferEncoding, *i, &noeud->fils[j]);
+                (*i)++;
+            }
+            else{
+                checkQuotedPair(transferEncoding, i, longueur, &noeud->fils[j]);
+            }
+            // (*i)++;
         }
-        else if (checkQdtext(transferEncoding, *i, NULL)){
-            checkQdtext(transferEncoding, *i, &noeud->fils[j]);
-        }
-        else{
-            checkQuotedPair(transferEncoding, i, longueur, &noeud->fils[j]);
-        }
-        (*i)++;
     }
     return true;
 }
@@ -530,49 +507,16 @@ bool checkQdtext(const char transferEncoding[], int i, Noeud *noeud){
     //          / %x5D-7E ; ']'-'~'
     //         / obs-text
     // obs-text = %x80-FF
-    if (noeud!=NULL){
-        noeud->indice = i;
-        noeud->longueur = 1;
-        noeud->tag = "qdtext";
-        noeud->fils = malloc(sizeof(Noeud));
-        noeud->nombreFils =1;
-    }
 
-    if (transferEncoding[i]==9){
+    if (transferEncoding[i]==9 || transferEncoding[i]==32 || transferEncoding[i]==33 || (transferEncoding[i]>=35 && transferEncoding[i]<=91) || (transferEncoding[i]>=93 && transferEncoding[i]<=126) || (transferEncoding[i]>=128 && transferEncoding[i]<=255)) {
         if (noeud!=NULL){
-            createFilsSimple("HTAB", i, 1, &noeud->fils[0]);
+            createFilsSimple("qdtext", i, 1, noeud);
         }
-    }
-    else if (transferEncoding[i]==32){
-        if (noeud!=NULL){
-            createFilsSimple("SP", i, 1, &noeud->fils[0]);
-        }
-    }
-    else if (transferEncoding[i]==33){
-        if (noeud!=NULL){
-            createFilsSimple("case-insensitive-string", i, 1, &noeud->fils[0]);
-        }
-    }
-    else if (transferEncoding[i]>=35 && transferEncoding[i]<=91){
-        if (noeud!=NULL){
-            createFilsSimple("23-5B", i, 1, &noeud->fils[0]);
-        }
-    }
-    else if (transferEncoding[i]>=93 && transferEncoding[i]<=126){
-        if (noeud!=NULL){
-            createFilsSimple("5D-7E", i, 1, &noeud->fils[0]);
-        }
-    }
-    else if (transferEncoding[i]>=128 && transferEncoding[i]<=255){
-        if (noeud!=NULL){
-            createFilsSimple("obs-text", i, 1, &noeud->fils[0]);
-        }
-    }
-    else {
+        return true;
+    } else {
         free(noeud);
         return false;
     }
-    return true;
 }
 
 bool checkQuotedPair(const char transferEncoding[], int *i, int longueur, Noeud *noeud){
@@ -589,10 +533,10 @@ bool checkQuotedPair(const char transferEncoding[], int *i, int longueur, Noeud 
         free(noeud);
         return false;
     }
-    (*i)++;
     if (noeud!=NULL){
-        createFilsSimple("case-insensitive-string",*i, 1, &noeud->fils[0]);
+        createFilsSimple("case_insensitive_string",*i, 1, &noeud->fils[0]);
     }
+    (*i)++;
     if (transferEncoding[*i]==9){
         if (noeud!=NULL){
             createFilsSimple("HTAB", *i, 1, &noeud->fils[1]);
@@ -618,6 +562,12 @@ bool checkQuotedPair(const char transferEncoding[], int *i, int longueur, Noeud 
         (*i)=indice;
         return false;
     }
+    (*i)++;
+
+    if (noeud == NULL) {
+        (*i)--;
+    }
+
     return true;
 }
 bool checkTChar(const char requete[], int i, Noeud *noeud) {
@@ -676,4 +626,19 @@ bool checkAlpha(const char requete[], int i) {
 
 bool checkDigit(const char requete[], int i) {
     return (requete[i] >= '0' && requete[i] <= '9');
+}
+
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
+    int diff = 'a' - 'A';
+    int n = strlen(chaine1);
+    for (int k = i; k < j; k++) {
+        if (k < n) {
+            if (chaine1[k] >= 'A' && chaine1[k] <= 'Z') {
+                chaine2[k - i] = chaine1[k] + diff;
+            } else {
+                chaine2[k - i] = chaine1[k];
+            }
+        }
+    }
+    chaine2[j - i] = '\0';
 }
