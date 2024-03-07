@@ -14,4 +14,5 @@ bool checkQuotedPair(const char transferEncoding[], int *i, int longueur, Noeud 
 bool checkTChar(const char requete[], int i, Noeud *noeud);
 bool checkAlpha(const char requete[], int i);
 bool checkDigit(const char requete[], int i);
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
 #endif

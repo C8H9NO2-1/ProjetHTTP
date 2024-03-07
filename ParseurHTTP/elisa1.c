@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     
-    char cookie[] = "Cookie: delicieux_cookie=choco; savoureux_cookie=menthe; test=otherTest";
+    char cookie[] = "cookIE:fF0o7E|5U#YVgPA=vSMa}b1K[+!@dEl; IBBud*CySI&FW'B=WPz^pB[w<XhSm6>	 		";
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
@@ -32,7 +32,6 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 
     Noeud *filsCookie = malloc(sizeof(Noeud));
     if (!checkCookie(cookie, filsCookie)) {
-        printf("not checkcookie");
         free(noeud);
         *i = indice;
         return false;
@@ -40,7 +39,6 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
     *i=6;
 
     if (cookie[*i] != 58) { //? ":" = 58
-        printf("not :");
         free(noeud);
         *i = indice;
         return false;
@@ -53,7 +51,6 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 
     Noeud *filsCookieString = malloc(sizeof(Noeud));
     if (!checkCookieString(cookie, i, longueur, filsCookieString)){
-        printf("not checkcookiestring");
         free(noeud);
         *i = indice;
         return false;
@@ -73,7 +70,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
     noeud->fils[0] = *filsCookie;
     (*i) += noeud->fils[0].longueur;
     
-    createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[1]);
+    createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[1]);
     (*i)++;
     
     noeud->fils[2] = *filsOWS1;
@@ -92,7 +89,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 bool checkCookie(const char cookie[], Noeud *noeud){
     noeud->indice = 0;
     noeud->longueur = 6;
-    noeud->tag = "Cookie";
+    noeud->tag = "case_insensitive_string";
     noeud->fils = NULL;
     noeud->nombreFils = 0;
 
@@ -191,7 +188,7 @@ bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud){
         j++;
 
         while (*i < longueur && cookie[*i]==59 && j < compteur){ //";"=59
-            createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[j]);
+            createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
             j++;
             (*i)+=2;
             createFilsSimple("SP", (*i) - 1, 1, &noeud->fils[j]);
@@ -250,7 +247,7 @@ bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud){ /
         noeud->fils[0] = *filsCookieName;
         (*i) += noeud->fils[0].longueur;
 
-        createFilsSimple("case-insensitive-string", *i, 1, &noeud->fils[1]);
+        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[1]);
         (*i)++;
 
         noeud->fils[2] = *filsCookieValue;
