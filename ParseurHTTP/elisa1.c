@@ -32,7 +32,6 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 
     Noeud *filsCookie = malloc(sizeof(Noeud));
     if (!checkCookie(cookie, filsCookie)) {
-        printf("not checkcookie");
         free(noeud);
         *i = indice;
         return false;
@@ -40,7 +39,6 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
     *i=6;
 
     if (cookie[*i] != 58) { //? ":" = 58
-        printf("not :");
         free(noeud);
         *i = indice;
         return false;
@@ -53,7 +51,6 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 
     Noeud *filsCookieString = malloc(sizeof(Noeud));
     if (!checkCookieString(cookie, i, longueur, filsCookieString)){
-        printf("not checkcookiestring");
         free(noeud);
         *i = indice;
         return false;
@@ -92,7 +89,7 @@ bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud) 
 bool checkCookie(const char cookie[], Noeud *noeud){
     noeud->indice = 0;
     noeud->longueur = 6;
-    noeud->tag = "Cookie";
+    noeud->tag = "case_insensitive_string";
     noeud->fils = NULL;
     noeud->nombreFils = 0;
 
