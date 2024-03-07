@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "api.h"
 #include "structure.h"
 #include "pm.h"
 #include "affichage.h"
@@ -12,15 +13,15 @@ int main(int argc, char *argv[]) {
     printf("%c\n", 94);
     
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
-    // char requete[] = "KxLx_xCuXib~Zk9 /%e9?iUl2@7enSxC'0Zb HTTP/6.9\r\n";
+    char requete[] = "KxLx_xCuXib~Zk9 /%e9?iUl2@7enSxC'0Zb HTTP/6.9\r\n";
     // char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,";
-    char requete[] = "cONnECTiOn:  	,	 ,   	P#Y36mLGO|vvWBu, As^NUN`.H'p&POI";
+    // char requete[] = "cONnECTiOn:  	,	 ,   	P#Y36mLGO|vvWBu, As^NUN`.H'p&POI";
 
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
 
-    if (!checkConnectionHeader(requete, &i, strlen(requete), test)) {
+    if (!checkStartLine(requete, &i, strlen(requete), test)) {
         printf("Hello world\n");
         test = NULL;
     }
@@ -28,6 +29,8 @@ int main(int argc, char *argv[]) {
     if (test != NULL) {
         printArbre(requete, test, 0);
     }
+
+    free(test);
     
     return 0;
 }
@@ -544,12 +547,13 @@ bool checkHTTPVersion(const char requete[], int *i, const int longueur, Noeud *n
 
     // On créé les fils
 
-    noeud->fils[0].fils = NULL;
-    noeud->fils[0].indice = indice;
-    noeud->fils[0].longueur = 4;
-    noeud->fils[0].nombreFils = 0;
-    noeud->fils[0].tag = "HTTP-name";
+    // noeud->fils[0].fils = NULL;
+    // noeud->fils[0].indice = indice;
+    // noeud->fils[0].longueur = 4;
+    // noeud->fils[0].nombreFils = 0;
+    // noeud->fils[0].tag = "HTTP-name";
 
+    createFilsSimple("HTTP-name", indice, 4, &noeud->fils[0]);
     createFilsSimple("case_insensitive_string", indice + 4, 1, &noeud->fils[1]);
     createFilsSimple("DIGIT", indice + 5, 1, &noeud->fils[2]);
     createFilsSimple("case_insensitive_string", indice + 6, 1, &noeud->fils[3]);
@@ -615,6 +619,8 @@ bool checkConnectionHeader(const char requete[], int *i, const int longueur, Noe
     checkOWS(requete, i, longueur, &noeud->fils[j]);
     j++;
 
+    noeud->longueur = *i - indice;
+
     return true;
 }
 
@@ -640,7 +646,7 @@ bool checkConnectionString(const char requete[], int *i, Noeud *noeud) {
     noeud->indice = indice;
     noeud->longueur = *i - indice;
     noeud->nombreFils = 0;
-    noeud->tag = "Connection";
+    noeud->tag = "case_insensitive_string";
 
     return true;
 }
