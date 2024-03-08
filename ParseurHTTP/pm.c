@@ -11,6 +11,8 @@
 int main(int argc, char *argv[]) {
 
     printf("%c\n", 94);
+
+    printf("Hello world\n");
     
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
     char requete[] = "KxLx_xCuXib~Zk9 /%e9?iUl2@7enSxC'0Zb HTTP/6.9\r\n";
