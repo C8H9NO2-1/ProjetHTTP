@@ -5,7 +5,7 @@
 #include "structure.h"
 #include "affichage.h"
 
-void printArbre(const char requete[], Noeud *noeud, int nombreTab) {
+void printArbre(Noeud *noeud, int nombreTab) {
     for (int i = 0; i < nombreTab; i++) {
         printf("\t");
     }
@@ -13,7 +13,7 @@ void printArbre(const char requete[], Noeud *noeud, int nombreTab) {
     if (noeud->nombreFils == 0) {
         printf("%s : \"", noeud->tag);
         for (int i = 0; i < noeud->longueur; i++) {
-            switch (requete[noeud->indice + i]) {
+            switch (noeud->valeur[i]) {
                 case 13:
                     printf("CR");
                     break;
@@ -21,7 +21,7 @@ void printArbre(const char requete[], Noeud *noeud, int nombreTab) {
                     printf("LF");
                     break;
                 default:
-                    printf("%c", requete[noeud->indice + i]);
+                    printf("%c", noeud->valeur[i]);
                     break;
             }
         }
@@ -29,7 +29,7 @@ void printArbre(const char requete[], Noeud *noeud, int nombreTab) {
     } else {
         printf("%s :\n", noeud->tag);
         for (int i = 0; i < noeud->nombreFils; i++) {
-            printArbre(requete, &noeud->fils[i], nombreTab + 1);
+            printArbre(&noeud->fils[i], nombreTab + 1);
         }
     }
 }

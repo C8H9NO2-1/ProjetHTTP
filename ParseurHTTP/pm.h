@@ -10,9 +10,9 @@ bool checkUnreserved(const char requete[], int i);
 bool checkPctEncoded(const char requete[], int i);
 bool checkSubDelims(const char requete[], int i);
 //! Fonction utile pour la création de feuilles dans l'arbre
-void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
+void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
 //! Fonction qui permet de vérifier et de créer un token
-bool checkToken(const char requete[], int *i, const int longueur, Noeud *noeud, char nom[]); //? token = 1*tchar
+bool checkToken(char requete[], int *i, const int longueur, Noeud *noeud, char nom[]); //? token = 1*tchar
 //! Fonction qui transforme une sous chaîne en minuscule pour pouvoir comparer les chaînes non sensibles à la casse
 void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
 
@@ -28,7 +28,7 @@ void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkStartLine(const char requete[], int *i, int longueur, Noeud *noeud); //? start-line = method SP request-target SP HTTP-version CRLF
+bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud); //? start-line = method SP request-target SP HTTP-version CRLF
 
 /**
  * @brief Vérifie qu'une partie de la chaîne requete est bien une method
@@ -40,7 +40,7 @@ bool checkStartLine(const char requete[], int *i, int longueur, Noeud *noeud); /
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkMethod(const char requete[], int *i, const int longueur, Noeud *noeud); //? method = token
+bool checkMethod(char requete[], int *i, const int longueur, Noeud *noeud); //? method = token
 
 /**
  * @brief Vérifie si un caractère est bien un tchar
@@ -51,7 +51,7 @@ bool checkMethod(const char requete[], int *i, const int longueur, Noeud *noeud)
  * @return true Si requête[i] est un tchar
  * @return false Sinon
  */
-bool checkTChar(const char requete[], int i, Noeud *noeud); //? tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /"^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
+bool checkTChar(char requete[], int i, Noeud *noeud); //? tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /"^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
 
 /**
  * @brief Vérifie si une chaîne est bien une request-target
@@ -63,7 +63,7 @@ bool checkTChar(const char requete[], int i, Noeud *noeud); //? tchar = "!" / "#
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkRequestTarget(const char requete[], int *i, const int longueur, Noeud *noeud); //? request-target = absolute-path [ "?" query ]
+bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud); //? request-target = absolute-path [ "?" query ]
 
 /**
  * @brief Vérifie si une chaîne est bien un absolute-path
@@ -75,7 +75,7 @@ bool checkRequestTarget(const char requete[], int *i, const int longueur, Noeud 
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkAbsolutePath(const char requete[], int *i, const int longueur, Noeud *noeud); //? absolute-path = 1*( "/" segment )
+bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud); //? absolute-path = 1*( "/" segment )
 
 /**
  * @brief Vérifie si une chaîne est bien un segment
@@ -87,7 +87,7 @@ bool checkAbsolutePath(const char requete[], int *i, const int longueur, Noeud *
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkSegment(const char requete[], int *i, const int longueur, Noeud *noeud); //? segment = *pchar
+bool checkSegment(char requete[], int *i, const int longueur, Noeud *noeud); //? segment = *pchar
 
 /**
  * @brief Vérifie si une chaîne est bien un pchar
@@ -99,7 +99,7 @@ bool checkSegment(const char requete[], int *i, const int longueur, Noeud *noeud
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkPChar(const char requete[], int *i, const int longueur, Noeud *noeud); //? pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+bool checkPChar(char requete[], int *i, const int longueur, Noeud *noeud); //? pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
 
 /**
  * @brief Vérifie si une chaîne est bien un query
@@ -111,7 +111,7 @@ bool checkPChar(const char requete[], int *i, const int longueur, Noeud *noeud);
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkQuery(const char requete[], int *i, const int longueur, Noeud *noeud); //? query = *( pchar / "/" / "?" )
+bool checkQuery(char requete[], int *i, const int longueur, Noeud *noeud); //? query = *( pchar / "/" / "?" )
 
 /**
  * @brief Vérifie si une chaîne est bien une HTTP-version
@@ -123,19 +123,19 @@ bool checkQuery(const char requete[], int *i, const int longueur, Noeud *noeud);
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkHTTPVersion(const char requete[], int *i, const int longueur, Noeud *noeud); //? HTTP-version = HTTP-name "/" DIGIT "." DIGIT
+bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud); //? HTTP-version = HTTP-name "/" DIGIT "." DIGIT
 
 //!====================================================================================================
 //? Fonctions utiles pour parser le connection-header
 
-bool checkConnectionHeader(const char requete[], int *i, const int longueur, Noeud *noeud); //? Connection-header = "Connection" ":" OWS Connection OWS
+bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *noeud); //? Connection-header = "Connection" ":" OWS Connection OWS
 
-bool checkConnectionString(const char requete[], int *i, Noeud *noeud); //? "Connection"
+bool checkConnectionString(char requete[], int *i, Noeud *noeud); //? "Connection"
 
-bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud); //? OWS = *( SP / HTAB )
+bool checkOWS(char requete[], int *i, const int longueur, Noeud *noeud); //? OWS = *( SP / HTAB )
 
-bool checkConnection(const char requete[], int *i, const int longueur, Noeud *noeud); //? *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] )
+bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud); //? *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] )
 
-bool checkConnectionOption(const char requete[], int *i, const int longueur, Noeud *noeud); //? connection-option = token
+bool checkConnectionOption(char requete[], int *i, const int longueur, Noeud *noeud); //? connection-option = token
 
 #endif

@@ -11,25 +11,25 @@
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkCookieHeader(const char cookie[], int *i, int longueur, Noeud *noeud);//? "Cookie" ":" OWS cookie-string OWS
+bool checkCookieHeader(char cookie[], int *i, int longueur, Noeud *noeud);//? "Cookie" ":" OWS cookie-string OWS
 
-bool checkCookie(const char cookie[], Noeud *noeud);
+bool checkCookie(char cookie[], Noeud *noeud);
 
-bool checkOWS(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkOWS(char cookie[], int *i, int longueur, Noeud *noeud);
 
-bool checkCookieString(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkCookieString(char cookie[], int *i, int longueur, Noeud *noeud);
 
-bool checkCookiePair(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkCookiePair(char cookie[], int *i, int longueur, Noeud *noeud);
 
-bool checkCookieName(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkCookieName(char cookie[], int *i, int longueur, Noeud *noeud);
 
-bool checkTChar(const char requete[], int i, Noeud *noeud);
+bool checkTChar(char requete[], int i, Noeud *noeud);
 
-bool checkCookieValue(const char cookie[], int *i, int longueur, Noeud *noeud);
+bool checkCookieValue(char cookie[], int *i, int longueur, Noeud *noeud);
 
 bool checkCookieOctet(const char cookie[], int *i);
 
 bool checkAlpha(const char requete[], int i);
 bool checkDigit(const char requete[], int i);
-void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
+void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
 #endif
