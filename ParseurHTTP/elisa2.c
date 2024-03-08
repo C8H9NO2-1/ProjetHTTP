@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     
-    char transferEncoding[] = "TRaNSFEr-enCODiNG:  ,20Kmy%d_Yg8t.MS; 	eh6owY1JpoLr99n=\"k_*	lx:H~ rV\\-\\R\\	!Pa,v\"";
+    char transferEncoding[] = "traNsfer-EnCodINg:	  ,, ,	cHUnKed";
 
     Noeud *test = malloc(sizeof(Noeud));
     int i = 0;
@@ -161,7 +161,7 @@ bool checkTransferEncoding(const char transferEncoding[], int *i, int longueur, 
     while (*i<longueur && transferEncoding[*i]==44){
         compteur+=2;
         (*i)++;
-        int iTemp=(*i);
+        // int iTemp=(*i);
         checkOWS(transferEncoding, i, longueur, NULL);
         if(checkTransferCoding(transferEncoding, i, longueur, NULL)){
                 if (*i>=longueur) {
@@ -302,8 +302,8 @@ bool checktransferextension(const char transferEncoding[], int *i, int longueur,
         if (checkTransferParameter(transferEncoding, i, longueur, NULL)){
             compteur+=2;
             (*i)++;
-        checkOWS(transferEncoding, i, longueur, NULL);
-        }   
+            checkOWS(transferEncoding, i, longueur, NULL);
+        }
     }
     if (noeud!=NULL){
         noeud->indice = indice;
@@ -321,6 +321,8 @@ bool checktransferextension(const char transferEncoding[], int *i, int longueur,
                 (*i)++;
             }
             else if(transferEncoding[*i]==59){
+                checkOWS(transferEncoding, i, longueur, &noeud->fils[j]);
+                j++;
                 createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
                 (*i)++;
             }
