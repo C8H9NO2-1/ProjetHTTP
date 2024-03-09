@@ -9,8 +9,6 @@
 #include "affichage.h"
 
 int main(int argc, char *argv[]) {
-
-    printf("%c\n", 94);
     
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
     char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n";
@@ -28,16 +26,6 @@ int main(int argc, char *argv[]) {
 
     if (test != NULL) {
         printArbre(test, 0);
-    }
-
-    _Token *liste = searchTree(test, "connection-option");
-
-    while (liste != NULL) {
-        int l;
-        char *s; 
-        s=getElementValue(liste->node,&l); 
-        printf("FOUND [%.*s]\n",l,s); 
-        liste=liste->next;
     }
 
     free(test);
