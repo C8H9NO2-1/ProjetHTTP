@@ -15,6 +15,8 @@ bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud); /
 
 bool checkIPV4(const char requete[], int *i, Noeud *noeud);
 
+int CompteurDigit(const char requete[], int *i);
+
 bool checkIPV6(const char requete[], int *i, Noeud *noeud);
 
 bool checkIPfuture(const char requete[], int *i, Noeud *noeud);
@@ -36,7 +38,7 @@ bool checkSubDelims(const char requete[], int i);
 
 
 // Fonction utile pour la création de feuilles dans l'arbre
-void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
+void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
 
 // Fonction qui transforme une sous chaîne en minuscule pour pouvoir comparer les chaînes non sensibles à la casse
 void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);

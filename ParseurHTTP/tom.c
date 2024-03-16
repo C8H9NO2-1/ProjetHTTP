@@ -71,10 +71,10 @@ bool checkSubDelims(const char requete[], int i) {
     }
 }
 
-void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud) {
+void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud) {
     noeud->tag = nom;
     noeud->fils = NULL;
-    noeud->indice = i;
+    noeud->valeur = i;
     noeud->longueur = longueur;
     noeud->nombreFils = 0;
 }
@@ -108,7 +108,7 @@ bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud) {
 
     if (noeud != NULL) {
         // On stocke les données nécessaires pour le noeud courant
-        noeud->indice = indice;
+        noeud->valeur = requete + indice;
         noeud->longueur = *i - indice;
         noeud->tag = "OWS";
         noeud->nombreFils = compteur;
@@ -122,9 +122,9 @@ bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud) {
         // On remplit le tableau des fils du noeud
         for (int j = 0; j < compteur; j++) {
             if (requete[*i] == 32) {
-                createFilsSimple("SP", *i, 1, &noeud->fils[j]);
+                createFilsSimple("SP", requete + *i, 1, &noeud->fils[j]);
             } else {
-                createFilsSimple("HTAB", *i, 1, &noeud->fils[j]);               
+                createFilsSimple("HTAB", requete + *i, 1, &noeud->fils[j]);               
             }
             (*i)++;
         }
@@ -152,7 +152,7 @@ bool checkExpectString(const char requete[], int *i, Noeud *noeud) {
 
     // Si tout s'est bien passé, on créé le noeud contenant "Expect"
     noeud->fils = NULL;
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->longueur = *i - indice;
     noeud->nombreFils = 0;
     noeud->tag = "case_insensitive_string";
@@ -179,7 +179,7 @@ bool checkHostString(const char requete[], int *i, Noeud *noeud) {
 
     // Si tout s'est bien passé, on créé le noeud contenant "Host"
     noeud->fils = NULL;
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->longueur = *i - indice;
     noeud->nombreFils = 0;
     noeud->tag = "case_insensitive_string";
@@ -206,7 +206,7 @@ bool checkExpect(const char requete[], int *i, Noeud *noeud){
 
     // Si tout s'est bien passé, on créé le noeud contenant "100-continue"
     noeud->fils = NULL;
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->longueur = *i - indice;
     noeud->nombreFils = 0;
     noeud->tag = "case_insensitive_string";
@@ -216,21 +216,147 @@ bool checkExpect(const char requete[], int *i, Noeud *noeud){
 
 bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
+    int NombreFils;
     //noeud->fils = NULL;
     //noeud->longueur = *i - indice;
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     //noeud->nombreFils = ;
     noeud->tag = "dec-octet";
-    (*i)++;
-    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhhhhhhh
+    int tailleIP=0;
+    while (checkDigit(requete, indice + tailleIP)){
+        tailleIP++;
+    }
 
+    if (tailleIP == 0){
+        free (noeud);
+        return false;
+    }
+    // pas oubleir de (*i)++;
+    else if (tailleIP >= 3){
+        if (requete[indice]== '2'){
+            if(requete[indice + 1 ]=='5'){
+                if (requete[indice + 2] >= '0' && requete[indice + 2] <= '5'){
+
+                NombreFils =3;
+                noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+                noeud->longueur = *i - indice;
+                noeud->nombreFils = NombreFils ;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+
+                return true;
+
+                }
+                else{
+                    free (noeud);
+                    return false;
+                }
+
+            }
+
+            else if (requete[indice + 1] >= 0 && requete[indice + 1] >= 4){
+                if (checkDigit(requete, indice +2 )){
+
+
+                NombreFils =3;
+                noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+                noeud->longueur = *i - indice;
+                noeud->nombreFils = NombreFils ;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+
+                return true;
+
+                }
+                else{
+                    free(noeud);
+                    return false;
+                }
+
+            }
+            else {
+                free(noeud);
+                return false;
+            }
+        }
+        else if (requete[indice]==1){ 
+
+
+        NombreFils =3;
+        noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+        noeud->longueur = *i - indice;
+        noeud->nombreFils = NombreFils ;
+        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+        (*i)++;
+        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+        (*i)++;
+        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+        (*i)++;
+
+        return true;
+
+        }
+        else {
+            free (noeud);
+            return false;
+        }
+    }
+
+    else if (tailleIP == 2){
+        if (requete[indice] != '0'){
+
+
+        NombreFils =2;
+        noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+        noeud->longueur = *i - indice;
+        noeud->nombreFils = NombreFils ;
+        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+        (*i)++;
+        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+        (*i)++;
+
+        return true;
+
+        }
+        else{
+            free (noeud);
+            return false;
+        }
+    }
+
+    else if (tailleIP == 1){
+
+    NombreFils =1;
+    noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+    noeud->longueur = *i - indice;
+    noeud->nombreFils = NombreFils ;
+    createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+    (*i)++;
+
+    return true;
+
+    }
+
+    else {
+        printf("Si ceci s'affiche : Gros Probleme dans la fonction checkDecoctet");
+        free (noeud);
+        return false;
+    }
 }
 
 bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int NombreFils=0;
    // noeud->fils = malloc(NombreFils*sizeof(Noeud));
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
    // noeud->longueur = *i - indice;
    // noeud->nombreFils = NombreFils;
     noeud->tag = "IPvFuture";
@@ -291,12 +417,12 @@ bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
     *i=indice;
 
     int *j=0; //Compteur de fils
-    createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[*j]);
+    createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[*j]);
     (*i)++;
     (*j)++;
 
     while (checkHexdig(requete, *i)){
-        createFilsSimple("HEXDIG", *i, 1, &noeud->fils[0]);
+        createFilsSimple("HEXDIG", requete + *i, 1, &noeud->fils[0]);
         (*i)++; 
         (*j)++; 
     }
@@ -307,41 +433,41 @@ bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
             if (checkAlpha(requete, *i)){
                 petit->tag = "unreserved";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-                createFilsSimple("Alpha", *i, 1, &petit->fils[0]);
+                createFilsSimple("Alpha", requete + *i, 1, &petit->fils[0]);
             }
             else if (checkDigit(requete, *i)){
                 petit->tag = "unreserved";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-                createFilsSimple("Digit", *i, 1, &petit->fils[0]);
+                createFilsSimple("Digit", requete + *i, 1, &petit->fils[0]);
             }
             else {
                 petit->tag = "unreserved";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-                createFilsSimple("case_insensitive_string", *i, 1, &petit->fils[0]);
+                createFilsSimple("case_insensitive_string", requete + *i, 1, &petit->fils[0]);
             }
 
         }
         else if (checkSubDelims(requete, *i)){
                 petit->tag = "sub-delims";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-            createFilsSimple("case_insensitive_string", *i, 1, &petit->fils[0]);
+            createFilsSimple("case_insensitive_string", requete + *i, 1, &petit->fils[0]);
         }
         else if(requete[*i] == 58){
             petit->tag = "case_insensitive_string";
             petit->fils = NULL;
-            petit->indice = *i;
+            petit->valeur = requete + *i;
             petit->longueur = 1;
             petit->nombreFils = 0;
         }
@@ -353,7 +479,7 @@ bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
         (*i)++;
     }
 
-    createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[*j]);
+    createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[*j]);
 
     (*j)++;
     (*i)++;
@@ -362,21 +488,118 @@ bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
 
 }
 
-bool checkIPV6((const char requete[], int *i, Noeud *noeud)){
+int CompteurDigit(const char requete[], int *i){
+     int indice= *i;
+     int CompteurDigit=0;
+
+    while (checkDigit(requete, indice)){
+        CompteurDigit++;
+        indice++;
+    }
+
+    return CompteurDigit;
+}
+
+bool checkIPV6(const char requete[], int *i, Noeud *noeud){
     // Ne pas oublier de faire *i=indice; avant chaque return false pour ne pas créer de problèmes lors du 2e if de checkIPliteral
+
+    //Potentiellement faire un tableau des tailles de H16
+    
+    const int indice = *i; // On conserve l'indice de début
+    int NombreFils = 0;
+    int CompteurH16=0;
+    int Compteur=0;
+    bool interrupteur= true;
+    bool cas_1 = true;
+    
+    //noeud->fils = malloc(NombreFils*sizeof(Noeud));
+    noeud->valeur = requete + indice;
+    //noeud->longueur = ;
+    //noeud->nombreFils = ;
+    noeud->tag = "IPv6address";
+
+    while (interrupteur){ // Cette boucle while va nous permettre de compter le nombre de H16 ou de (H16 ":") avant les "::"
+        Compteur=CompteurDigit(requete,*i);
+        switch (Compteur) {
+            case 0:
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                CompteurH16++;
+                break;
+            
+            default:
+            if (cas_1){
+                CompteurH16=-1;
+            }
+            else{
+                interrupteur=false;
+            }
+            break;
+        }
+
+        if (CompteurH16 < 0 || CompteurH16 > 8){
+            free (noeud);
+            *i=indice;
+            return false;
+        }
+
+
+        else {
+            if (requete[*i + Compteur]==":"){
+                if (CompteurH16==6){  //A partir de H16 = 6 on peut soit être dans le cas 1 ou les deux derniers, on active donc une option nous permettant de ne plus tout jeter si ce qui vient après n'est pas H16 ou ":" "::"
+                    cas_1=false;     
+                }
+                else if(requete[*i + Compteur + 1]==":"){
+                    interrupteur=false;
+                }
+                else{
+                    *i=*i+Compteur + 1;
+                }
+            }
+
+            else{
+                if (CompteurH16!=8 | requete[*i + Compteur]!="."){ //Si Il y a 8 H16 alors on est dans le cas 1 avec 2 H16 dans ls32, donc c'est valide de ne pas avoir de ":" après le 8e H16
+                free(noeud);
+                *i=indice;
+                return false;
+                }
+
+                else{
+                    if (requete[*i + Compteur]=="."){ //Ce qu'on a pris pour un H16 était en réalité un dec-octet, on corrige notre erreur
+                        CompteurH16--;
+                        interrupteur=false;
+                    }
+
+                    else{
+                        *i=*i+Compteur;
+                        interrupteur=false;
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
+
+   
     zrberljl jjjjjjjjjjjjjjjj, oooooooooooooooooooh scouuuuuuuuuuuuuuuuuurrr
 }
 
 bool checkIPliteral(const char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     noeud->fils = malloc(3*sizeof(Noeud));
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->longueur = 3;
     noeud->nombreFils = 3;
     noeud->tag = "IP-literal";
 
     if (requete[indice]==91){ // Code ascii pour [
-        createFilsSimple("case_insensitive_string", indice, 1, &noeud->fils[0]);
+        createFilsSimple("case_insensitive_string", requete + indice, 1, &noeud->fils[0]);
         (*i)++;
     }
     else{
@@ -392,7 +615,7 @@ bool checkIPliteral(const char requete[], int *i, Noeud *noeud){
     (*i)++;
 
     if (requete[indice+2]==93){ // Code ascii pour ]
-        createFilsSimple("case_insensitive_string", indice+2, 1, &noeud->fils[2]);
+        createFilsSimple("case_insensitive_string", requete + indice+2, 1, &noeud->fils[2]);
         (*i)++;
     }
     else{
@@ -408,7 +631,7 @@ bool checkIPV4(const char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int nombreFils=7;
 
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->nombreFils = nombreFils;
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
     noeud->tag = "IPv4address";
@@ -424,7 +647,7 @@ bool checkIPV4(const char requete[], int *i, Noeud *noeud){
             free(noeud);
             return false;
         }
-        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[j]);
         (*i)++;
         j++;
     }
@@ -441,7 +664,7 @@ bool checkREGNAME(const char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int nombreFils=0;
 
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->tag = "reg-name";
 
 
@@ -467,48 +690,48 @@ bool checkREGNAME(const char requete[], int *i, Noeud *noeud){
             if (checkAlpha(requete, *i)){
                 petit->tag = "unreserved";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-                createFilsSimple("Alpha", *i, 1, &petit->fils[0]);
+                createFilsSimple("Alpha", requete + *i, 1, &petit->fils[0]);
             }
             else if (checkDigit(requete, *i)){
                 petit->tag = "unreserved";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-                createFilsSimple("Digit", *i, 1, &petit->fils[0]);
+                createFilsSimple("Digit", requete + *i, 1, &petit->fils[0]);
             }
             else {
                 petit->tag = "unreserved";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-                createFilsSimple("case_insensitive_string", *i, 1, &petit->fils[0]);
+                createFilsSimple("case_insensitive_string", requete + *i, 1, &petit->fils[0]);
             }
 
         }
         else if (checkSubDelims(requete, *i)){
                 petit->tag = "sub-delims";
                 petit->fils = malloc(sizeof(Noeud));
-                petit->indice = *i;
+                petit->valeur = requete + *i;
                 petit->longueur = 1;
                 petit->nombreFils = 1;
-            createFilsSimple("case_insensitive_string", *i, 1, &petit->fils[0]);
+            createFilsSimple("case_insensitive_string", requete + *i, 1, &petit->fils[0]);
         }
         else if(checkPctEncoded(requete, *i)){
             petit->tag = "pct-encoded";
             petit->fils = malloc(3*sizeof(Noeud));
-            petit->indice = *i;
+            petit->valeur = requete + *i;
             petit->longueur = 3;
             petit->nombreFils = 3;
-            createFilsSimple("case_insensitive_string", *i, 1, &petit->fils[0]);
+            createFilsSimple("case_insensitive_string", requete + *i, 1, &petit->fils[0]);
             (*i)++;
-            createFilsSimple("HEXDIG", *i, 1, &petit->fils[1]);
+            createFilsSimple("HEXDIG", requete + *i, 1, &petit->fils[1]);
             (*i)++;
-            createFilsSimple("HEXDIG", *i, 1, &petit->fils[2]);
+            createFilsSimple("HEXDIG", requete + *i, 1, &petit->fils[2]);
         }
 
         else {
@@ -527,7 +750,7 @@ bool checkHost(const char requete[], int *i, const int longueur, Noeud *noeud){
 
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
     //noeud->longueur = *i - indice;
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     noeud->nombreFils = nombreFils ;
     noeud->tag = "Host";
 
@@ -559,7 +782,7 @@ bool checkExpectHeader(const char requete[], int *i, const int longueur, Noeud *
     const int indice= *i;
 
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     // On ne connaît pas encore noeud->longueur
     noeud->nombreFils = nombreFils;
     noeud->tag = "Expect-header";
@@ -588,7 +811,7 @@ bool checkExpectHeader(const char requete[], int *i, const int longueur, Noeud *
         *i = indice;
         return false;
     } else {
-        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[j]);
         (*i)++;
     }
     j++;
@@ -619,7 +842,7 @@ bool checkHostHeader(const char requete[], int *i, const int longueur, Noeud *no
     const int indice= *i;
 
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
-    noeud->indice = indice;
+    noeud->valeur = requete + indice;
     // On ne connaît pas encore noeud->longueur
     noeud->nombreFils = nombreFils;
     noeud->tag = "Host-header";
@@ -648,7 +871,7 @@ bool checkHostHeader(const char requete[], int *i, const int longueur, Noeud *no
         *i = indice;
         return false;
     } else {
-        createFilsSimple("case_insensitive_string", *i, 1, &noeud->fils[j]);
+        createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[j]);
         (*i)++;
     }
     j++;

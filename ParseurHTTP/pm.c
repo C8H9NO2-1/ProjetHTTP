@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "api.h"
 #include "structure.h"
 #include "pm.h"
 #include "affichage.h"
