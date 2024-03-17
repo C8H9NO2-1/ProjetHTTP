@@ -99,6 +99,56 @@ void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud) {
     noeud->nombreFils = 0;
 }
 
+bool checkTChar(char requete[], int i, Noeud *noeud) {
+    //! Cette fonction a deux éxécution différentes:
+    //* - Une qui ne fait que vérifier syntaxiquement un caractère
+    //* - Une qui vérifie syntaxiquement un caractère mais stocke aussi ce caractère
+
+    // On stocke les données nécessaires pour le noeud courant
+    if (noeud != NULL) {
+        noeud->fils = NULL;
+        noeud->valeur = requete + i;
+        noeud->longueur = 1;
+        noeud->nombreFils = 0;
+        noeud->tag = "tchar";
+    }
+
+    // On vérifie que la syntaxe est correcte
+    switch (requete[i]) {
+        case '!':
+        case '#':
+        case '$':
+        case '%':
+        case '&':
+        case 39 : //? ' = 39
+        case '*':
+        case '+':
+        case '-':
+        case '.':
+        case '^':
+        case '_':
+        case '`':
+        case '|':
+        case '~':
+            return true;
+            break;
+        
+        default:
+            break;
+    }
+
+    if (checkAlpha(requete, i) || checkDigit(requete, i)) {
+        return true;
+    }
+
+    // Si la syntaxe n'est pas correcte, on libère la mémoire et on renvoie false
+    if (noeud != NULL) {
+        free(noeud);
+    }
+
+    return false;
+}
+
 bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) {
     int compteur = 0;
     const int indice = *i;
@@ -280,56 +330,6 @@ bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud
     }
 
     return true;
-}
-
-bool checkTChar(char requete[], int i, Noeud *noeud) {
-    //! Cette fonction a deux éxécution différentes:
-    //* - Une qui ne fait que vérifier syntaxiquement un caractère
-    //* - Une qui vérifie syntaxiquement un caractère mais stocke aussi ce caractère
-
-    // On stocke les données nécessaires pour le noeud courant
-    if (noeud != NULL) {
-        noeud->fils = NULL;
-        noeud->valeur = requete + i;
-        noeud->longueur = 1;
-        noeud->nombreFils = 0;
-        noeud->tag = "tchar";
-    }
-
-    // On vérifie que la syntaxe est correcte
-    switch (requete[i]) {
-        case '!':
-        case '#':
-        case '$':
-        case '%':
-        case '&':
-        case 39 : //? ' = 39
-        case '*':
-        case '+':
-        case '-':
-        case '.':
-        case '^':
-        case '_':
-        case '`':
-        case '|':
-        case '~':
-            return true;
-            break;
-        
-        default:
-            break;
-    }
-
-    if (checkAlpha(requete, i) || checkDigit(requete, i)) {
-        return true;
-    }
-
-    // Si la syntaxe n'est pas correcte, on libère la mémoire et on renvoie false
-    if (noeud != NULL) {
-        free(noeud);
-    }
-
-    return false;
 }
 
 bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud) {
@@ -560,6 +560,8 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
 
     return true;
 }
+
+//!===============================================================================
 
 bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *noeud) {
     int nombreFils = 5;

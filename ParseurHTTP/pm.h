@@ -11,8 +11,12 @@ bool checkPctEncoded(const char requete[], int i);
 bool checkSubDelims(const char requete[], int i);
 //! Fonction utile pour la création de feuilles dans l'arbre
 void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
+//! Fonction qui permet de vérifier et de créer un tchar
+bool checkTChar(char requete[], int i, Noeud *noeud); //? tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /"^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
 //! Fonction qui permet de vérifier et de créer un token
 bool checkToken(char requete[], int *i, const int longueur, Noeud *noeud, char nom[]); //? token = 1*tchar
+//! Fonction qui permet de vérifier et de créer un OWS
+bool checkOWS(char requete[], int *i, const int longueur, Noeud *noeud); //? OWS = *( SP / HTAB )
 //! Fonction qui transforme une sous chaîne en minuscule pour pouvoir comparer les chaînes non sensibles à la casse
 void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
 
@@ -41,17 +45,6 @@ bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud); //? sta
  * @return false Sinon
  */
 bool checkMethod(char requete[], int *i, const int longueur, Noeud *noeud); //? method = token
-
-/**
- * @brief Vérifie si un caractère est bien un tchar
- * 
- * @param requete Requête HTTP en cours de parsing
- * @param i Indice du caractère à vérifier dans requête
- * @param noeud Pointeur vers le noeud dans lequel on va stocker le caractère
- * @return true Si requête[i] est un tchar
- * @return false Sinon
- */
-bool checkTChar(char requete[], int i, Noeud *noeud); //? tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*" / "+" / "-" / "." /"^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA
 
 /**
  * @brief Vérifie si une chaîne est bien une request-target
@@ -128,14 +121,51 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud);
 //!====================================================================================================
 //? Fonctions utiles pour parser le connection-header
 
+/**
+ * @brief Vérifie si une chaîne est bien un connection-header
+ * 
+ * @param requete Requête HTTP en cours de parsing
+ * @param i Pointeur vers l'indice de début de la chaîne à vérifier
+ * @param longueur longueur de requete
+ * @param noeud Pointeur vers le noeud dans lequel on va stocker le connection-header
+ * @return true Si la syntaxe est correcte
+ * @return false Sinon
+ */
 bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *noeud); //? Connection-header = "Connection" ":" OWS Connection OWS
 
+/**
+ * @brief Vérifie si une chaîne est bien un connection-string
+ * 
+ * @param requete Requête HTTP en cours de parsing
+ * @param i Pointeur vers l'indice de début de la chaîne à vérifier
+ * @param noeud Pointeur vers le noeud dans lequel on va stocker le connection-option
+ * @return true Si la syntaxe est correcte
+ * @return false Sinon
+ */
 bool checkConnectionString(char requete[], int *i, Noeud *noeud); //? "Connection"
 
-bool checkOWS(char requete[], int *i, const int longueur, Noeud *noeud); //? OWS = *( SP / HTAB )
-
+/**
+ * @brief Vérifie si une chaîne est bien un connection
+ * 
+ * @param requete Requête HTTP en cours de parsing
+ * @param i Pointeur vers l'indice de début de la chaîne à vérifier
+ * @param longueur longueur de requete
+ * @param noeud Pointeur vers le noeud dans lequel on va stocker le connection-option
+ * @return true Si la syntaxe est correcte
+ * @return false Sinon
+ */
 bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud); //? *( "," OWS ) connection-option *( OWS "," [ OWS connection-option ] )
 
+/**
+ * @brief Vérifie si une chaîne est bien un connection-option
+ * 
+ * @param requete Requête HTTP en cours de parsing
+ * @param i Pointeur vers l'indice de début de la chaîne à vérifier
+ * @param longueur longueur de requete
+ * @param noeud Pointeur vers le noeud dans lequel on va stocker le connection-option
+ * @return true Si la syntaxe est correcte
+ * @return false Sinon
+ */
 bool checkConnectionOption(char requete[], int *i, const int longueur, Noeud *noeud); //? connection-option = token
 
 #endif
