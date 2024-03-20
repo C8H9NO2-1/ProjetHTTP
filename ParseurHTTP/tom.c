@@ -507,8 +507,19 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
     
     const int indice = *i; // On conserve l'indice de début
     int NombreFils = 0;
+    int *j=0;            // J nous servira plus tard pour créer les différents noeuds
+    Noeud *petit; // A l'aide du noeud petit on va créer les noeuds H16 puis digit
+    int somme ; // Nous sert à "localiser" les noeuds
+    int *m;
+
     int CompteurH16=0;
     int Compteur=0;
+    int tab1[9]; //Ce tableau nous sert à garder en mémoire la taille de chaque H16
+
+    int tab2[8]; //Ce tableau fais la meme chose que le premier mais pour les H16 après "::"
+    int CompteurH16_bis=0; //Idem
+    bool ls32=false; // Ce boolean nous sera utile pour verifier si on se trouve dans le ls32 ou non
+
     bool interrupteur= true;
     bool cas_1 = true;
     
@@ -527,6 +538,9 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
             case 2:
             case 3:
             case 4:
+                if (CompteurH16 <= 8){
+                    tab1[CompteurH16]=Compteur;
+                }
                 CompteurH16++;
                 break;
             
@@ -561,15 +575,14 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
             }
 
             else{
-                if (CompteurH16!=8 | requete[*i + Compteur]!="."){ //Si Il y a 8 H16 alors on est dans le cas 1 avec 2 H16 dans ls32, donc c'est valide de ne pas avoir de ":" après le 8e H16
+                if (CompteurH16!=8 || requete[*i + Compteur]!="."){ //Si Il y a 8 H16 alors on est dans le cas 1 avec 2 H16 dans ls32, donc c'est valide de ne pas avoir de ":" après le 8e H16
                 free(noeud);
                 *i=indice;
                 return false;
                 }
 
                 else{
-                    if (requete[*i + Compteur]=="."){ //Ce qu'on a pris pour un H16 était en réalité un dec-octet, on corrige notre erreur
-                        CompteurH16--;
+                    if (requete[*i + Compteur]=="."){ //Ce qu'on a pris pour un H16 était en réalité un dec-octet, on corrigera notre erreur plus tard
                         interrupteur=false;
                     }
 
@@ -583,6 +596,170 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
 
         }
 
+    }
+
+    interrupteur=true;
+
+    if (CompteurH16==8){ // C'est le cas 1.1 où ls32 = 2 H16, on corrige donc notre erreur
+        NombreFils= 8 + 7;
+        noeud->fils = malloc(NombreFils*sizeof(Noeud));
+        noeud->longueur = *i - indice;
+        noeud->nombreFils = NombreFils ;
+
+        Noeud *petit = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis digit
+        somme =0; // Nous sert à "localiser" leqs noeuds
+        *m=0;
+
+        while (*j < NombreFils){
+
+            petit->tag = "H16";
+            petit->fils = malloc(tab1[*j]*sizeof(Noeud));
+            petit->valeur = requete + indice + somme; //ETNBZ
+            petit->longueur = tab1[*j];
+            petit->nombreFils = tab1[*j];
+            *m=0;
+            while (i < tab1[*j]){
+                createFilsSimple("Digit", requete + indice + somme , 1, &petit->fils[*m]);
+                (*m)++;
+            }
+            somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":"
+            (*j)++;
+
+        }
+        return true;
+    }
+
+    else if(CompteurH16==6 && requete [*i]!=":" &&requete[*i + 1] != ":"){ //On traite le cas 1.2
+        NombreFils= 6 + 6; // 6 H16 + 5 :  + 1 addresseipv4
+        noeud->fils = malloc(NombreFils*sizeof(Noeud));
+        noeud->longueur = *i - indice;
+        noeud->nombreFils = NombreFils ;
+
+        if (checkIPV4(requete,*i, &noeud->fils[15])){
+
+            Noeud *petit = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis digit 
+            somme =0; // Nous sert à "localiser" leqs noeuds
+            *m=0;
+
+            while (*j < NombreFils - 1){
+
+                petit->tag = "H16";
+                petit->fils = malloc(tab1[*j]*sizeof(Noeud));
+                petit->valeur = requete + indice + somme; //ETNBZ
+                petit->longueur = tab1[*j];
+                petit->nombreFils = tab1[*j];
+                *m=0;
+                while (i < tab1[*j]){
+                    createFilsSimple("Digit", requete + indice + somme , 1, &petit->fils[*m]);
+                    (*m)++;
+                }
+                somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":", c'est pour ça que le +1 est là !
+                (*j)++;
+
+            }
+            return true;
+        }
+
+        else{
+            free (noeud);
+            *i=indice;
+            return false;
+        }
+    }
+
+    else {  // Maintenant le plan c'est de compter les H16 de l'autre coté des ":" pour comparer leur nombre à ceux d'avant et de déterminer le cas où l'on se trouve
+        while (interrupteur){ // Cette boucle while va nous permettre de compter le nombre de H16 ou de (H16 ":") après les "::"
+            Compteur=CompteurDigit(requete,*i);
+            switch (Compteur) {
+                case 0:
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    if (CompteurH16_bis <= 8){
+                        tab2[CompteurH16_bis]=Compteur;
+                    }
+                    CompteurH16_bis++;
+                    break;
+                
+                default:
+                interrupteur=false;
+                break;
+            }
+
+            if (CompteurH16_bis < 0 || CompteurH16_bis > 7){
+                free (noeud);
+                *i=indice;
+                return false;
+            }
+
+
+            else {
+                if (requete[*i + Compteur]==":"){
+                    *i=*i+Compteur + 1;
+                }
+
+                else{
+                    if (requete[*i + Compteur]!="."){ //Si il n'y a pas de "." ou de ":" alors on arrête de compter sans savoir ce qui se trouve après (on regardera plus tard)
+                    *i=*i+Compteur;
+                    interrupteur= false;
+                    }
+
+                    else{
+                        if (requete[*i + Compteur]=="."){ //Ce qu'on a pris pour un H16 était en réalité un dec-octet, on corrige notre erreur
+                            CompteurH16--;
+                            interrupteur=false;
+                        }
+
+                        else{
+                            *i=*i+Compteur;
+                            interrupteur=false;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    // OK alors maintenant l'idée c'est de vérifier si après le dernier h16 on a un ":" ou non.
+    // Si il n'y a pas de ":" alors on est dans le cas 1 de ls32 (ou dans le cas où il n'y a que 1 H16)
+    // Si il y a un ":" alors on est avant le ls32 (ou dans le dernier cas)
+
+    if (requete[*i -1] != ":" && CompteurH16_bis > 1){
+        ls32=true;
+        CompteurH16_bis--;
+        CompteurH16_bis--;
+    }
+
+    switch (CompteurH16_bis) {
+    case 0:
+        if (CompteurH16<1 || CompteurH16 >7){
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
+        }
+        else{
+            break;
+        }
+    case 1: //Code à continuer à partir de là
+    case 2:
+    case 3:
+    case 4:
+        if (CompteurH16_bis <= 8){
+            tab2[CompteurH16_bis]=Compteur;
+        }
+        CompteurH16_bis++;
+        break;
+    
+    default:
+    interrupteur=false;
+    break;
     }
 
 
