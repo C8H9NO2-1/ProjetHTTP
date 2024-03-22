@@ -539,6 +539,8 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
     int somme ; // Nous sert à "localiser" les noeuds
     int *m;
 
+    int *k=0; //k nous sert à accéder au tableau du compteur de digit des h16
+
     int CompteurH16=0;
     int Compteur=0;
     int tab1[9]; //Ce tableau nous sert à garder en mémoire la taille de chaque H16
@@ -673,7 +675,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
             while (*j < NombreFils - 1){
 
                 petit->tag = "H16";
-                petit->fils = malloc(tab1[*j]*sizeof(Noeud));
+                petit->fils = malloc(tab1[*j - *k]*sizeof(Noeud));
                 petit->valeur = requete + indice + somme; //ETNBZ
                 petit->longueur = tab1[*j];
                 petit->nombreFils = tab1[*j];
@@ -686,6 +688,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
                 createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &noeud->fils[*j]);
                 somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":", c'est pour ça que le +1 est là !
                 (*j)++;
+                (*k)++;
 
             }
             return true;
@@ -838,22 +841,27 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
         NombreFils++;
     }
 
-    NombreFils= 2+CompteurH16 + CompteurH16_bis;
+
+    NombreFils= 1+2*(CompteurH16 + CompteurH16_bis); // Pour chaque H16 1 ":" + le 2e ":" du milieu de la fonction
+    if (CompteurH16_bis == 1){
+        NombreFils--; // On a compté 1 ":" de trop
+    }
     noeud->fils = malloc(NombreFils*sizeof(Noeud));
     noeud->longueur = *i - indice;
     noeud->nombreFils = NombreFils ;
 
     *j=0;
+    *k=0;
     *i=indice;
 
     Noeud *petit1 = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis digit
     somme =0; // Nous sert à "localiser" leqs noeuds
     *m=0;
 
-    while (*j < CompteurH16){
+    while (*j < 2*CompteurH16){
 
         petit1->tag = "H16";
-        petit1->fils = malloc(tab1[*j]*sizeof(Noeud));
+        petit1->fils = malloc(tab1[*j- *k]*sizeof(Noeud));
         petit1->valeur = requete + indice + somme; //ETNBZ
         petit1->longueur = tab1[*j];
         petit1->nombreFils = tab1[*j];
@@ -867,6 +875,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
         createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &noeud->fils[*j]);
         somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":"
         (*j)++;
+        (*k)++;
 
     }
 
@@ -875,13 +884,14 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
     (*m)++;
 
     (*j)=0;
+    (*k)=0;
 
     somme=somme+1;
 
-    while (*j < CompteurH16_bis){
+    while (*j < 2*CompteurH16_bis){
 
         petit1->tag = "H16";
-        petit1->fils = malloc(tab2[*j]*sizeof(Noeud));
+        petit1->fils = malloc(tab2[*j - *k]*sizeof(Noeud));
         petit1->valeur = requete + indice + somme; //ETNBZ
         petit1->longueur = tab2[*j];
         petit1->nombreFils = tab2[*j];
@@ -890,11 +900,16 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
             (*m)++;
             (*i)++;
         }
-        if (CompteurH16_bis !=1){
+        if ((CompteurH16_bis) !=1){
+            (*j)++;
             createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &noeud->fils[*j]);
+        }
+        else{
+            (*j)++;
         }
         somme= somme + tab2[*j] + 1; // Ne pas oublier de compter le ":"
         (*j)++;
+        (*k)++;
 
     }
 
@@ -920,12 +935,12 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
             while (*j < 3){
 
                 petit2->tag = "H16";
-                petit2->fils = malloc(tab2[CompteurH16_bis + *j]*sizeof(Noeud));
+                petit2->fils = malloc(tab2[CompteurH16_bis + *j - *k]*sizeof(Noeud));
                 petit2->valeur = requete + indice + somme; //ETNBZ
-                petit2->longueur = tab1[CompteurH16_bis + *j];
+                petit2->longueur = tab1[CompteurH16_bis + *j - *k];
                 petit2->nombreFils = tab1[CompteurH16_bis + *j];
                 while (*m < tab1[*j]){
-                    createFilsSimple("Digit", requete + indice + somme + *m, 1, &petit1->fils[*m]);
+                    createFilsSimple("Digit", requete + indice + somme + *m, 1, &petit2->fils[*m]);
                     (*m)++;
                     (*i)++;
                 }
@@ -933,8 +948,12 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud){
                         (*j)++;
                         createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &petit1->fils[*j]);
                     }
+                    else{
+                        (*j)++;
+                    }
                 somme= somme + tab2[*j] + 1; // Ne pas oublier de compter le ":"
                 (*j)++;
+                (*k)++;
 
             }
 
