@@ -7,10 +7,21 @@
 #include "elisa2.h"
 #include "affichage.h"
 
-#define VERIFICATION() if (*i >= longueur) { \
-if (noeud != NULL) \
+#define VERIFICATION1() if (*i >= longueur) { \
 free(noeud); \
 return false; } \
+
+#define VERIFICATION() if (*i >= longueur) { \
+return false; } \
+
+void freeArbre(Noeud *racine) {
+    for (int i = 0; i < racine->nombreFils; i++) {
+        if (racine->fils[i].nombreFils != 0) {
+            freeArbre(&racine->fils[i]);
+        }
+    }
+    free(racine->fils);
+}
 
 int main(int argc, char *argv[]) {
     
@@ -20,9 +31,12 @@ int main(int argc, char *argv[]) {
 	// char transferEncoding[] = "TrANsfEr-eNcOdinG:				,GZiP ,		Fp#SAbMJPw8wTz- ;Z#QT~h4p#u|PPK5= nKi|kxaOW$uKHke 	; z-^6'FzCNW_WJ3w =\"\"";
 	// char transferEncoding[] = "TRaNSFEr-enCODiNG:  ,20Kmy%d_Yg8t.MS; 	eh6owY1JpoLr99n=\"k_*	lx:H~ rV\\-\\R\\	!Pa,v\"";
 	// char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,  ,  	,  P4lVdK%%we_#X!m";
-    // char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,  ,  	,  ";
+    char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,  ,  	,  ";
     // char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,,  	,P4lVdK%%we_#X!m";
-    char transferEncoding[] = "TrAnSfEr-encoDInG:,	,ComPRESs 	, chuNKED, 	Z#QT~h4p#u|PPK5= nKi|kxaOW$uKHke";
+    // char transferEncoding[] = "TrAnSfEr-encoDInG:,	,ComPRESs 	, chuNKED, 	Z#QT~h4p#u|PPK5  = nKi|kxaOW$uKHke";
+
+    // On affiche le nombre d'octets de la structure Noeud
+    printf("Taille de la structure Noeud : %ld octets\n", sizeof(Noeud));
 
     Noeud *test = malloc(sizeof(Noeud));
     int i = 0;
@@ -34,7 +48,10 @@ int main(int argc, char *argv[]) {
 
     if (test != NULL) {
         printArbre(test, 0);
+        freeArbre(test);
     }
+
+    free(test);
     
     return 0;
 }
@@ -47,6 +64,7 @@ bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, 
     const int indice = *i;
     Noeud *filsTransferEncodingMot = malloc(sizeof(Noeud));
     if (!checkTransferEncodingMot(transferEncoding, filsTransferEncodingMot)) {
+        free(filsTransferEncodingMot);
         free(noeud);
         *i = indice;
         return false;
@@ -54,23 +72,27 @@ bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, 
     *i=17;
     if (transferEncoding[*i] != 58) { //? ":" = 58
         free(noeud);
+        free(filsTransferEncodingMot);
         *i = indice;
         return false;
     }
     (*i)++;
 
-    Noeud *filsOWS1 = malloc(sizeof(Noeud));
-    checkOWS(transferEncoding, i, longueur, filsOWS1);
+    // Noeud *filsOWS1 = malloc(sizeof(Noeud));
+    checkOWS(transferEncoding, i, longueur, NULL);
 
     Noeud *filsTransferEncoding = malloc(sizeof(Noeud));
     if (!checkTransferEncoding(transferEncoding, i, longueur, filsTransferEncoding)){
         free(noeud);
+        free(filsTransferEncodingMot);
+        free(filsTransferEncoding);
+        // free(filsOWS1);
         *i = indice;
         return false;
     }
 
-    Noeud *filsOWS2 = malloc(sizeof(Noeud));
-    checkOWS(transferEncoding, i, longueur, filsOWS2);
+    // Noeud *filsOWS2 = malloc(sizeof(Noeud));
+    checkOWS(transferEncoding, i, longueur, NULL);
 
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
     noeud->valeur = transferEncoding + indice;
@@ -86,14 +108,22 @@ bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, 
     createFilsSimple("case_insensitive_string", transferEncoding + *i, 1, &noeud->fils[1]);
     (*i)++;
     
-    noeud->fils[2] = *filsOWS1;
-    (*i) += noeud->fils[2].longueur;
+    // noeud->fils[2] = *filsOWS1;
+    // (*i) += noeud->fils[2].longueur;
+    checkOWS(transferEncoding, i, longueur, &noeud->fils[2]);
 
     noeud->fils[3] = *filsTransferEncoding;
     (*i) += noeud->fils[3].longueur;
 
-    noeud->fils[4] = *filsOWS2;
-    (*i) += noeud->fils[4].longueur;
+    printf("i = %d\n", *i);
+
+    // noeud->fils[4] = *filsOWS2;
+    // (*i) += noeud->fils[4].longueur;
+    checkOWS(transferEncoding, i, longueur, &noeud->fils[4]);
+
+    // On nettoie les fils temporaires
+    free(filsTransferEncodingMot);
+    free(filsTransferEncoding);
 
     return true;
 
@@ -117,7 +147,7 @@ bool checkTransferEncodingMot(char transferEncoding[], Noeud *noeud) {
     sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, 0, 17);
     int a=strcmp("transfer-encoding", transferEncodingMinuscule);
     if (a!=0){
-        free(noeud);
+        // free(noeud);
         return false ;
     }
     return true;
@@ -178,7 +208,7 @@ bool checkTransferEncoding(char transferEncoding[], int *i, int longueur, Noeud 
     }
 
     if (!checkTransferCoding(transferEncoding, i, longueur, NULL)) {
-            free(noeud);
+            // free(noeud);
             *i = indice;
             return false;
     }
@@ -208,7 +238,7 @@ bool checkTransferEncoding(char transferEncoding[], int *i, int longueur, Noeud 
     // printf("compteur = %d\n", compteur);
 
     noeud->valeur = transferEncoding + indice;
-    noeud->longueur = *i - indice;
+    // noeud->longueur = *i - indice;
     noeud->tag = "Transfer-Encoding";
     noeud->fils = malloc(compteur * sizeof(Noeud));
     noeud->nombreFils =compteur;
@@ -248,6 +278,9 @@ bool checkTransferEncoding(char transferEncoding[], int *i, int longueur, Noeud 
             owsChecked = true;
         }
     }
+
+    noeud->longueur = *i - indice;
+
     return true;  
 }
 
@@ -326,15 +359,19 @@ bool checkTransferCoding(char transferEncoding[], int *i, int longueur, Noeud *n
         if (noeud!=NULL){
             noeud->longueur = (*i)-indice;
             noeud->fils[0]=*filsTransferExtension;
+        } else {
+            freeArbre(filsTransferExtension);
         }
+        free(filsTransferExtension);
         return true;
     }
 
     else{
-        free(noeud);
+        // free(noeud);
         (*i)=indice;
         return false;
     }
+
     return true;
 }
 
@@ -349,7 +386,7 @@ bool checktransferextension(char transferEncoding[], int *i, int longueur, Noeud
     // int point_virgule = -1;
     
     if (!checkToken(transferEncoding, i, longueur, NULL, "")) {
-        free(noeud);
+        // free(noeud);
         (*i) = indice;
         return false;
     }
@@ -454,7 +491,7 @@ bool checkTransferParameter(char transferEncoding[], int *i, int longueur, Noeud
     checkOWS(transferEncoding, i, longueur, NULL);
     compteur++;
     if (transferEncoding[*i]!=61){
-        free(noeud);
+        // free(noeud);
         *i=indice;
         return false;
     }
@@ -467,7 +504,7 @@ bool checkTransferParameter(char transferEncoding[], int *i, int longueur, Noeud
     }
     else {
         if (!checkToken(transferEncoding, i, longueur, NULL, "")) {
-            free(noeud);
+            // free(noeud);
             (*i) = indice;
             return false;
         }
@@ -527,7 +564,7 @@ bool checkQuotedString(char transferEncoding[], int *i, int longueur, Noeud *noe
     int const indice =(*i);
     if (transferEncoding[*i]!=34){
         (*i)=indice;
-        free(noeud);
+        // free(noeud);
         return false;
     }
     (*i)++;
@@ -538,7 +575,7 @@ bool checkQuotedString(char transferEncoding[], int *i, int longueur, Noeud *noe
     }
     if (transferEncoding[*i]!=34){
         (*i)=indice;
-        free(noeud);
+        // free(noeud);
         return false;
     }
     (*i)++;
@@ -583,7 +620,7 @@ bool checkQdtext(char transferEncoding[], int i, Noeud *noeud){
         }
         return true;
     } else {
-        free(noeud);
+        // free(noeud);
         return false;
     }
 }
@@ -602,7 +639,7 @@ bool checkQuotedPair(char transferEncoding[], int *i, int longueur, Noeud *noeud
         noeud->nombreFils =2;
     }
     if (transferEncoding[*i]!=92){
-        free(noeud);
+        // free(noeud);
         return false;
     }
     if (noeud!=NULL){
@@ -630,7 +667,7 @@ bool checkQuotedPair(char transferEncoding[], int *i, int longueur, Noeud *noeud
         }
     }
     else {
-        free(noeud);
+        // free(noeud);
         (*i)=indice;
         return false;
     }
@@ -685,9 +722,9 @@ bool checkTChar(char requete[], int i, Noeud *noeud) {
     }
 
     // Si la syntaxe n'est pas correcte, on libère la mémoire et on renvoie false
-    if (noeud != NULL) {
-        free(noeud);
-    }
+    // if (noeud != NULL) {
+    //     free(noeud);
+    // }
 
     return false;
 }
@@ -717,7 +754,7 @@ void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
 
 bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) {
 
-    //VERIFICATION()
+    VERIFICATION()
 
     int compteur = 0;
     const int indice = *i;
@@ -730,9 +767,9 @@ bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) 
 
     // Si on a 0 tchar, on renvoie false
     if (compteur < 1) {
-        if (noeud != NULL) {
-            free(noeud);
-        }
+        // if (noeud != NULL) {
+        //     free(noeud);
+        // }
         (*i) = indice;
         return false;
     }

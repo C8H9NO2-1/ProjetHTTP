@@ -32,4 +32,7 @@ bool checkCookieOctet(const char cookie[], int *i);
 bool checkAlpha(const char requete[], int i);
 bool checkDigit(const char requete[], int i);
 void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
+
+bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]);
+
 #endif
