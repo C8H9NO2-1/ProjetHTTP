@@ -7,6 +7,7 @@
 #include "tom.h"
 #include "affichage.h"
 
+
 //==============================Fonctions générales==============================
 
 int main(){
@@ -14,22 +15,22 @@ int main(){
     return(1);
 }
 
-bool checkAlpha(const char requete[], int i) {
+bool checkAlpha(char requete[], int i) {
     return ((requete[i] >= 'a' && requete[i] <= 'z') || (requete[i] >= 'A' && requete[i] <= 'Z'));
 }
 
-bool checkDigit(const char requete[], int i) {
+bool checkDigit(char requete[], int i) {
     return (requete[i] >= '0' && requete[i] <= '9');
 }
 
-bool checkHexdig(const char requete[], int i) {
+bool checkHexdig(char requete[], int i) {
     if ((requete[i] >= 'a' && requete[i] <= 'f') || (requete[i] >= 'A' && requete[i] <= 'F') || (requete[i] >= '0' && requete[i] <= '9')) {
         return true;
     }
     return false;
 }
 
-bool checkUnreserved(const char requete[], int i) {
+bool checkUnreserved(char requete[], int i) {
     switch (requete[i]) {
         case '-':
         case '.':
@@ -45,11 +46,11 @@ bool checkUnreserved(const char requete[], int i) {
     return (checkAlpha(requete, i) || checkDigit(requete, i));
 }
 
-bool checkPctEncoded(const char requete[], int i) {
+bool checkPctEncoded(char requete[], int i) {
     return (requete[i] == '%' && checkHexdig(requete, i + 1) && checkHexdig(requete, i + 2));
 }
 
-bool checkSubDelims(const char requete[], int i) {
+bool checkSubDelims(char requete[], int i) {
     switch (requete[i]) {
         case '!':
         case '$':
@@ -79,7 +80,7 @@ void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud) {
     noeud->nombreFils = 0;
 }
 
-void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
+void sousChaineMinuscule(char chaine1[], char chaine2[], int i, int j) {
     int diff = 'a' - 'A';
     int n = strlen(chaine1);
     for (int k = i; k < j; k++) {
@@ -94,7 +95,7 @@ void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
     chaine2[j - i] = '\0';
 }
 
-bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud) {
+bool checkOWS(char requete[], int *i, int longueur, Noeud *noeud) {
     //! Même formule qu'avec checkTChar, il y a deux éxécutions différentes, en fonction de la valeur de noeud
 
     int compteur = 0;
@@ -133,7 +134,7 @@ bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud) {
     return true;
 }
 
-bool checkExpectString(const char requete[], int *i, Noeud *noeud) {
+bool checkExpectString(char requete[], int *i, Noeud *noeud) {
     const int indice = *i; // On conserve l'indice de début
     int n = 6; // Taille de la sous-chaîne qui contient potentiellement "Connection"
     char *chaineExpect = malloc((n + 1) * sizeof(char)); // On ajoute un caractère pour le \0
@@ -160,7 +161,7 @@ bool checkExpectString(const char requete[], int *i, Noeud *noeud) {
     return true;
 }
 
-bool checkHostString(const char requete[], int *i, Noeud *noeud) {
+bool checkHostString(char requete[], int *i, Noeud *noeud) {
     const int indice = *i; // On conserve l'indice de début
     int n = 4; // Taille de la sous-chaîne qui contient potentiellement "Connection"
     char *chaineHost = malloc((n + 1) * sizeof(char)); // On ajoute un caractère pour le \0
@@ -187,7 +188,7 @@ bool checkHostString(const char requete[], int *i, Noeud *noeud) {
     return true;
 }
 
-bool checkExpect(const char requete[], int *i, Noeud *noeud){
+bool checkExpect(char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int n = 12; // Taille de la sous-chaîne qui contient potentiellement "100-continue"
     char *chaineContinue = malloc((n + 1) * sizeof(char)); // On ajoute un caractère pour le \0
@@ -214,7 +215,7 @@ bool checkExpect(const char requete[], int *i, Noeud *noeud){
     return true;    
 }
 
-bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
+bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker){ // if stocker = true on stock si false on stock pas
     const int indice = *i; // On conserve l'indice de début
     int NombreFils;
     //noeud->fils = NULL;
@@ -237,19 +238,24 @@ bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
             if(requete[indice + 1 ]=='5'){
                 if (requete[indice + 2] >= '0' && requete[indice + 2] <= '5'){
 
-                NombreFils =3;
-                noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
-                noeud->longueur = *i - indice;
-                noeud->nombreFils = NombreFils ;
-                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-                (*i)++;
-                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-                (*i)++;
-                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-                (*i)++;
+                    if (stocker){
 
-                return true;
-
+                        NombreFils =3;
+                        noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+                        noeud->longueur = *i - indice;
+                        noeud->nombreFils = NombreFils ;
+                        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                        (*i)++;
+                        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                        (*i)++;
+                        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                        (*i)++;
+                        return true;
+                     }
+                     else{
+                        free(noeud);
+                        return true;
+                     }
                 }
                 else{
                     free (noeud);
@@ -261,19 +267,24 @@ bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
             else if (requete[indice + 1] >= 0 && requete[indice + 1] >= 4){
                 if (checkDigit(requete, indice +2 )){
 
+                    if (stocker){
+                        NombreFils =3;
+                        noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+                        noeud->longueur = *i - indice;
+                        noeud->nombreFils = NombreFils ;
+                        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                        (*i)++;
+                        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                        (*i)++;
+                        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                        (*i)++;
 
-                NombreFils =3;
-                noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
-                noeud->longueur = *i - indice;
-                noeud->nombreFils = NombreFils ;
-                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-                (*i)++;
-                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-                (*i)++;
-                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-                (*i)++;
-
-                return true;
+                        return true;
+                    }
+                     else{
+                        free(noeud);
+                        return true;
+                     }
 
                 }
                 else{
@@ -289,19 +300,24 @@ bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
         }
         else if (requete[indice]==1){ 
 
+            if (stocker){
+                NombreFils =3;
+                noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+                noeud->longueur = *i - indice;
+                noeud->nombreFils = NombreFils ;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
 
-        NombreFils =3;
-        noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
-        noeud->longueur = *i - indice;
-        noeud->nombreFils = NombreFils ;
-        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-        (*i)++;
-        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-        (*i)++;
-        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-        (*i)++;
-
-        return true;
+                return true;
+            }
+            else{
+                    free(noeud);
+                    return true;
+             }
 
         }
         else {
@@ -313,18 +329,22 @@ bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
     else if (tailleIP == 2){
         if (requete[indice] != '0'){
 
+            if (stocker){
+                 NombreFils =2;
+                noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+                noeud->longueur = *i - indice;
+                noeud->nombreFils = NombreFils ;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
+                createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+                (*i)++;
 
-        NombreFils =2;
-        noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
-        noeud->longueur = *i - indice;
-        noeud->nombreFils = NombreFils ;
-        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-        (*i)++;
-        createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-        (*i)++;
-
-        return true;
-
+                return true;
+            }
+            else{
+            free(noeud);
+            return true;
+            }
         }
         else{
             free (noeud);
@@ -333,15 +353,20 @@ bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
     }
 
     else if (tailleIP == 1){
+        if (stocker){
+            NombreFils =1;
+            noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
+            noeud->longueur = *i - indice;
+            noeud->nombreFils = NombreFils ;
+            createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
+            (*i)++;
 
-    NombreFils =1;
-    noeud->fils = malloc(NombreFils*sizeof(Noeud)) ;
-    noeud->longueur = *i - indice;
-    noeud->nombreFils = NombreFils ;
-    createFilsSimple("Digit", requete + *i, 1, &noeud->fils[*i]);
-    (*i)++;
-
-    return true;
+            return true;
+        }
+        else{
+        free(noeud);
+        return true;
+        }
 
     }
 
@@ -352,7 +377,7 @@ bool checkDecoctet(const char requete[], int *i, Noeud *noeud){
     }
 }
 
-bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
+bool checkIPfuture(char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int NombreFils=0;
    // noeud->fils = malloc(NombreFils*sizeof(Noeud));
@@ -488,7 +513,7 @@ bool checkIPfuture(const char requete[], int *i, Noeud *noeud){
 
 }
 
-int CompteurDigit(const char requete[], int *i){
+int CompteurDigit(char requete[], int *i){
      int indice= *i;
      int CompteurDigit=0;
 
@@ -500,12 +525,14 @@ int CompteurDigit(const char requete[], int *i){
     return CompteurDigit;
 }
 
-bool checkIPV6(const char requete[], int *i, Noeud *noeud){
+bool checkIPV6(char requete[], int *i, Noeud *noeud){
     // Ne pas oublier de faire *i=indice; avant chaque return false pour ne pas créer de problèmes lors du 2e if de checkIPliteral
 
     //Potentiellement faire un tableau des tailles de H16
     
     const int indice = *i; // On conserve l'indice de début
+    int indice2;
+
     int NombreFils = 0;
     int *j=0;            // J nous servira plus tard pour créer les différents noeuds
     Noeud *petit; // A l'aide du noeud petit on va créer les noeuds H16 puis digit
@@ -522,6 +549,8 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
 
     bool interrupteur= true;
     bool cas_1 = true;
+
+    Noeud * test; // Ce noeud nous servira juste à tester si ipv6 continet une @ ipv4
     
     //noeud->fils = malloc(NombreFils*sizeof(Noeud));
     noeud->valeur = requete + indice;
@@ -618,8 +647,8 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
             petit->longueur = tab1[*j];
             petit->nombreFils = tab1[*j];
             *m=0;
-            while (i < tab1[*j]){
-                createFilsSimple("Digit", requete + indice + somme , 1, &petit->fils[*m]);
+            while (*m < tab1[*j]){
+                createFilsSimple("Digit", requete + indice + somme + *m , 1, &petit->fils[*m]);
                 (*m)++;
             }
             somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":"
@@ -635,7 +664,7 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
         noeud->longueur = *i - indice;
         noeud->nombreFils = NombreFils ;
 
-        if (checkIPV4(requete,*i, &noeud->fils[15])){
+        if (checkIPV4(requete,*i, &noeud->fils[15], true)){
 
             Noeud *petit = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis digit 
             somme =0; // Nous sert à "localiser" leqs noeuds
@@ -649,10 +678,12 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
                 petit->longueur = tab1[*j];
                 petit->nombreFils = tab1[*j];
                 *m=0;
-                while (i < tab1[*j]){
-                    createFilsSimple("Digit", requete + indice + somme , 1, &petit->fils[*m]);
+                while (*m < tab1[*j]){
+                    createFilsSimple("Digit", requete + indice + somme + *m, 1, &petit->fils[*m]);
                     (*m)++;
                 }
+                (*j)++;
+                createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &noeud->fils[*j]);
                 somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":", c'est pour ça que le +1 est là !
                 (*j)++;
 
@@ -730,15 +761,21 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
     // Si il n'y a pas de ":" alors on est dans le cas 1 de ls32 (ou dans le cas où il n'y a que 1 H16)
     // Si il y a un ":" alors on est avant le ls32 (ou dans le dernier cas)
 
-    if (requete[*i -1] != ":" && CompteurH16_bis > 1){
+    if (requete[*i ] != ":" && CompteurH16_bis > 1){  // Vérifier IPV4 pour ls32 : Créer une option dans la fonction ipv4 pour pouvoir ne pas créer de noeud et ensuite l'utiliser pour check si c'est une adresse ipv4, plus haut et dans une autre fiction
         ls32=true;
         CompteurH16_bis--;
         CompteurH16_bis--;
     }
 
-    switch (CompteurH16_bis) {
+    else if(checkIPV4(requete,*i, test, false)){
+        ls32=true;
+        free (test);
+    }
+    // On a donc dans compteurH16_bis le nombre exact de H16 hors ls32
+
+    switch (CompteurH16_bis) { // Dans ce switch on va "exclure" tous les cas faux, cad les cas ou il ya plus de 7 h16 a gauche sans ls32 à droite
     case 0:
-        if (CompteurH16<1 || CompteurH16 >7){
+        if (((CompteurH16<1 || CompteurH16 >7) && !ls32) ||((CompteurH16<1 || CompteurH16 >5) && ls32) ){ // (!ls32 est égal à ls32==False non ?) 
             free (noeud);
             *i=indice;
             return false;
@@ -747,27 +784,170 @@ bool checkIPV6(const char requete[], int *i, Noeud *noeud){
         else{
             break;
         }
-    case 1: //Code à continuer à partir de là
+    case 1: 
+        if (((CompteurH16<1 || CompteurH16 >6) && !ls32) ||((CompteurH16<1 || CompteurH16 >4) && ls32) ){
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
+            }
     case 2:
-    case 3:
-    case 4:
-        if (CompteurH16_bis <= 8){
-            tab2[CompteurH16_bis]=Compteur;
+        if (((CompteurH16<1 || CompteurH16 >5) && ls32) || !ls32){
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
         }
-        CompteurH16_bis++;
-        break;
+    case 3:
+        if (((CompteurH16<1 || CompteurH16 >4) && ls32) || !ls32) {
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
+            }
+    case 4:
+        if (((CompteurH16<1 || CompteurH16 >3) && ls32) || !ls32){
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
+            }
+    case 5:
+        if (((CompteurH16<1 || CompteurH16 >2) && ls32) || !ls32){
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
+            }
+    case 6:
+        if (((CompteurH16!=1) && ls32) || !ls32){
+            free (noeud);
+            *i=indice;
+            return false;
+            break;
+            }
+        
     
     default:
     interrupteur=false;
     break;
     }
+    // Si on est arrivé jusqu'ici ça veut dire que tout va bien et que l'on peut ENFIN STOCKER HAHA PRENDS CA IPV6 FONCTION DE MERDE
+    NombreFils=0;
+    if (ls32){
+        NombreFils++;
+    }
 
+    NombreFils= 2+CompteurH16 + CompteurH16_bis;
+    noeud->fils = malloc(NombreFils*sizeof(Noeud));
+    noeud->longueur = *i - indice;
+    noeud->nombreFils = NombreFils ;
 
-   
-    zrberljl jjjjjjjjjjjjjjjj, oooooooooooooooooooh scouuuuuuuuuuuuuuuuuurrr
+    *j=0;
+    *i=indice;
+
+    Noeud *petit1 = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis digit
+    somme =0; // Nous sert à "localiser" leqs noeuds
+    *m=0;
+
+    while (*j < CompteurH16){
+
+        petit1->tag = "H16";
+        petit1->fils = malloc(tab1[*j]*sizeof(Noeud));
+        petit1->valeur = requete + indice + somme; //ETNBZ
+        petit1->longueur = tab1[*j];
+        petit1->nombreFils = tab1[*j];
+        *m=0;
+        while (*m < tab1[*j]){
+            createFilsSimple("Digit", requete + indice + somme + *m , 1, &petit1->fils[*m]);
+            (*m)++;
+            (*i)++;
+        }
+        (*j++);
+        createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &noeud->fils[*j]);
+        somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":"
+        (*j)++;
+
+    }
+
+    createFilsSimple("Incensitive case string", requete + *i, 1, &petit1->fils[*m]); // On fait le noeud pour les "::" , mais le premier a déja été fait juste &vant
+    (*i)++;
+    (*m)++;
+
+    (*j)=0;
+
+    somme=somme+1;
+
+    while (*j < CompteurH16_bis){
+
+        petit1->tag = "H16";
+        petit1->fils = malloc(tab2[*j]*sizeof(Noeud));
+        petit1->valeur = requete + indice + somme; //ETNBZ
+        petit1->longueur = tab2[*j];
+        petit1->nombreFils = tab2[*j];
+        while (*m < tab1[*j]){
+            createFilsSimple("Digit", requete + indice + somme + *m , 1, &petit1->fils[*m]);
+            (*m)++;
+            (*i)++;
+        }
+        if (CompteurH16_bis !=1){
+            createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &noeud->fils[*j]);
+        }
+        somme= somme + tab2[*j] + 1; // Ne pas oublier de compter le ":"
+        (*j)++;
+
+    }
+
+    //Maintenant on s'occupe de ls32
+    if (ls32){
+        Noeud *petit2 = &petit1->fils[*m];
+        petit2->tag = "LS32";
+        petit2->fils = malloc(3*sizeof(Noeud));
+        petit2->valeur = requete + *i; 
+        //petit1->longueur = 1;
+        //petit1->nombreFils = tab2[*j];
+        if (checkIPV4(requete,*i,&petit2->fils[0] , false)){
+            free(&petit2->fils[1]);
+            free(&petit2->fils[2]);
+            petit2->longueur = 1;
+            petit2->nombreFils = 1;
+            checkIPV4(requete,*i,&petit2->fils[0] , true);
+        }
+        else{
+            indice2= *i;
+
+            (*j)=0;
+            while (*j < 3){
+
+                petit2->tag = "H16";
+                petit2->fils = malloc(tab2[CompteurH16_bis + *j]*sizeof(Noeud));
+                petit2->valeur = requete + indice + somme; //ETNBZ
+                petit2->longueur = tab1[CompteurH16_bis + *j];
+                petit2->nombreFils = tab1[CompteurH16_bis + *j];
+                while (*m < tab1[*j]){
+                    createFilsSimple("Digit", requete + indice + somme + *m, 1, &petit1->fils[*m]);
+                    (*m)++;
+                    (*i)++;
+                }
+                    if (*j ==0){
+                        (*j)++;
+                        createFilsSimple("Incensitive case string", requete + indice + somme + *m + 1, 1, &petit1->fils[*j]);
+                    }
+                somme= somme + tab2[*j] + 1; // Ne pas oublier de compter le ":"
+                (*j)++;
+
+            }
+
+            petit2->longueur = *i - indice2;
+            petit2->nombreFils = 3;
+        }
+
+    }
+    return true;
+
 }
 
-bool checkIPliteral(const char requete[], int *i, Noeud *noeud){
+bool checkIPliteral(char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     noeud->fils = malloc(3*sizeof(Noeud));
     noeud->valeur = requete + indice;
@@ -804,7 +984,7 @@ bool checkIPliteral(const char requete[], int *i, Noeud *noeud){
 }
 
 
-bool checkIPV4(const char requete[], int *i, Noeud *noeud){
+bool checkIPV4(char requete[], int *i, Noeud *noeud, bool stocker){
     const int indice = *i; // On conserve l'indice de début
     int nombreFils=7;
 
@@ -815,7 +995,7 @@ bool checkIPV4(const char requete[], int *i, Noeud *noeud){
 
     int j=0; //compteur de Fils
     while (j < 6){
-        if (!checkDecoctet(requete, *i, &noeud->fils[j])){
+        if (!checkDecoctet(requete, *i, &noeud->fils[j], stocker)){
             free(noeud);
             return false;
         }
@@ -828,16 +1008,27 @@ bool checkIPV4(const char requete[], int *i, Noeud *noeud){
         (*i)++;
         j++;
     }
-    if (!checkDecoctet(requete, *i, &noeud->fils[j])){
+    if (!checkDecoctet(requete, *i, &noeud->fils[j], stocker)){
         free(noeud);
         return false;
     }
     j++;
     noeud->longueur = *i - indice;
+    if (!stocker){
+        int suppr=0;
+        while (suppr<nombreFils){
+            free(&noeud->fils[j]);
+            suppr++;
+        }
+        free(noeud);
+        
+        *i=indice;
+    }
     return true;
+
 }
 
-bool checkREGNAME(const char requete[], int *i, Noeud *noeud){
+bool checkREGNAME(char requete[], int *i, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int nombreFils=0;
 
@@ -921,7 +1112,7 @@ bool checkREGNAME(const char requete[], int *i, Noeud *noeud){
     return true;
 }
 
-bool checkHost(const char requete[], int *i, const int longueur, Noeud *noeud){
+bool checkHost(char requete[], int *i, int longueur, Noeud *noeud){
     const int indice = *i; // On conserve l'indice de début
     int nombreFils=1;
 
@@ -931,19 +1122,18 @@ bool checkHost(const char requete[], int *i, const int longueur, Noeud *noeud){
     noeud->nombreFils = nombreFils ;
     noeud->tag = "Host";
 
-    int j=0; //compteur de fils
 
-    if (checkIPliteral(requete, i, &noeud->fils[j])){
+    if (checkIPliteral(requete, i, &noeud->fils[0])){
         noeud->longueur = *i - indice;
         return true;
 
     }
-    else if (checkIPV4(requete, i, &noeud->fils[j])){
+    else if (checkIPV4(requete, i, &noeud->fils[0], true)){ //pas sur du true là, ya surement un moyen plus efficace de faire cette histoire là
         noeud->longueur = *i - indice;
         return true;
 
     }
-    else if(checkREGNAME(requete, i, &noeud->fils[j])){
+    else if(checkREGNAME(requete, i, &noeud->fils[0])){
         noeud->longueur = *i - indice;
         return true;
 
@@ -954,7 +1144,7 @@ bool checkHost(const char requete[], int *i, const int longueur, Noeud *noeud){
 }
 
 
-bool checkExpectHeader(const char requete[], int *i, const int longueur, Noeud *noeud) {
+bool checkExpectHeader(char requete[], int *i, int longueur, Noeud *noeud) {
     int nombreFils=5;
     const int indice= *i;
 
@@ -1014,7 +1204,7 @@ bool checkExpectHeader(const char requete[], int *i, const int longueur, Noeud *
     return true;
 }
 
-bool checkHostHeader(const char requete[], int *i, const int longueur, Noeud *noeud) {
+bool checkHostHeader(char requete[], int *i, int longueur, Noeud *noeud) {
     int nombreFils=5;
     const int indice= *i;
 
