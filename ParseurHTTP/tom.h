@@ -15,7 +15,7 @@ bool checkOWS(char requete[], int *i, int longueur, Noeud *noeud); // OWS = *( S
 
 bool checkIPV4(char requete[], int *i, Noeud *noeud, bool stocker);
 
-int CompteurDigit(char requete[], int *i);
+int CompteurHexdig(char requete[], int *i);
 
 bool checkIPV6(char requete[], int *i, Noeud *noeud);
 

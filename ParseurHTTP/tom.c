@@ -549,16 +549,16 @@ bool checkIPfuture(char requete[], int *i, Noeud *noeud){
 
 }
 
-int CompteurDigit(char requete[], int *i){
+int CompteurHexdig(char requete[], int *i){
      int indice= *i;
-     int CompteurDigit=0;
+     int CompteurHexdig=0;
 
-    while (checkDigit(requete, indice)){
-        CompteurDigit++;
+    while (checkHexdig(requete, indice)){
+        CompteurHexdig++;
         indice++;
     }
 
-    return CompteurDigit;
+    return CompteurHexdig;
 }
 
 bool checkIPV6(char requete[], int *i, Noeud *noeud) {
@@ -605,7 +605,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
     noeud->tag = "IPv6address";
 
     while (interrupteur) { // Cette boucle while va nous permettre de compter le nombre de H16 ou de (H16 ":") avant les "::"
-        Compteur = CompteurDigit(requete, i);
+        Compteur = CompteurHexdig(requete, i);
         printf("Compteur : %d\n", Compteur);
         switch (Compteur) {
             case 0:
@@ -692,7 +692,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
             petit->nombreFils = tab1[*j];
             *m=0;
             while (*m < tab1[*j]){
-                createFilsSimple("Digit", requete + indice + somme + *m , 1, &petit->fils[*m]);
+                createFilsSimple("Hexdig", requete + indice + somme + *m , 1, &petit->fils[*m]);
                 (*m)++;
             }
             somme= somme + tab1[*j] + 1; // Ne pas oublier de compter le ":"
@@ -723,7 +723,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
                 petit->nombreFils = tab1[*j];
                 *m=0;
                 while (*m < tab1[*j]){
-                    createFilsSimple("Digit", requete + indice + somme + *m, 1, &petit->fils[*m]);
+                    createFilsSimple("Hexdig", requete + indice + somme + *m, 1, &petit->fils[*m]);
                     (*m)++;
                 }
                 (*j)++;
@@ -745,7 +745,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
 
     else {  // Maintenant le plan c'est de compter les H16 de l'autre coté des ":" pour comparer leur nombre à ceux d'avant et de déterminer le cas où l'on se trouve
         while (interrupteur){ // Cette boucle while va nous permettre de compter le nombre de H16 ou de (H16 ":") après les "::"
-            Compteur=CompteurDigit(requete, i);
+            Compteur=CompteurHexdig(requete, i);
             switch (Compteur) {
                 case 0:
                     break;
@@ -896,7 +896,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
     *k=0;
     *i=indice;
 
-    Noeud *petit1 = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis digit
+    Noeud *petit1 = &noeud->fils[*j]; // A l'aide du noeud petit on va créer les noeuds H16 puis Hexdig
     somme =0; // Nous sert à "localiser" leqs noeuds
     *m=0;
 
@@ -909,7 +909,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
         petit1->nombreFils = tab1[*j];
         *m=0;
         while (*m < tab1[*j]){
-            createFilsSimple("Digit", requete + indice + somme + *m , 1, &petit1->fils[*m]);
+            createFilsSimple("Hexdig", requete + indice + somme + *m , 1, &petit1->fils[*m]);
             (*m)++;
             (*i)++;
         }
@@ -938,7 +938,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
         petit1->longueur = tab2[*j];
         petit1->nombreFils = tab2[*j];
         while (*m < tab1[*j]){
-            createFilsSimple("Digit", requete + indice + somme + *m , 1, &petit1->fils[*m]);
+            createFilsSimple("Hexdig", requete + indice + somme + *m , 1, &petit1->fils[*m]);
             (*m)++;
             (*i)++;
         }
@@ -982,7 +982,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
                 petit2->longueur = tab1[CompteurH16_bis + *j - *k];
                 petit2->nombreFils = tab1[CompteurH16_bis + *j];
                 while (*m < tab1[*j]){
-                    createFilsSimple("Digit", requete + indice + somme + *m, 1, &petit2->fils[*m]);
+                    createFilsSimple("Hexdig", requete + indice + somme + *m, 1, &petit2->fils[*m]);
                     (*m)++;
                     (*i)++;
                 }
