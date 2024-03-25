@@ -27,8 +27,8 @@ int main(int argc, char *argv[]) {
     
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
     // char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n ";
-    // char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,  ";
-    char requete[] = "CONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,";
+    char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,  ";
+    // char requete[] = "CONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,";
 
     Noeud *test = malloc(sizeof(Noeud));
 
@@ -285,7 +285,7 @@ bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud) {
         return false;
     }
 
-    printf("%c\n", requete[*i]);
+    // printf("%c\n", requete[*i]);
     if (requete[*i] != 13) { //? CR = 13
         free(noeud);
         freeArbre(filsMethod);
@@ -569,12 +569,16 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
 
     VERIFICATION()
 
+    if (*i + 8 >= longueur) {
+        return false;
+    }
+
     int longTemp = 8; // On compte les 4 lettres du mot HTTP plus les versions
     const int indice = *i; // On garde en mémoire l'indice de début
     const int nombreFils = 5;
 
     if (requete[*i] != 'H' || requete[*i + 1] != 'T' || requete[*i + 2] != 'T' || requete[*i + 3] != 'P') {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -582,7 +586,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i) += 4;
 
     if (requete[*i] != '/') {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -590,7 +594,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i)++;
 
     if (!checkDigit(requete, *i)) {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -598,7 +602,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i)++;
 
     if (requete[*i] != '.') {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -606,7 +610,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i)++;
 
     if (!checkDigit(requete, *i)) {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }

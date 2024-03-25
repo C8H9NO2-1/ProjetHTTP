@@ -27,6 +27,10 @@ bool checkIPliteral(char requete[], int *i, Noeud *noeud);
 
 bool checkREGNAME(char requete[], int *i, Noeud *noeud);
 
+bool checkUriHost(char requete[], int *i, int longueur, Noeud *noeud);
+
+bool checkPort(char requete[], int *i, int longueur, Noeud *noeud);
+
 // Fonctions qui sont très génériques
 // Elles ne font aucun stockage, elles vérifient juste des syntaxes spécifiques qui peuvent être utiles autre part
 bool checkAlpha(char requete[], int i);

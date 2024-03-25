@@ -66,7 +66,7 @@ Tests pour le Expect-header:
 	Expect:100-CoNTinUe 	
 	ExPecT:			 100-cONTInUe  
 	exPect:   100-CoNtinUE		
-	EXPEct: 100-ContiNuE 
+	EXPEct: 100-ContiNuE
 
 
 Tests pour le Host-header:
