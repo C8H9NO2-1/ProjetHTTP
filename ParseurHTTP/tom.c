@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     
     // char requete[] = "hoSt:[f731:542:6e:57c5:c3a:d3:e6f:e]		";
 	// char requete[] = "hOsT: 			138.199.75.219:84766 ";
-	char requete[] = "Host: [Ve2509c.1oGFNz9rfZi+;*=)*+:++*:$&($+K7B6]  "; //! Ce test n'est pas censé fonctionner de la façon dont il fonctionne actuellement => Solved √
+	// char requete[] = "Host: [Ve2509c.1oGFNz9rfZi+;*=)*+:++*:$&($+K7B6]  "; //! Ce test n'est pas censé fonctionner de la façon dont il fonctionne actuellement => Solved √
 	// char requete[] = "hosT:    *;('*==S~7nGt.a+='!$'$*NxQWy%bAmV%6C";
 	// char requete[] = "hosT:[1f2f:2532:922f:93d6:8fc:4605:239.44.246.129]:0176";
 	// char requete[] = "HOST:[::b886:ec3f:f56:a366:c3e:f1bd:1ce]:9164 	 ";
@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
     // char requete[] = "hsT:";
     // char requete[] = "hOsT	138.199.75.219:84a66 ";
     // char requete[] = "hOSt:[21::d7c0:2ab:34ca:f88:]:3663 		";
+    char requete[] = "hOSt:[21::d7c0:2ab:34ca:f88]: 		";
     
     //* Annotations
     //? Pourquoi es-ce qu'on ignore le premier caractère si celui est un [
@@ -1417,7 +1418,11 @@ bool checkREGNAME(char requete[], int *i, Noeud *noeud) {
     // }
 
     noeud->nombreFils = nombreFils ;
-    noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    
+    if (nombreFils > 0) {
+        noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    }
+
     noeud->longueur = *i - indice;
 
     //On remet les comptes à 0 et on crée maintenant les noeuds
@@ -1602,7 +1607,9 @@ bool checkPort(char requete[], int *i, int longueur, Noeud *noeud) {
         nombreFils++;
     }
 
-    noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    if (nombreFils > 0) {
+        noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    }
     noeud->nombreFils = nombreFils;
     noeud->longueur = *i - indice;
     noeud->tag = "port";
