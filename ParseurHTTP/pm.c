@@ -3,29 +3,45 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "api.h"
 #include "structure.h"
 #include "pm.h"
 #include "affichage.h"
 
+#define VERIFICATION1() if (*i >= longueur) { \
+free(noeud); \
+return false; } \
+
+#define VERIFICATION() if (*i >= longueur) { \
+return false; } \
+
+void freeArbre(Noeud *racine) {
+    for (int i = 0; i < racine->nombreFils; i++) {
+        if (racine->fils[i].nombreFils != 0) {
+            freeArbre(&racine->fils[i]);
+        }
+    }
+    free(racine->fils);
+}
+
 int main(int argc, char *argv[]) {
     
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
-    char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n";
-    // char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,";
+    // char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n ";
+    char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,  ";
     // char requete[] = "CONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,";
 
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
 
-    if (!checkStartLine(requete, &i, strlen(requete), test)) {
+    if (!checkConnectionHeader(requete, &i, strlen(requete), test)) {
         printf("Hello world\n");
         test = NULL;
     }
 
     if (test != NULL) {
         printArbre(test, 0);
+        freeArbre(test);
     }
 
     free(test);
@@ -100,189 +116,6 @@ void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud) {
     noeud->nombreFils = 0;
 }
 
-bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) {
-    int compteur = 0;
-    const int indice = *i;
-
-    // On compte le nombre de caractères dans le champ courant
-    while (*i < longueur && checkTChar(requete, *i, NULL)) {
-        (*i)++;
-        compteur++;
-    }
-
-    // Si on a 0 tchar, on renvoie false
-    if (compteur < 1) {
-        free(noeud);
-        return false;
-    }
-
-    // On stocke les données nécessaires pour le noeud courant
-    noeud->valeur = requete + indice;
-    noeud->longueur = *i - indice;
-    noeud->tag = nom;
-    noeud->fils = malloc(compteur * sizeof(Noeud));
-    noeud->nombreFils = compteur;
-
-    // On réinitialise l'indice i pour la suite de la fonction
-    *i = indice;
-
-    // On remplit le tableau des fils du noeud method
-    for (int j = 0; j < compteur; j++) {
-        checkTChar(requete, *i, &noeud->fils[j]); // On a pas besoin de récupérer la valeur de retour cette fois-ci
-        (*i)++;
-    }
-    
-    return true;
-}
-
-void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
-    int diff = 'a' - 'A';
-    int n = strlen(chaine1);
-    for (int k = i; k < j; k++) {
-        if (k < n) {
-            if (chaine1[k] >= 'A' && chaine1[k] <= 'Z') {
-                chaine2[k - i] = chaine1[k] + diff;
-            } else {
-                chaine2[k - i] = chaine1[k];
-            }
-        }
-    }
-    chaine2[j - i] = '\0';
-}
-
-//!===============================================================================
-
-bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud) {
-    int nombreFils = 6;
-    const int indice = *i;
-
-    Noeud *filsMethod = malloc(sizeof(Noeud));
-    if (!checkMethod(requete, i, longueur, filsMethod)) {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-
-    if (requete[*i] != 32) { //? SP = 32
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-
-    (*i)++;
-
-    Noeud *filsRequestTarget = malloc(sizeof(Noeud));
-    if (!checkRequestTarget(requete, i, longueur, filsRequestTarget)) {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-
-    if (requete[*i] != 32) {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-
-    (*i)++;
-
-    Noeud *filsVersion = malloc(sizeof(Noeud));
-    if (!checkHTTPVersion(requete, i, longueur, filsVersion)) {
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-
-    printf("%c\n", requete[*i]);
-    if (requete[*i] != 13) { //? CR = 13
-        free(noeud);
-        *i = indice;
-        printf("Test CR\n");
-        return false;
-    }
-
-    (*i)++;
-
-    if (requete[*i] != 10) { //? LF = 10
-        free(noeud);
-        *i = indice;
-        return false;
-    }
-
-    (*i)++;
-
-    // Si tout s'est passé, on remplit le noeud start-line et on créé les noeuds fils qui ne le sont pas déjà
-    noeud->fils = malloc(nombreFils * sizeof(Noeud));
-    noeud->valeur = requete + indice;
-    noeud->longueur = *i - indice;
-    noeud->nombreFils = nombreFils;
-    noeud->tag = "start-line";
-
-    *i = indice; // On réinitialise i
-    
-    noeud->fils[0] = *filsMethod;
-    (*i) += noeud->fils[0].longueur;
-    
-    createFilsSimple("SP", requete + *i, 1, &noeud->fils[1]);
-    (*i)++;
-    
-    noeud->fils[2] = *filsRequestTarget;
-    (*i) += noeud->fils[2].longueur;
-
-    createFilsSimple("SP", requete + *i, 1, &noeud->fils[3]);
-    (*i)++;
-
-    noeud->fils[4] = *filsVersion;
-    (*i) += noeud->fils[4].longueur;
-
-    createFilsSimple("CRLF", requete + *i, 2, &noeud->fils[5]);
-    (*i) += noeud->fils[5].longueur;
-
-    return true;
-}
-
-bool checkMethod(char requete[], int *i, int longueur, Noeud *noeud) {
-    return checkToken(requete, i, longueur, noeud, "method");
-}
-
-bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud) {
-    // On remplit ce qu'on sait déjà du noeud
-    noeud->valeur = requete + *i;
-    noeud->tag = "request-target";
-    
-    // On est certain d'avoir une absolute-path comme fils
-    Noeud *filsPath = malloc(sizeof(Noeud));
-    Noeud *filsQuery1 = NULL;
-    Noeud *filsQuery2 = NULL;
-
-    if (!checkAbsolutePath(requete, i, longueur, filsPath)) {
-        filsPath = NULL;
-        return false;
-    }
-
-    // On regarde si il y a une query
-    if (requete[*i] == '?') {
-        filsQuery1 = malloc(sizeof(Noeud));
-        filsQuery2 = malloc(sizeof(Noeud));
-        createFilsSimple("case_insensitive_string", requete + *i, 1, filsQuery1);
-        (*i)++;
-        checkQuery(requete, i, longueur, filsQuery2);
-        noeud->nombreFils = 3;
-        noeud->fils = malloc(3 * sizeof(Noeud));
-        noeud->fils[0] = *filsPath;
-        noeud->fils[1] = *filsQuery1;
-        noeud->fils[2] = *filsQuery2;
-        noeud->longueur = filsPath->longueur + filsQuery1->longueur + filsQuery2->longueur;
-    } else {
-        noeud->nombreFils = 1;
-        noeud->fils = malloc(sizeof(Noeud));
-        noeud->fils[0] = *filsPath;
-        noeud->longueur = filsPath->longueur;
-    }
-
-    return true;
-}
-
 bool checkTChar(char requete[], int i, Noeud *noeud) {
     //! Cette fonction a deux éxécution différentes:
     //* - Une qui ne fait que vérifier syntaxiquement un caractère
@@ -326,14 +159,253 @@ bool checkTChar(char requete[], int i, Noeud *noeud) {
     }
 
     // Si la syntaxe n'est pas correcte, on libère la mémoire et on renvoie false
-    if (noeud != NULL) {
-        free(noeud);
-    }
+    // if (noeud != NULL) {
+    //     free(noeud);
+    // }
 
     return false;
 }
 
+bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) {
+
+    VERIFICATION()
+
+    int compteur = 0;
+    const int indice = *i;
+
+    // On compte le nombre de caractères dans le champ courant
+    while (*i < longueur && checkTChar(requete, *i, NULL)) {
+        (*i)++;
+        compteur++;
+    }
+
+    // Si on a 0 tchar, on renvoie false
+    if (compteur < 1) {
+        // if (noeud != NULL) {
+        //     free(noeud);
+        // }
+        (*i) = indice;
+        return false;
+    }
+
+    if (noeud != NULL) {
+        // On stocke les données nécessaires pour le noeud courant
+        noeud->valeur = requete + indice;
+        noeud->longueur = *i - indice;
+        noeud->tag = nom;
+        noeud->fils = malloc(compteur * sizeof(Noeud));
+        noeud->nombreFils = compteur;
+
+        // On réinitialise l'indice i pour la suite de la fonction
+        *i = indice;
+
+        // On remplit le tableau des fils du noeud method
+        for (int j = 0; j < compteur; j++) {
+            checkTChar(requete, *i, &noeud->fils[j]); // On a pas besoin de récupérer la valeur de retour cette fois-ci
+            (*i)++;
+        }
+    }
+    
+    return true;
+}
+
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
+    int diff = 'a' - 'A';
+    int n = strlen(chaine1);
+    for (int k = i; k < j; k++) {
+        if (k < n) {
+            if (chaine1[k] >= 'A' && chaine1[k] <= 'Z') {
+                chaine2[k - i] = chaine1[k] + diff;
+            } else {
+                chaine2[k - i] = chaine1[k];
+            }
+        }
+    }
+    chaine2[j - i] = '\0';
+}
+
+//!===============================================================================
+
+bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud) {
+
+    VERIFICATION1()
+
+    int nombreFils = 6;
+    const int indice = *i;
+
+    Noeud *filsMethod = malloc(sizeof(Noeud));
+    if (!checkMethod(requete, i, longueur, filsMethod)) {
+        free(noeud);
+        free(filsMethod);
+        *i = indice;
+        return false;
+    }
+
+    if (requete[*i] != 32) { //? SP = 32
+        free(noeud);
+        freeArbre(filsMethod);
+        free(filsMethod);
+        *i = indice;
+        return false;
+    }
+
+    (*i)++;
+
+    Noeud *filsRequestTarget = malloc(sizeof(Noeud));
+    if (!checkRequestTarget(requete, i, longueur, filsRequestTarget)) {
+        free(noeud);
+        free(filsRequestTarget);
+        freeArbre(filsMethod);
+        free(filsMethod);
+        *i = indice;
+        return false;
+    }
+
+    if (requete[*i] != 32) {
+        free(noeud);
+        freeArbre(filsMethod);
+        free(filsMethod);
+        freeArbre(filsRequestTarget);
+        free(filsRequestTarget);
+        *i = indice;
+        return false;
+    }
+
+    (*i)++;
+
+    Noeud *filsVersion = malloc(sizeof(Noeud));
+    if (!checkHTTPVersion(requete, i, longueur, filsVersion)) {
+        free(noeud);
+        freeArbre(filsMethod);
+        free(filsMethod);
+        freeArbre(filsRequestTarget);
+        free(filsRequestTarget);
+        free(filsVersion);
+        *i = indice;
+        return false;
+    }
+
+    // printf("%c\n", requete[*i]);
+    if (requete[*i] != 13) { //? CR = 13
+        free(noeud);
+        freeArbre(filsMethod);
+        free(filsMethod);
+        freeArbre(filsRequestTarget);
+        free(filsRequestTarget);
+        freeArbre(filsVersion);
+        free(filsVersion);
+        *i = indice;
+        return false;
+    }
+
+    (*i)++;
+
+    if (requete[*i] != 10) { //? LF = 10
+        free(noeud);
+        freeArbre(filsMethod);
+        free(filsMethod);
+        freeArbre(filsRequestTarget);
+        free(filsRequestTarget);
+        freeArbre(filsVersion);
+        free(filsVersion);
+        *i = indice;
+        return false;
+    }
+
+    (*i)++;
+
+    // Si tout s'est passé, on remplit le noeud start-line et on créé les noeuds fils qui ne le sont pas déjà
+    noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    noeud->valeur = requete + indice;
+    noeud->longueur = *i - indice;
+    noeud->nombreFils = nombreFils;
+    noeud->tag = "start-line";
+
+    *i = indice; // On réinitialise i
+    
+    noeud->fils[0] = *filsMethod;
+    (*i) += noeud->fils[0].longueur;
+    
+    createFilsSimple("SP", requete + *i, 1, &noeud->fils[1]);
+    (*i)++;
+    
+    noeud->fils[2] = *filsRequestTarget;
+    (*i) += noeud->fils[2].longueur;
+
+    createFilsSimple("SP", requete + *i, 1, &noeud->fils[3]);
+    (*i)++;
+
+    noeud->fils[4] = *filsVersion;
+    (*i) += noeud->fils[4].longueur;
+
+    createFilsSimple("CRLF", requete + *i, 2, &noeud->fils[5]);
+    (*i) += noeud->fils[5].longueur;
+
+    free(filsMethod);
+    free(filsRequestTarget);
+    free(filsVersion);
+
+    return true;
+}
+
+bool checkMethod(char requete[], int *i, int longueur, Noeud *noeud) {
+
+    VERIFICATION()
+
+    return checkToken(requete, i, longueur, noeud, "method");
+}
+
+bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud) {
+
+    VERIFICATION()
+
+    // On remplit ce qu'on sait déjà du noeud
+    noeud->valeur = requete + *i;
+    noeud->tag = "request-target";
+    
+    // On est certain d'avoir une absolute-path comme fils
+    Noeud *filsPath = malloc(sizeof(Noeud));
+    Noeud *filsQuery1 = NULL;
+    Noeud *filsQuery2 = NULL;
+
+    if (!checkAbsolutePath(requete, i, longueur, filsPath)) {
+        // filsPath = NULL;
+        free(filsPath);
+        return false;
+    }
+
+    // On regarde si il y a une query
+    if (requete[*i] == '?') {
+        filsQuery1 = malloc(sizeof(Noeud));
+        filsQuery2 = malloc(sizeof(Noeud));
+        createFilsSimple("case_insensitive_string", requete + *i, 1, filsQuery1);
+        (*i)++;
+        checkQuery(requete, i, longueur, filsQuery2);
+        noeud->nombreFils = 3;
+        noeud->fils = malloc(3 * sizeof(Noeud));
+        noeud->fils[0] = *filsPath;
+        noeud->fils[1] = *filsQuery1;
+        noeud->fils[2] = *filsQuery2;
+        noeud->longueur = filsPath->longueur + filsQuery1->longueur + filsQuery2->longueur;
+
+        free(filsQuery1);
+        free(filsQuery2);
+    } else {
+        noeud->nombreFils = 1;
+        noeud->fils = malloc(sizeof(Noeud));
+        noeud->fils[0] = *filsPath;
+        noeud->longueur = filsPath->longueur;
+    }
+
+    free(filsPath);
+
+    return true;
+}
+
 bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud) {
+
+    VERIFICATION()
+
     int compteur = 0;
     const int indice = *i;
 
@@ -346,7 +418,7 @@ bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud)
 
     // Si on a 0 tchar, on renvoie false
     if (compteur < 1) {
-        free(noeud);
+        // free(noeud);
         return false;
     }
 
@@ -449,9 +521,9 @@ bool checkPChar(char requete[], int *i, const int longueur, Noeud *noeud) {
     }
 
     // Si la syntaxe n'est pas correcte, on libère la mémoire et on renvoie false
-    if (noeud != NULL) {
-        free(noeud);
-    }
+    // if (noeud != NULL) {
+    //     free(noeud);
+    // }
 
     return false;
 }
@@ -494,12 +566,19 @@ bool checkQuery(char requete[], int *i, const int longueur, Noeud *noeud) {
 }
 
 bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) {
+
+    VERIFICATION()
+
+    if (*i + 8 >= longueur) {
+        return false;
+    }
+
     int longTemp = 8; // On compte les 4 lettres du mot HTTP plus les versions
     const int indice = *i; // On garde en mémoire l'indice de début
     const int nombreFils = 5;
 
     if (requete[*i] != 'H' || requete[*i + 1] != 'T' || requete[*i + 2] != 'T' || requete[*i + 3] != 'P') {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -507,7 +586,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i) += 4;
 
     if (requete[*i] != '/') {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -515,7 +594,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i)++;
 
     if (!checkDigit(requete, *i)) {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -523,7 +602,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i)++;
 
     if (requete[*i] != '.') {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -531,7 +610,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     (*i)++;
 
     if (!checkDigit(requete, *i)) {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -562,7 +641,12 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud) 
     return true;
 }
 
+//!===============================================================================
+
 bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *noeud) {
+
+    VERIFICATION1()
+
     int nombreFils = 5;
     const int indice = *i;
 
@@ -575,11 +659,12 @@ bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *no
     int j = 0; // On utilise cet indice pour compter les fils
 
     if (!checkConnectionString(requete, i, &noeud->fils[j])) {
-		for (int k = 0; k < nombreFils; k ++) {
-			if (k != j) {
-				free(&noeud->fils[k]);
-			}
-		}
+		// for (int k = 0; k < nombreFils; k ++) {
+		// 	if (k != j) {
+		// 		free(&noeud->fils[k]);
+		// 	}
+		// }
+        free(noeud->fils);
         free(noeud);
         *i = indice;
         return false;
@@ -587,11 +672,12 @@ bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *no
     j++;
 
     if (requete[*i] != ':') {
-        for (int k = 0; k < nombreFils; k ++) {
-			if (k != j) {
-				free(&noeud->fils[k]);
-			}
-		}
+        // for (int k = 0; k < nombreFils; k ++) {
+		// 	if (k != j) {
+		// 		free(&noeud->fils[k]);
+		// 	}
+		// }
+        free(noeud->fils);
         free(noeud);
         *i = indice;
         return false;
@@ -605,11 +691,12 @@ bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *no
     j++;
 
     if (!checkConnection(requete, i, longueur, &noeud->fils[j])) {
-        for (int k = 0; k < nombreFils; k ++) {
-			if (k != j) {
-				free(&noeud->fils[k]);
-			}
-		}
+        // for (int k = 0; k < nombreFils; k ++) {
+		// 	if (k != j) {
+		// 		free(&noeud->fils[k]);
+		// 	}
+		// }
+        free(noeud->fils);
         free(noeud);
         *i = indice;
         return false;
@@ -632,7 +719,7 @@ bool checkConnectionString(char requete[], int *i, Noeud *noeud) {
     sousChaineMinuscule(requete, chaineConnection, *i, *i + n);
 
     if (strcmp(chaineConnection, "connection") != 0) {
-        free(noeud);
+        // free(noeud);
         free(chaineConnection);
         *i = indice;
         return false;
@@ -691,6 +778,9 @@ bool checkOWS(char requete[], int *i, const int longueur, Noeud *noeud) {
 }
 
 bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud) {
+
+    VERIFICATION()
+
     // On vérifie si on a une ou plusieurs virgule et on en compte le nombre
     int compteur = 0;
     const int indice = *i; // On stocke l'indice du début de la chaîne
@@ -706,11 +796,14 @@ bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud) {
     // On créé ensuite le premier fils connection-option
     Noeud *filsConnectionOption = malloc(sizeof(Noeud));
     if (!checkConnectionOption(requete, i, longueur, filsConnectionOption)) {
-        free(noeud);
+        free(filsConnectionOption);
+        // free(noeud);
         *i = indice;
         return false;
     }
     compteur++;
+    free(filsConnectionOption->fils);
+    free(filsConnectionOption);
 
     // On a un problème car après la rulename Connection on a un OWS
     // Or ici on cherche aussi un ou plusieurs OWS chacun suivi d'une virgule
@@ -733,8 +826,10 @@ bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud) {
         Noeud *temp = malloc(sizeof(Noeud)); // Ce n'est pas très propre mais c'est ce que j'ai trouvé de plus simple
         indiceTemp = *i; // On veut pouvoir revenir en arrière si on a pas de connectionOption
         if (!checkConnectionOption(requete, i, longueur, temp)) {
+            free(temp);
             *i = indiceTemp;
         } else {
+            free(temp->fils);
             free(temp);
             compteur++; // On compte le champ connection-option
             // On passe ensuite l'OWS suivant
@@ -816,5 +911,8 @@ bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud) {
 }
 
 bool checkConnectionOption(char requete[], int *i, int longueur, Noeud *noeud) {
+
+    VERIFICATION()
+
     return checkToken(requete, i, longueur, noeud, "connection-option");
 }

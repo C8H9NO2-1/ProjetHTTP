@@ -3,43 +3,49 @@
 
 #include "structure.h"
 
-bool checkExpectString(const char requete[], int *i, Noeud *noeud); // "Expect"
+bool checkExpectString(char requete[], int *i, Noeud *noeud); // "Expect"
 
-bool checkHostString(const char requete[], int *i, Noeud *noeud); // "Host"
+bool checkHostString(char requete[], int *i, Noeud *noeud); // "Host"
 
-bool checkExpect(const char requete[], int *i, Noeud *noeud); // "100-continue"
+bool checkExpect(char requete[], int *i, Noeud *noeud); // "100-continue"
 
-bool checkHost(const char requete[], int *i, const int longueur, Noeud *noeud); //
+bool checkHost(char requete[], int *i, int longueur, Noeud *noeud); //
 
-bool checkOWS(const char requete[], int *i, const int longueur, Noeud *noeud); // OWS = *( SP / HTAB )
+bool checkOWS(char requete[], int *i, int longueur, Noeud *noeud); // OWS = *( SP / HTAB )
 
-bool checkIPV4(const char requete[], int *i, Noeud *noeud);
+bool checkIPV4(char requete[], int *i, Noeud *noeud, bool stocker);
 
-bool checkIPV6(const char requete[], int *i, Noeud *noeud);
+int CompteurHexdig(char requete[], int *i);
 
-bool checkIPfuture(const char requete[], int *i, Noeud *noeud);
+bool checkIPV6(char requete[], int *i, Noeud *noeud);
 
-bool checkDecoctet(const char requete[], int *i, Noeud *noeud);
+bool checkIPfuture(char requete[], int *i, Noeud *noeud);
 
-bool checkIPliteral(const char requete[], int *i, Noeud *noeud);
+bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker);
 
-bool checkREGNAME(const char requete[], int *i, Noeud *noeud);
+bool checkIPliteral(char requete[], int *i, Noeud *noeud);
+
+bool checkREGNAME(char requete[], int *i, Noeud *noeud);
+
+bool checkUriHost(char requete[], int *i, int longueur, Noeud *noeud);
+
+bool checkPort(char requete[], int *i, int longueur, Noeud *noeud);
 
 // Fonctions qui sont très génériques
 // Elles ne font aucun stockage, elles vérifient juste des syntaxes spécifiques qui peuvent être utiles autre part
-bool checkAlpha(const char requete[], int i);
-bool checkDigit(const char requete[], int i);
-bool checkHexdig(const char requete[], int i);
-bool checkUnreserved(const char requete[], int i);
-bool checkPctEncoded(const char requete[], int i);
-bool checkSubDelims(const char requete[], int i);
+bool checkAlpha(char requete[], int i);
+bool checkDigit(char requete[], int i);
+bool checkHexdig(char requete[], int i);
+bool checkUnreserved(char requete[], int i);
+bool checkPctEncoded(char requete[], int i);
+bool checkSubDelims(char requete[], int i);
 
 
 // Fonction utile pour la création de feuilles dans l'arbre
-void createFilsSimple(char nom[], int i, int longueur, Noeud *noeud);
+void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
 
 // Fonction qui transforme une sous chaîne en minuscule pour pouvoir comparer les chaînes non sensibles à la casse
-void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
+void sousChaineMinuscule(char chaine1[], char chaine2[], int i, int j);
 
 /**
  * @brief Vériie si une chaîne est bien l'expect-header d'une requête HTTP
@@ -51,7 +57,7 @@ void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkExpectHeader(const char requete[], int *i, const int longueur, Noeud *noeud) ; // Expect-header = "Expect" ":" OWS Expect OWS
+bool checkExpectHeader(char requete[], int *i,int longueur, Noeud *noeud) ; // Expect-header = "Expect" ":" OWS Expect OWS
 
 /**
  * @brief Vériie si une chaîne est bien l'host-header d'une requête HTTP
@@ -63,5 +69,5 @@ bool checkExpectHeader(const char requete[], int *i, const int longueur, Noeud *
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkHostHeader(const char requete[], int *i, const int longueur, Noeud *noeud) ; // Host-header = "Host" ":" OWS Host OWS
+bool checkHostHeader(char requete[], int *i, int longueur, Noeud *noeud) ; // Host-header = "Host" ":" OWS Host OWS
 #endif
