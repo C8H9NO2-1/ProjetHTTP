@@ -138,4 +138,5 @@ bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud); 
 
 bool checkConnectionOption(char requete[], int *i, const int longueur, Noeud *noeud); //? connection-option = token
 
+
 #endif
