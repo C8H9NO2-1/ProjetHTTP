@@ -26,15 +26,22 @@ void freeArbre(Noeud *racine) {
 
 int main(int argc, char *argv[]) {
     
-    char requete[] = "hoSt:[f731:542:6e:57c5:c3a:d3:e6f:e]		";
+    // char requete[] = "hoSt:[f731:542:6e:57c5:c3a:d3:e6f:e]		";
 	// char requete[] = "hOsT: 			138.199.75.219:84766 ";
-	// char requete[] = "Host: [Ve2509c.1oGFNz9rfZi+;*=)*+:++*:$&($+K7B6]  "; //! Ce test n'est pas censé fonctionner de la façon dont il fonctionne actuellement => Solved √
+	char requete[] = "Host: [Ve2509c.1oGFNz9rfZi+;*=)*+:++*:$&($+K7B6]  "; //! Ce test n'est pas censé fonctionner de la façon dont il fonctionne actuellement => Solved √
 	// char requete[] = "hosT:    *;('*==S~7nGt.a+='!$'$*NxQWy%bAmV%6C";
 	// char requete[] = "hosT:[1f2f:2532:922f:93d6:8fc:4605:239.44.246.129]:0176";
 	// char requete[] = "HOST:[::b886:ec3f:f56:a366:c3e:f1bd:1ce]:9164 	 ";
 	// char requete[] = "HOsT:[::c83c:7e0c:2b58:cf7c:aea1:166.202.243.242]";
 	// char requete[] = "hOSt:[21::d7c0:2ab:34ca:f88:4616]:3663 		";
 	// char requete[] = "HoST:[8748::5790:9b7c:203.221.115.212]";
+
+    //! Batterie de tests qui ne devraient pas fonctionner (ou du moins pas de la manière dont on le pense à première vue)
+    // char requete[] = "hoSt:[f731:542:pe:57c5:c3a:d3:e6f:e]		";
+    // char requete[] = "hOsT: 			138.199.75.219:84a66 ";
+    // char requete[] = "hsT:";
+    // char requete[] = "hOsT	138.199.75.219:84a66 ";
+    // char requete[] = "hOSt:[21::d7c0:2ab:34ca:f88:]:3663 		";
     
     //* Annotations
     //? Pourquoi es-ce qu'on ignore le premier caractère si celui est un [
@@ -135,6 +142,8 @@ int main(int argc, char *argv[]) {
     
     // char requete[] = "47.122.200.37";
 
+    // char requete[] = "Ve2509c.1oGFNz9rfZi+;*=)*+:++*:$&($+K7B6";
+
     Noeud *test = malloc(sizeof(Noeud));
 
     int i = 0;
@@ -144,7 +153,7 @@ int main(int argc, char *argv[]) {
         test = NULL;
     }
 
-    // if (!checkREGNAME(requete, &i, test)) {
+    // if (!checkIPfuture(requete, &i, test)) {
     //     printf("Hello world\n");
     //     test = NULL;
     // }
@@ -528,7 +537,8 @@ bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker){ // if st
     }
 }
 
-bool checkIPfuture(char requete[], int *i, Noeud *noeud){
+bool checkIPfuture(char requete[], int *i, Noeud *noeud) {
+
    
     int length = strlen(requete);
     
@@ -541,7 +551,7 @@ bool checkIPfuture(char requete[], int *i, Noeud *noeud){
     noeud->tag = "IPvFuture";
 
 
-    if (*i < length && requete[*i] != 'v'){ // Code ascii pour "v"
+    if (*i < length && requete[*i] != 'v' && requete[*i] != 'V') { // Code ascii pour "v"
         // free(noeud);
         *i=indice;
         return false;
@@ -653,9 +663,10 @@ bool checkIPfuture(char requete[], int *i, Noeud *noeud){
         (*i)++;
     }
 
-    createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[j]);
+    // createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[j]);
 
-    (*i)++;
+    // (*i)++;
+
 
     return true;
 
@@ -709,8 +720,6 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
 
     bool interrupteur = true;
     bool cas_1 = true;
-
-    Noeud *test = malloc(sizeof(Noeud)); // Ce noeud nous servira juste à tester si ipv6 continet une @ ipv4
 
     printf("Test\n");
     
@@ -773,7 +782,6 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
                 }
             } else {
                 printf("Test 3\n");
-                //! Ici pourquoi es-ce qu'on vériifie si le caractère n'est pas un '.' ?
                 if (CompteurH16 != 8 && requete[*i + Compteur] != '.') { //Si Il y a 8 H16 alors on est dans le cas 1 avec 2 H16 dans ls32, donc c'est valide de ne pas avoir de ":" après le 8e H16
                 // free(noeud);
                     *i=indice;
@@ -963,6 +971,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
 
      // On recule d'un cran pour vérifier si il y a un ":" ou non
 
+    Noeud *test = malloc(sizeof(Noeud)); // Ce noeud nous servira juste à tester si ipv6 continet une @ ipv4
     if (requete[*i - 1] != ':' && CompteurH16_bis > 1) {  // Vérifier IPV4 pour ls32 : Créer une option dans la fonction ipv4 pour pouvoir ne pas créer de noeud et ensuite l'utiliser pour check si c'est une adresse ipv4, plus haut et dans une autre fiction
         ls32=1;
         CompteurH16_bis--;
@@ -970,8 +979,8 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
     } else if(checkIPV4(requete, i, test, false)) {
         ls32=2;
         CompteurH16_bis--;
-        free(test);
     }
+    free(test);
     // On a donc dans compteurH16_bis le nombre exact de H16 hors ls32
 
     printf("CompteurH16_bis : %d\n", CompteurH16_bis);
@@ -1253,8 +1262,11 @@ bool checkIPliteral(char requete[], int *i, Noeud *noeud) {
         return false;
     }
 
+    printf("Line => %d \t i => %d\n", __LINE__, *i);
+
     Noeud *temp = malloc(sizeof(Noeud));
     if(!checkIPV6(requete,  i, temp)) {
+        *i = indice + 1;
         if (!checkIPfuture(requete,  i, temp)) {
             free(temp);
             return false;
@@ -1262,8 +1274,11 @@ bool checkIPliteral(char requete[], int *i, Noeud *noeud) {
     } else {
         ipv6 = true;
     }
+    freeArbre(temp);
     free(temp);
     // (*i)++;
+
+    printf("Line => %d \t i => %d\n", __LINE__, *i);
 
     if (requete[*i] == ']') { // Code ascii pour ]
         (*i)++;
@@ -1293,7 +1308,6 @@ bool checkIPliteral(char requete[], int *i, Noeud *noeud) {
     createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[2]);
     (*i)++;
 
-
     return true;
 
 }
@@ -1314,11 +1328,27 @@ bool checkIPV4(char requete[], int *i, Noeud *noeud, bool stocker) {
     while (j < 6) {
         if (!checkDecoctet(requete,  i, &noeud->fils[j], stocker)) {
             // free(noeud);
+            if (stocker) {
+                for (int k = 0; k < j; k++) {
+                    if (noeud->fils[k].nombreFils > 0) {
+                        free(noeud->fils[k].fils);
+                    }
+                }
+            }
+            free(noeud->fils);
             return false;
         }
         j++;
         if(requete[*i] != '.'){  // 46 est le code ascii du point "."
             // free(noeud);
+            if (stocker) {
+                for (int k = 0; k < j; k++) {
+                    if (noeud->fils[k].nombreFils > 0) {
+                        free(noeud->fils[k].fils);
+                    }
+                }
+            }
+            free(noeud->fils);
             return false;
         }
         createFilsSimple("case_insensitive_string", requete + *i, 1, &noeud->fils[j]);
@@ -1328,6 +1358,14 @@ bool checkIPV4(char requete[], int *i, Noeud *noeud, bool stocker) {
 
     if (!checkDecoctet(requete,  i, &noeud->fils[j], stocker)) {
         // free(noeud);
+        if (stocker) {
+            for (int k = 0; k < j; k++) {
+                if (noeud->fils[k].nombreFils > 0) {
+                    free(noeud->fils[k].fils);
+                }
+            }
+        }
+        free(noeud->fils);
         return false;
     }
     j++;
@@ -1547,6 +1585,8 @@ bool checkUriHost(char requete[], int *i, int longueur, Noeud *noeud) {
     //     return true;
 
     // }
+
+    free(noeud->fils);
 
     *i = indice;
     
