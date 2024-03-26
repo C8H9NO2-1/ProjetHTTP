@@ -1678,6 +1678,11 @@ bool checkExpectHeader(char requete[], int *i, int longueur, Noeud *noeud) {
 		// 		free(&noeud->fils[k]);
 		// 	}
 		// }
+
+        if (noeud->fils[j - 1].nombreFils > 0) {
+            free(noeud->fils[j - 1].fils);
+        } 
+
         free(noeud->fils);
         free(noeud);
         *i = indice;

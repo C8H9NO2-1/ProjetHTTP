@@ -81,29 +81,50 @@ void purgeElement(_Token **r) {
     *r = NULL;
 }
 
-void purgeTree(void *root) {
-    // On parcourt l'arbre en profondeur et on libère chaque noeud
-    pile *p = malloc(sizeof(pile));
-    p->noeud = (Noeud *) root;
-    p->indice = 0;
-    p->suivant = NULL;
+// void purgeTree(void *root) {
+//     // On parcourt l'arbre en profondeur et on libère chaque noeud
+//     pile *p = malloc(sizeof(pile));
+//     p->noeud = (Noeud *) root;
+//     p->indice = 0;
+//     p->suivant = NULL;
 
-    while (p != NULL) {
-        if (p->indice < p->noeud->nombreFils) {
-            pile *nouveau = malloc(sizeof(pile));
-            nouveau->noeud = &(p->noeud->fils[p->indice]);
-            nouveau->indice = 0;
-            nouveau->suivant = p;
-            p = nouveau;
-        } else {
-            pile *tmp = p;
-            p = p->suivant;
-            free(tmp->noeud->tag);
-            free(tmp->noeud->valeur);
-            free(tmp);
-            if (p != NULL) {
-                p->indice++;
-            }
+//     while (p != NULL) {
+//         if (p->indice < p->noeud->nombreFils) {
+//             pile *nouveau = malloc(sizeof(pile));
+//             nouveau->noeud = &(p->noeud->fils[p->indice]);
+//             nouveau->indice = 0;
+//             nouveau->suivant = p;
+//             p = nouveau;
+//         } else {
+//             pile *tmp = p;
+//             p = p->suivant;
+//             // free(tmp->noeud->tag);
+//             //free(tmp->noeud->valeur);
+//             free(tmp);
+//             if (p != NULL) {
+//                 p->indice++;
+//             }
+//         }
+//     }
+
+//     // On libère tous les états de la pile
+//     while (p != NULL) {
+//         pile *tmp = p;
+//         p = p->suivant;
+//         free(tmp);
+//     }
+//     free(p);
+// }
+
+void purgeTree(void *root) {
+    for (int i = 0; i < ((Noeud *) root)->nombreFils; i++) {
+        if (((Noeud *) root)->fils[i].nombreFils != 0) {
+            purgeTree(&((Noeud *) root)->fils[i]);
         }
+    }
+    free(((Noeud *) root)->fils);
+
+    if (strcmp(((Noeud *) root)->tag, "HTTP-message") == 0) {
+        free(root);
     }
 }
