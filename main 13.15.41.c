@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
 
-    char chaineMessage[] = "startVKiMupi-.4 LCTKq-.fin\n";
+    char chaineMessage[] = "startOpPap .kkrDqK-:fin\n";
 
     Noeud *racine = malloc(sizeof(Noeud));
 

@@ -128,3 +128,64 @@ void purgeTree(void *root) {
         free(root);
     } 
 }
+
+ int parseur(requete[], int longueur){
+    Noeud *racine=malloc(sizeof(Noeud));
+    racine->valeur = requete;
+    racine->longueur = strlen(requete);
+    racine->tag = "requête";
+
+    int i=0;
+    int fin = checkCRLF(requete, longueur, i); //vaut indice où est le CRLF
+    if (fin==0){
+        return 0;
+    }
+    Noeud *start = malloc(sizeof(Noeud));
+    if (!checkStartLine(requete, &i, (fin+2), start)){ //+2 car le CRLF est dans la start line
+        return 0;
+    }
+    fin = checkCRLF(requete, longueur, i);
+    int *tabHeader = malloc(sizeof(int));
+    int nombreHeader = compteHeader(requete, i, longueur, tabHeader);
+    racine->fils = malloc((nombreHeader+1) * sizeof(Noeud));
+    racine->fils[0]=start; 
+    racine->nombrefils=nombreHeader+1;
+    
+    for (int j=1; j<CompteHeader; j++){
+        switch(header[j]){
+            case 1 :
+                checkConnectionHeader(requete, &i, longueur, &racine->fils[j]);
+                break;
+            
+            case 2 :
+                checkContentLengthHeader(requete, &i, longueur, &racine->fils[j]);
+                break;
+
+            case 3 : 
+                checkContentTypeHeader(requete, &i, longueur,  &racine->fils[j]);
+                break;
+            
+            case 4 :
+                checkCookieHeader(requete, &i, longueur,  &racine->fils[j]);
+                break;
+        
+            case 5 :
+                checkTransferEncodingHeader(requete, &i, longueur,  &racine->fils[j]);
+                break;
+
+            case 6 :
+                checkExpectHeader(requete, &i, longueur,  &racine->fils[j]);
+                break;
+            
+            case 7 : 
+                checkHostHeader(requete, &i, fin,  &racine->fils[j]);
+                break;
+            default :
+                printf("erreur header non identifié à partir de l'indice %d", i);
+                return -1;
+        }
+    }
+    printArbre(racine, 0);
+    free(tabHeader);
+
+}
