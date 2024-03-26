@@ -46,6 +46,13 @@ int compteHeader(char requete[], int i, int longueur, int tabHeader[]){
             tabHeader[k]=7;
             k++;
         }
+        else {
+            return k;
+        }
+        if (checkCRLF(requete, longueur,j)!=i+1){
+            return k;
+        }
+        i+=2;
     }
     return k;
 }
