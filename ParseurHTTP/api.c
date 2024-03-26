@@ -126,5 +126,5 @@ void purgeTree(void *root) {
 
     if (strcmp(((Noeud *) root)->tag, "HTTP-message") == 0) {
         free(root);
-    }
+    } 
 }
