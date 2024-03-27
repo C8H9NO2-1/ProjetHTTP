@@ -31,15 +31,17 @@ int main(int argc, char *argv[]) {
 	// char transferEncoding[] = "TrANsfEr-eNcOdinG:				,GZiP ,		Fp#SAbMJPw8wTz- ;Z#QT~h4p#u|PPK5= nKi|kxaOW$uKHke 	; z-^6'FzCNW_WJ3w =\"\"";
 	// char transferEncoding[] = "TRaNSFEr-enCODiNG:  ,20Kmy%d_Yg8t.MS; 	eh6owY1JpoLr99n=\"k_*	lx:H~ rV\\-\\R\\	!Pa,v\"";
 	// char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,  ,  	,  P4lVdK%%we_#X!m";
-    char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,  ,  	,  ";
+    // char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,  ,  	,  ";
     // char transferEncoding[] = "TraNsfER-ENcOdiNg:    	dEflaTE	 ,,  	,P4lVdK%%we_#X!m";
     // char transferEncoding[] = "TrAnSfEr-encoDInG:,	,ComPRESs 	, chuNKED, 	Z#QT~h4p#u|PPK5  = nKi|kxaOW$uKHke";
+    // char transferEncoding[] = "Transfer-Encoding: gzip";
+    char transferEncoding[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTransfer-Encoding: gzip\r\n\r\n";
 
     // On affiche le nombre d'octets de la structure Noeud
     printf("Taille de la structure Noeud : %ld octets\n", sizeof(Noeud));
 
     Noeud *test = malloc(sizeof(Noeud));
-    int i = 0;
+    int i = 38;
 
     if (!checkTransferEncodingHeader(transferEncoding, &i, strlen(transferEncoding), test)) {
         printf("Hello world\n");
@@ -63,17 +65,19 @@ bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, 
     int nombreFils = 5;
     const int indice = *i;
     Noeud *filsTransferEncodingMot = malloc(sizeof(Noeud));
-    if (!checkTransferEncodingMot(transferEncoding, filsTransferEncodingMot)) {
+    if (!checkTransferEncodingMot(transferEncoding, i, filsTransferEncodingMot)) {
         free(filsTransferEncodingMot);
         free(noeud);
         *i = indice;
+        printf("File => %s \t Function => %s \t Line => %d\n",__FILE__, __FUNCTION__, __LINE__);
         return false;
     }
-    *i=17;
+    (*i) += 17;
     if (transferEncoding[*i] != 58) { //? ":" = 58
         free(noeud);
         free(filsTransferEncodingMot);
         *i = indice;
+        printf("File => %s \t Function => %s \t Line => %d\n",__FILE__, __FUNCTION__, __LINE__);
         return false;
     }
     (*i)++;
@@ -88,6 +92,7 @@ bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, 
         free(filsTransferEncoding);
         // free(filsOWS1);
         *i = indice;
+        printf("File => %s \t Function => %s \t Line => %d\n",__FILE__, __FUNCTION__, __LINE__);
         return false;
     }
 
@@ -137,14 +142,15 @@ void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud) {
     noeud->nombreFils = 0;
 }
 
-bool checkTransferEncodingMot(char transferEncoding[], Noeud *noeud) {
-    noeud->valeur = transferEncoding;
+bool checkTransferEncodingMot(char transferEncoding[], int *i, Noeud *noeud) {
+    noeud->valeur = transferEncoding + *i;
     noeud->longueur = 17;
     noeud->tag = "case_insensitive_string";
     noeud->fils = NULL;
     noeud->nombreFils = 0;
     char transferEncodingMinuscule[18];
-    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, 0, 17);
+    sousChaineMinuscule(transferEncoding, transferEncodingMinuscule, *i, *i + 17);
+    printf("%s\n", transferEncodingMinuscule);
     int a=strcmp("transfer-encoding", transferEncodingMinuscule);
     if (a!=0){
         // free(noeud);

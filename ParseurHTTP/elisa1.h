@@ -13,7 +13,7 @@
  */
 bool checkCookieHeader(char cookie[], int *i, int longueur, Noeud *noeud);//? "Cookie" ":" OWS cookie-string OWS
 
-bool checkCookie(char cookie[], Noeud *noeud);
+bool checkCookie(char cookie[], int *i, Noeud *noeud);
 
 bool checkOWS(char cookie[], int *i, int longueur, Noeud *noeud);
 
@@ -34,5 +34,7 @@ bool checkDigit(const char requete[], int i);
 void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
 
 bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]);
+
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
 
 #endif

@@ -57,7 +57,7 @@ void sousChaineMinuscule(char chaine1[], char chaine2[], int i, int j);
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkExpectHeader(char requete[], int *i,int longueur, Noeud *noeud) ; // Expect-header = "Expect" ":" OWS Expect OWS
+bool checkExpectHeader(char requete[], int *i,int longueur, Noeud *noeud); // Expect-header = "Expect" ":" OWS Expect OWS
 
 /**
  * @brief Vériie si une chaîne est bien l'host-header d'une requête HTTP
@@ -69,5 +69,5 @@ bool checkExpectHeader(char requete[], int *i,int longueur, Noeud *noeud) ; // E
  * @return true Si la syntaxe est correcte
  * @return false Sinon
  */
-bool checkHostHeader(char requete[], int *i, int longueur, Noeud *noeud) ; // Host-header = "Host" ":" OWS Host OWS
+bool checkHostHeader(char requete[], int *i, int longueur, Noeud *noeud); // Host-header = "Host" ":" OWS Host OWS
 #endif

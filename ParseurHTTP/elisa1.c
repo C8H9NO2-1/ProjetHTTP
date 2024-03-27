@@ -25,10 +25,12 @@ void freeArbre(Noeud *racine) {
 
 int main(int argc, char *argv[]) {
     
-    char cookie[] = "COoKiE: 	  n+q#_iP&W9EoHoE=\"/{i>}uPeh9TZ9]V\"; 4qdK8ZQdCyBMF.k=\"#j.=cFZ@$?^&-$4\"; k1KU^_X&opaKHta=:]xa&s<TDKnZPM*; zN&yiA`MFeSoGaa=*wwlhxR28?L![32  ";
+    // char cookie[] = "COoKiE: 	  n+q#_iP&W9EoHoE=\"/{i>}uPeh9TZ9]V\"; 4qdK8ZQdCyBMF.k=\"#j.=cFZ@$?^&-$4\"; k1KU^_X&opaKHta=:]xa&s<TDKnZPM*; zN&yiA`MFeSoGaa=*wwlhxR28?L![32  ";
+    // char cookie[] = "COoKiE: 	  n+q#_iP&W9EoHoE=\"/{i>}uPeh9TZ9]V\"h; 4qdK8ZQdCyBMF.k=\"#j.=cFZ@$?^&-$4\"; k1KU^_X&opaKHta=:]xa&s<TDKnZPM*; zN&yiA`MFeSoGaa=*wwlhxR28?L![32";
+    char cookie[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTransfer-Encoding: gzip\r\nCOoKie:	'Ym!%pdVb-s~Ue6=\".vl/vjesB-<bn0q\"\r\n\r\n";
     Noeud *test = malloc(sizeof(Noeud));
 
-    int i = 0;
+    int i = 63;
 
     if (!checkCookieHeader(cookie, &i, strlen(cookie), test)) {
         printf("Hello world\n");
@@ -53,13 +55,13 @@ bool checkCookieHeader(char cookie[], int *i, int longueur, Noeud *noeud) { //Co
     const int indice = *i;
 
     Noeud *filsCookie = malloc(sizeof(Noeud));
-    if (!checkCookie(cookie, filsCookie)) {
+    if (!checkCookie(cookie, i, filsCookie)) {
         free(filsCookie);
         free(noeud);
         *i = indice;
         return false;
     }
-    *i=6;
+    (*i) += 6;
 
     if (cookie[*i] != 58) { //? ":" = 58
         free(filsCookie);
@@ -117,33 +119,48 @@ bool checkCookieHeader(char cookie[], int *i, int longueur, Noeud *noeud) { //Co
 }
 
 
-bool checkCookie(char cookie[], Noeud *noeud){
-    noeud->valeur = cookie;
+bool checkCookie(char cookie[], int *i, Noeud *noeud) {
+    // noeud->valeur = cookie + *i;
+    // noeud->longueur = 6;
+    // noeud->tag = "case_insensitive_string";
+    // noeud->fils = NULL;
+    // noeud->nombreFils = 0;
+
+    // if (cookie[0] != 'C' && cookie[0] !='c' ) {
+    //     printf("not c");
+    //     return false;
+    // }
+    // if (cookie[1] != 'o' && cookie[1]!='O') {
+    //     return false;
+    // }
+    // if (cookie[2] != 'o' && cookie[2]!='O') {
+    //     return false;
+    // }
+    // if (cookie[3] != 'k' && cookie[3]!='K') {
+    //     return false;
+    // }
+    // if (cookie[4] != 'i' && cookie[4]!='I') {
+    //     return false;
+    // }
+    // if (cookie[5] != 'e' && cookie[5] != 'E') {
+    //     return false;
+    // }
+
+    // return true;
+
+    noeud->valeur = cookie + *i;
     noeud->longueur = 6;
     noeud->tag = "case_insensitive_string";
     noeud->fils = NULL;
     noeud->nombreFils = 0;
-
-    if (cookie[0] != 'C' && cookie[0] !='c' ) {
-        printf("not c");
-        return false;
+    char cookieMinuscule[7];
+    sousChaineMinuscule(cookie, cookieMinuscule, *i, *i + 6);
+    printf("%s\n", cookieMinuscule);
+    int a=strcmp("cookie", cookieMinuscule);
+    if (a!=0){
+        // free(noeud);
+        return false ;
     }
-    if (cookie[1] != 'o' && cookie[1]!='O') {
-        return false;
-    }
-    if (cookie[2] != 'o' && cookie[2]!='O') {
-        return false;
-    }
-    if (cookie[3] != 'k' && cookie[3]!='K') {
-        return false;
-    }
-    if (cookie[4] != 'i' && cookie[4]!='I') {
-        return false;
-    }
-    if (cookie[5] != 'e' && cookie[5] != 'E') {
-        return false;
-    }
-
     return true;
 }
 
@@ -186,7 +203,6 @@ bool checkOWS(char cookie[], int *i, int longueur, Noeud *noeud) { //OWS = *( SP
     return true;
 }
 
-
 bool checkCookieString(char cookie[], int *i, int longueur, Noeud *noeud){ //cookie-pair *( ";" SP cookie-pair )
 
     VERIFICATION()
@@ -196,7 +212,7 @@ bool checkCookieString(char cookie[], int *i, int longueur, Noeud *noeud){ //coo
 
     // Noeud *filsCookiePair1 = malloc(sizeof(Noeud));
     if (!checkCookiePair(cookie, i, longueur, NULL)) {
-        free(noeud);
+        // free(noeud);
         *i = indice;
         return false;
     }
@@ -250,8 +266,10 @@ bool checkCookieString(char cookie[], int *i, int longueur, Noeud *noeud){ //coo
         noeud->fils = malloc(sizeof(Noeud));
         noeud->nombreFils = 1;
         // noeud->fils[0]=*filsCookiePair1;
+        *i = indice;
         checkCookiePair(cookie, i, longueur, &noeud->fils[0]);
     }
+
     return true ;
 }
 
@@ -522,4 +540,19 @@ bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) 
     }
     
     return true;
+}
+
+void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j) {
+    int diff = 'a' - 'A';
+    int n = strlen(chaine1);
+    for (int k = i; k < j; k++) {
+        if (k < n) {
+            if (chaine1[k] >= 'A' && chaine1[k] <= 'Z') {
+                chaine2[k - i] = chaine1[k] + diff;
+            } else {
+                chaine2[k - i] = chaine1[k];
+            }
+        }
+    }
+    chaine2[j - i] = '\0';
 }

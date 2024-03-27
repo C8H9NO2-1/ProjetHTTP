@@ -3,8 +3,10 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "api.h"
 #include "structure.h"
+#include "functions.h"
+#include "affichage.h"
+#include "api.h"
 
 Noeud *racine = NULL;
 
@@ -129,63 +131,93 @@ void purgeTree(void *root) {
     } 
 }
 
- int parseur(requete[], int longueur){
-    Noeud *racine=malloc(sizeof(Noeud));
+// TODO -> Ajouter les CRLF dans les noeuds fils de HTTP-message
+// TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message
+// TODO -> Vérifier les fuites de mémoires 😭
+
+ int parseur(char *requete, int longueur) {
+
+    racine = malloc(sizeof(Noeud));
     racine->valeur = requete;
     racine->longueur = strlen(requete);
-    racine->tag = "requête";
+    racine->tag = "HTTP-message";
 
-    int i=0;
-    int fin = checkCRLF(requete, longueur, i); //vaut indice où est le CRLF
-    if (fin==0){
-        return 0;
-    }
-    Noeud *start = malloc(sizeof(Noeud));
-    if (!checkStartLine(requete, &i, (fin+2), start)){ //+2 car le CRLF est dans la start line
-        return 0;
-    }
-    fin = checkCRLF(requete, longueur, i);
-    int *tabHeader = malloc(sizeof(int));
-    int nombreHeader = compteHeader(requete, i, longueur, tabHeader);
-    racine->fils = malloc((nombreHeader+1) * sizeof(Noeud));
-    racine->fils[0]=start; 
-    racine->nombrefils=nombreHeader+1;
+    int i = 0;
     
-    for (int j=1; j<CompteHeader; j++){
-        switch(header[j]){
-            case 1 :
-                checkConnectionHeader(requete, &i, longueur, &racine->fils[j]);
-                break;
-            
-            case 2 :
-                checkContentLengthHeader(requete, &i, longueur, &racine->fils[j]);
-                break;
+    int fin = checkCRLF(requete, longueur, i); //vaut indice où est le CRLF
+    
+    if (fin == 0) {
+        return 0;
+    }
+    
+    Noeud *start = malloc(sizeof(Noeud));
+    if (!checkStartLine(requete, &i, (fin+2), start)) { //+2 car le CRLF est dans la start line
+        free(racine);
+        return 0;
+    }
 
-            case 3 : 
-                checkContentTypeHeader(requete, &i, longueur,  &racine->fils[j]);
+    const int indiceAvantHeader = i;
+
+    // fin = checkCRLF(requete, longueur, i);
+
+    //! La première fois qu'on appelle compteHeader, on ne sait pas combien on a de header donc on est obligé de parcourir une première fois 
+
+    int nombreHeader = compteHeader(requete, i, longueur, NULL);
+
+    //! On rappelle compteHeader avec un tableau
+    Header *tabHeader = malloc(nombreHeader * sizeof(Header));
+    nombreHeader = compteHeader(requete, i, longueur, tabHeader);
+
+    racine->fils = malloc((nombreHeader +  1) * sizeof(Noeud));
+    racine->fils[0] = *start;
+    racine->nombreFils = nombreHeader + 1;
+
+    i = indiceAvantHeader;
+    
+    for (int j = 1; j <= nombreHeader; j++) {
+        switch(tabHeader[j - 1]) {
+            case CONNECTION:
+                checkConnectionHeader(requete, &i, longueur, &racine->fils[j]);
+                i += 2; //? On compte les caractères CRLF
                 break;
             
-            case 4 :
+            // case 2 :
+            //     checkContentLengthHeader(requete, &i, longueur, &racine->fils[j]);
+            //     break;
+
+            // case 3 : 
+            //     checkContentTypeHeader(requete, &i, longueur,  &racine->fils[j]);
+            //     break;
+            
+            case COOKIE:
                 checkCookieHeader(requete, &i, longueur,  &racine->fils[j]);
+                i += 2; //? On compte les caractères CRLF
                 break;
         
-            case 5 :
+            case TRANSFER_ENCODING:
                 checkTransferEncodingHeader(requete, &i, longueur,  &racine->fils[j]);
+                i += 2; //? On compte les caractères CRLF
                 break;
 
-            case 6 :
+            case EXPECT:
                 checkExpectHeader(requete, &i, longueur,  &racine->fils[j]);
+                i += 2; //? On compte les caractères CRLF
                 break;
             
-            case 7 : 
-                checkHostHeader(requete, &i, fin,  &racine->fils[j]);
+            case HOST:
+                checkHostHeader(requete, &i, longueur,  &racine->fils[j]);
+                i += 2; //? On compte les caractères CRLF
                 break;
             default :
                 printf("erreur header non identifié à partir de l'indice %d", i);
-                return -1;
+                return 0;
         }
     }
-    printArbre(racine, 0);
+
+    // printArbre(racine, 0);
     free(tabHeader);
 
+    free(start);
+
+    return 1;
 }

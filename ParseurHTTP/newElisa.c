@@ -4,10 +4,11 @@
 #include <string.h>
 
 #include "structure.h"
-#include "pm.h"
+// #include "pm.h"
 #include "affichage.h"
+#include "functions.h"
 
-int checkCRLF(char requete[], int longueur, int i){
+int checkCRLF(char requete[], int longueur, int i) {
     while ((i+1)<longueur && (requete[i]!=13 || requete[i+1]!=10)){
         i++;
     }
@@ -59,10 +60,10 @@ int compteHeader(char requete[], int i, int longueur, int tabHeader[]) {
         else {
             return k;
         }
-        if (checkCRLF(requete, longueur,j)!=i+1){
+        if (checkCRLF(requete, longueur,j)!=i+1) {
             return k;
         }
-        i+=2;
+        i += 2;
     }
     return k;
 }

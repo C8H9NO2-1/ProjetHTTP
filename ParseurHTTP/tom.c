@@ -1576,7 +1576,7 @@ bool checkUriHost(char requete[], int *i, int longueur, Noeud *noeud) {
             *i = indice;
             if(checkREGNAME(requete, i, &noeud->fils[0])) {
                 noeud->longueur = *i - indice;
-            return true;
+                return true;
             }
         }
     }
@@ -1759,6 +1759,8 @@ bool checkHostHeader(char requete[], int *i, int longueur, Noeud *noeud) {
 
     checkOWS(requete, i, longueur, &noeud->fils[j]);
     j++;
+
+    noeud->longueur = *i - indice;
 
     return true;
 }

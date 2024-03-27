@@ -2,6 +2,8 @@
 #include <stdlib.h> 
 #include <string.h>
 
+#include "structure.h"
+#include "affichage.h"
 #include "api.h"
 
 /// Incluez ici les fichiers d'entête nécessaires pour l'execution de ce programme. 
@@ -10,28 +12,35 @@
 
 int main(int argc, char *argv[]) {
 
-    char req[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTransfer-Encoding: gzip\r\n\r\n"; 
-    if (argc != 2 ) {
-        printf("usage: %s <rulename>\n",argv[0]); 
-        return 0; 
-    }
+    char req[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTransfer-Encoding: gzip\r\nCOoKie:	'Ym!%pdVb-s~Ue6=\".vl/vjesB-<bn0q\"\r\nexPect:   100-CoNtinUE		\r\ncONneCtion:			  iuYlKmnz&ODppri	 , bdGs_7i|Ik2Ul%y	,	p~TuU2FuerMHNq*,	 \r\n\r\n";
+    // char req[] = "GET / HTTP/1.0\r\nCONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,\r\nCONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,\r\n";
+    // printf("length => %lu\n", strlen(req)); 
+
+    // if (argc != 2 ) {
+    //     printf("usage: %s <rulename>\n",argv[0]); 
+    //     return 0; 
+    // }
     if (parseur(req,strlen(req))) {
-        _Token *r,*tok;
+        // _Token *r,*tok;
         void *root; 
-        root=getRootTree(); 
-        r=searchTree(root,argv[1]); 
-        tok=r;
-        while (tok) {
-            int l;
-            char *s; 
-            s=getElementValue(tok->node,&l); 
-            printf("FOUND [%.*s]\n",l,s); 
-            tok=tok->next;
-        } 
-        purgeElement(&r); 
-        purgeTree(root) ;
-    } else {
-        return 0; 
+        root=getRootTree();
+
+        printArbre(root, 0);
     }
+
+    //     r=searchTree(root,argv[1]); 
+    //     tok=r;
+    //     while (tok) {
+    //         int l;
+    //         char *s; 
+    //         s=getElementValue(tok->node,&l); 
+    //         printf("FOUND [%.*s]\n",l,s); 
+    //         tok=tok->next;
+    //     } 
+    //     purgeElement(&r); 
+    //     purgeTree(root) ;
+    // } else {
+    //     return 0; 
+    // }
     return 1; 
 }

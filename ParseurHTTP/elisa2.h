@@ -1,10 +1,11 @@
 #ifndef ELISA2_H
 #define ELISA2_H
+
 bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, Noeud *noeud);
 
 void createFilsSimple(char nom[], char *i, int longueur, Noeud *noeud);
 
-bool checkTransferEncodingMot(char transferEncoding[], Noeud *noeud);
+bool checkTransferEncodingMot(char transferEncoding[], int *i, Noeud *noeud);
 
 bool checkOWS(char transferEncoding[], int *i, int longueur, Noeud *noeud);
 
