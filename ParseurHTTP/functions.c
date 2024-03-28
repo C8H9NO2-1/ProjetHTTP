@@ -17,6 +17,9 @@ return false; } \
 #define EXIT() *i = j; \
 return k; \
 
+#define FREE() freeArbre(test); \
+free(test); \
+
 #define DEBUG(name, value) printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, __FUNCTION__, __LINE__, name, value);
 
 // int main(int argc, char *argv[]) {
@@ -77,13 +80,14 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             indice = j;
             Noeud *test = malloc(sizeof(Noeud));
             if (checkConnectionHeader(requete, &j, longueur, test)) {
-                // printf("j => %d\n", j);
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     k += 2;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -91,11 +95,13 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkCookieHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     k += 2;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -126,11 +132,13 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkTransferEncodingHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     k += 2;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -138,11 +146,13 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkExpectHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     k += 2;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -150,11 +160,13 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkHostHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     k += 2;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -166,6 +178,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             Noeud *test = malloc(sizeof(Noeud));
             if (checkConnectionHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     tabHeader[k] = CONNECTION;
@@ -174,6 +187,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                     k++;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -181,6 +195,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkCookieHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     tabHeader[k] = COOKIE;
@@ -189,6 +204,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                     k++;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -221,6 +237,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkTransferEncodingHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     tabHeader[k] = TRANSFER_ENCODING;
@@ -229,6 +246,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                     k++;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -236,6 +254,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkExpectHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     tabHeader[k] = EXPECT;
@@ -244,6 +263,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                     k++;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -251,6 +271,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkHostHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
                     EXIT()
                 } else {
                     tabHeader[k] = HOST;
@@ -259,6 +280,7 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                     k++;
                     j += 2;
                 }
+                FREE()
                 continue;
             }
 
@@ -1831,7 +1853,7 @@ bool checkQdtext(char transferEncoding[], int i, Noeud *noeud){
     //         / obs-text
     // obs-text = %x80-FF
 
-    int temp = (int) transferEncoding[i];
+    int temp = (signed char) transferEncoding[i];
 
     if (temp < 0 && temp >= -128) {
         if (noeud!=NULL){
@@ -1885,7 +1907,7 @@ bool checkQuotedPair(char transferEncoding[], int *i, int longueur, Noeud *noeud
             createFilsSimple("VCHAR", transferEncoding + *i, 1, &noeud->fils[1]);
         }
     }
-    else if ( ((int) transferEncoding[*i]) < 0 && ((int) transferEncoding[*i] >= -128)) {
+    else if ( ((signed char) transferEncoding[*i]) < 0 && ((signed char) transferEncoding[*i] >= -128)) {
         if (noeud!=NULL){
             createFilsSimple("obs-text", transferEncoding + *i, 1, &noeud->fils[1]);
         }
@@ -3168,8 +3190,6 @@ bool checkMessageBody(char requete[], int *i, int longueur, Noeud *noeud) {
     const int indice = *i;
     int compteur = longueur - *i;
 
-    DEBUG("Compteur", compteur)
-
     noeud->tag = "message-body";
     noeud->valeur = requete + *i;
     noeud->nombreFils = compteur;
@@ -3180,10 +3200,6 @@ bool checkMessageBody(char requete[], int *i, int longueur, Noeud *noeud) {
         createFilsSimple("OCTET", requete + *i, 1, &noeud->fils[j]);
         (*i)++;
     }
-
-    // while (*i < longueur && ((requete[*i] >= 0 && requete[*i] <= 127) || (((int) requete[*i]) < 0 && ((int) requete[*i]) >= -128))) {
-    //     compteur++;
-    // }
     
     return true;
 }

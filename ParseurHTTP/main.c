@@ -14,7 +14,6 @@ int main(int argc, char *argv[]) {
 
     char req[]="GET / HTTP/1.0\r\nHost: www.google.com\r\nTRaNSFEr-enCODiNG:  ,20Kmy%d_Yg8t.MS; 	eh6owY1JpoLr99n=\"k_*	lx:H~¥ rV\\-\\R\\	!Pa,v\"\r\nCOoKie:	'Ym!%pdVb-s~Ue6=\".vl/vjesB-<bn0q\"\r\nexPect:   100-CoNtinUE		\r\ncONneCtion:			  iuYlKmnz&ODppri	 , bdGs_7i|Ik2Ul%y	,	p~TuU2FuerMHNq*,	 \r\n\r\n\¥íÄ“±PGÒ!î‘â¦Ý";
     // char req[] = "GET / HTTP/1.0\r\nCONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,\r\nCONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,\r\n";
-    printf("length => %lu\n", strlen(req));
 
     if (argc != 2 ) {
         printf("usage: %s <rulename>\n",argv[0]); 

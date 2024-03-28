@@ -136,7 +136,7 @@ void purgeTree(void *root) {
 // TODO -> Ajouter les CRLF dans les noeuds fils de HTTP-message                    √
 // TODO -> Ajouter les headers génériques                                           
 // TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message       √  
-// TODO -> Vérifier les fuites de mémoires 😭                                       
+// TODO -> Vérifier les fuites de mémoires 😭                                       √
 
  int parseur(char *requete, int longueur) {
 
@@ -152,6 +152,7 @@ void purgeTree(void *root) {
     int fin = checkCRLF(requete, longueur, i); //vaut indice où est le CRLF
     
     if (fin == 0) {
+        free(racine);
         return 0;
     }
     
@@ -170,6 +171,7 @@ void purgeTree(void *root) {
     int nombreHeader = compteHeader(requete, &i, longueur, NULL);
 
     if (!checkCRLFBool(requete, longueur, i)) {
+        freeArbre(start);
         free(start);
         free(racine);
         return 0;
@@ -177,21 +179,15 @@ void purgeTree(void *root) {
 
     i += 2;
 
-    DEBUG("i", i)
-
     if (i < longueur) {
         nombreFils++;
     }
 
     i = indiceAvantHeader;
 
-    // DEBUG("nbHeader", nombreHeader)
-
     //! On rappelle compteHeader avec un tableau
     Header *tabHeader = malloc(nombreHeader * sizeof(Header));
     nombreHeader = compteHeader(requete, &i, longueur, tabHeader);
-
-    DEBUG("i", i)
 
     nombreFils += nombreHeader +  1 + 1; //? Les headers plus les CRLF plus la start-line plus le CRLF final plus le message si besoin
 
@@ -200,8 +196,6 @@ void purgeTree(void *root) {
     racine->nombreFils = nombreFils;
 
     i = indiceAvantHeader;
-
-    // DEBUG("nbHeader", nombreHeader)
     
     int j = 1;
 
@@ -240,6 +234,9 @@ void purgeTree(void *root) {
                 break;
             default :
                 printf("erreur header non identifié à partir de l'indice %d", i);
+                freeArbre(start);
+                free(start);
+                free(tabHeader);
                 return 0;
         }
     }
@@ -248,15 +245,11 @@ void purgeTree(void *root) {
     i += 2;
     j++;
 
-    DEBUG("i", i) 
-
     if (i < longueur) {
         checkMessageBody(requete, &i, longueur, &racine->fils[j]);
     }
 
-    // printArbre(racine, 0);
     free(tabHeader);
-
     free(start);
 
     return 1;
