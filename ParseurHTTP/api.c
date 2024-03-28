@@ -1,12 +1,14 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "structure.h"
 #include "functions.h"
 #include "affichage.h"
 #include "api.h"
+
+#define DEBUG(name, value) printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, __FUNCTION__, __LINE__, name, value);
 
 Noeud *racine = NULL;
 
@@ -131,9 +133,10 @@ void purgeTree(void *root) {
     } 
 }
 
-// TODO -> Ajouter les CRLF dans les noeuds fils de HTTP-message
-// TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message
-// TODO -> Vérifier les fuites de mémoires 😭
+// TODO -> Ajouter les CRLF dans les noeuds fils de HTTP-message                    √
+// TODO -> Ajouter les headers génériques                                           
+// TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message       √  
+// TODO -> Vérifier les fuites de mémoires 😭                                       
 
  int parseur(char *requete, int longueur) {
 
@@ -141,6 +144,8 @@ void purgeTree(void *root) {
     racine->valeur = requete;
     racine->longueur = strlen(requete);
     racine->tag = "HTTP-message";
+
+    int nombreFils = 0;
 
     int i = 0;
     
@@ -162,23 +167,48 @@ void purgeTree(void *root) {
 
     //! La première fois qu'on appelle compteHeader, on ne sait pas combien on a de header donc on est obligé de parcourir une première fois 
 
-    int nombreHeader = compteHeader(requete, i, longueur, NULL);
+    int nombreHeader = compteHeader(requete, &i, longueur, NULL);
+
+    if (!checkCRLFBool(requete, longueur, i)) {
+        free(start);
+        free(racine);
+        return 0;
+    }
+
+    i += 2;
+
+    DEBUG("i", i)
+
+    if (i < longueur) {
+        nombreFils++;
+    }
+
+    i = indiceAvantHeader;
+
+    // DEBUG("nbHeader", nombreHeader)
 
     //! On rappelle compteHeader avec un tableau
     Header *tabHeader = malloc(nombreHeader * sizeof(Header));
-    nombreHeader = compteHeader(requete, i, longueur, tabHeader);
+    nombreHeader = compteHeader(requete, &i, longueur, tabHeader);
 
-    racine->fils = malloc((nombreHeader +  1) * sizeof(Noeud));
+    DEBUG("i", i)
+
+    nombreFils += nombreHeader +  1 + 1; //? Les headers plus les CRLF plus la start-line plus le CRLF final plus le message si besoin
+
+    racine->fils = malloc(nombreFils * sizeof(Noeud)); 
     racine->fils[0] = *start;
-    racine->nombreFils = nombreHeader + 1;
+    racine->nombreFils = nombreFils;
 
     i = indiceAvantHeader;
+
+    // DEBUG("nbHeader", nombreHeader)
     
-    for (int j = 1; j <= nombreHeader; j++) {
+    int j = 1;
+
+    for (j = 1; j <= nombreHeader; j++) {
         switch(tabHeader[j - 1]) {
             case CONNECTION:
                 checkConnectionHeader(requete, &i, longueur, &racine->fils[j]);
-                i += 2; //? On compte les caractères CRLF
                 break;
             
             // case 2 :
@@ -191,27 +221,37 @@ void purgeTree(void *root) {
             
             case COOKIE:
                 checkCookieHeader(requete, &i, longueur,  &racine->fils[j]);
-                i += 2; //? On compte les caractères CRLF
                 break;
         
             case TRANSFER_ENCODING:
                 checkTransferEncodingHeader(requete, &i, longueur,  &racine->fils[j]);
-                i += 2; //? On compte les caractères CRLF
                 break;
 
             case EXPECT:
                 checkExpectHeader(requete, &i, longueur,  &racine->fils[j]);
-                i += 2; //? On compte les caractères CRLF
                 break;
             
             case HOST:
                 checkHostHeader(requete, &i, longueur,  &racine->fils[j]);
+                break;
+            case CRLF:
+                createFilsSimple("CRLF", requete + i, 2, &racine->fils[j]);
                 i += 2; //? On compte les caractères CRLF
                 break;
             default :
                 printf("erreur header non identifié à partir de l'indice %d", i);
                 return 0;
         }
+    }
+
+    createFilsSimple("CRLF", requete + i, 2, &racine->fils[j]);
+    i += 2;
+    j++;
+
+    DEBUG("i", i) 
+
+    if (i < longueur) {
+        checkMessageBody(requete, &i, longueur, &racine->fils[j]);
     }
 
     // printArbre(racine, 0);

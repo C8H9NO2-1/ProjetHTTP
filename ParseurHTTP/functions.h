@@ -4,7 +4,7 @@
 //! Fonctions pour le parseur final
 int checkCRLF(char requete[], const int longueur, int i);
 bool checkCRLFBool(char requete[], const int longueur, int i);
-int compteHeader(char requete[], int i, int longueur, Header tabHeader[]);
+int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]);
 
 //! Fonctions qui sont très génériques
 //! Elles ne font aucun stockage, elles vérifient juste des syntaxes spécifiques qui peuvent être utiles autre part
@@ -543,5 +543,20 @@ bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker);
  * @return int Nombre de caractère hexa consécutifs
  */
 int CompteurHexdig(char requete[], int *i);
+
+//!===============================================================================
+//? Fonctions utiles pour parser le message-body
+
+/**
+ * @brief Vérifie si une chaîne est bien un message-body
+ * 
+ * @param requete Requête HTTP en cours de parsing
+ * @param i Pointeur vers l'indice de début de la chaîne à vérifier
+ * @param longueur Longueur de requête
+ * @param noeud Pointeur vers le noeud dans lequel on va stocker le message-body
+ * @return true Si la syntaxe est correcte
+ * @return false Sinon
+ */
+bool checkMessageBody(char requete[], int *i, int longueur, Noeud *noeud);
 
 #endif

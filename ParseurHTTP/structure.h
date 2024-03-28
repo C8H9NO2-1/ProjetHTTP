@@ -32,7 +32,9 @@ enum Header {
     COOKIE,
     TRANSFER_ENCODING,
     EXPECT,
-    HOST
+    HOST,
+    GENERIC,
+    CRLF
 };
 typedef enum Header Header;
 

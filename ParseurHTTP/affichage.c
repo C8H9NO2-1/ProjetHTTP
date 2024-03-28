@@ -21,7 +21,11 @@ void printArbre(Noeud *noeud, int nombreTab) {
                     printf("LF");
                     break;
                 default:
-                    printf("%c", noeud->valeur[i]);
+                    if (noeud->valeur[i] < 0) {
+                        printf("%u", (unsigned char) noeud->valeur[i]);
+                    } else {
+                        printf("%c", noeud->valeur[i]);
+                    }
                     break;
             }
         }

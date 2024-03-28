@@ -14,6 +14,11 @@ return false; } \
 #define VERIFICATION() if (*i >= longueur) { \
 return false; } \
 
+#define EXIT() *i = j; \
+return k; \
+
+#define DEBUG(name, value) printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, __FUNCTION__, __LINE__, name, value);
+
 // int main(int argc, char *argv[]) {
     
 //     // char requete[] = "GET /index.html HTTP/1.0\r\n";
@@ -61,10 +66,10 @@ bool checkCRLFBool(char requete[], const int longueur, int i) {
     return false;
 }
 
-int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
+int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
 
-    int indice = i;
-    int j = i;
+    int indice = *i;
+    int j = *i;
     int k = 0;
 
     if (tabHeader == NULL) {
@@ -74,9 +79,9 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             if (checkConnectionHeader(requete, &j, longueur, test)) {
                 // printf("j => %d\n", j);
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
-                    k++;
+                    k += 2;
                     j += 2;
                 }
                 continue;
@@ -86,9 +91,9 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkCookieHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
-                    k++;
+                    k += 2;
                     j += 2;
                 }
                 continue;
@@ -121,9 +126,9 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkTransferEncodingHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
-                    k++;
+                    k += 2;
                     j += 2;
                 }
                 continue;
@@ -133,9 +138,9 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkExpectHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
-                    k++;
+                    k += 2;
                     j += 2;
                 }
                 continue;
@@ -145,15 +150,15 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkHostHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
-                    k++;
+                    k += 2;
                     j += 2;
                 }
                 continue;
             }
 
-            return k;
+            EXIT()
         }
     } else {
         while (j < longueur) {
@@ -161,9 +166,11 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             Noeud *test = malloc(sizeof(Noeud));
             if (checkConnectionHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
                     tabHeader[k] = CONNECTION;
+                    k++;
+                    tabHeader[k] = CRLF;
                     k++;
                     j += 2;
                 }
@@ -174,9 +181,11 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkCookieHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
                     tabHeader[k] = COOKIE;
+                    k++;
+                    tabHeader[k] = CRLF;
                     k++;
                     j += 2;
                 }
@@ -212,9 +221,11 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkTransferEncodingHeader(requete, &j, longueur, test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
                     tabHeader[k] = TRANSFER_ENCODING;
+                    k++;
+                    tabHeader[k] = CRLF;
                     k++;
                     j += 2;
                 }
@@ -225,9 +236,11 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkExpectHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
                     tabHeader[k] = EXPECT;
+                    k++;
+                    tabHeader[k] = CRLF;
                     k++;
                     j += 2;
                 }
@@ -238,19 +251,21 @@ int compteHeader(char requete[], int i, int longueur, Header tabHeader[]) {
             test = malloc(sizeof(Noeud));
             if(checkHostHeader(requete, &j, longueur,  test)) {
                 if (!checkCRLFBool(requete, longueur,j)) {
-                    return k;
+                    EXIT()
                 } else {
                     tabHeader[k] = HOST;
+                    k++;
+                    tabHeader[k] = CRLF;
                     k++;
                     j += 2;
                 }
                 continue;
             }
 
-            return k;
+            EXIT()
         }
     }
-    return k;
+    EXIT()
 }
 
 //!==============================Fonctions générales==============================
@@ -1816,7 +1831,16 @@ bool checkQdtext(char transferEncoding[], int i, Noeud *noeud){
     //         / obs-text
     // obs-text = %x80-FF
 
-    if (transferEncoding[i]==9 || transferEncoding[i]==32 || transferEncoding[i]==33 || (transferEncoding[i]>=35 && transferEncoding[i]<=91) || (transferEncoding[i]>=93 && transferEncoding[i]<=126) || (transferEncoding[i]>=128 && transferEncoding[i]<=255)) {
+    int temp = (int) transferEncoding[i];
+
+    if (temp < 0 && temp >= -128) {
+        if (noeud!=NULL){
+            createFilsSimple("qdtext", transferEncoding + i, 1, noeud);
+        }
+        return true;
+    }
+
+    if (transferEncoding[i]==9 || transferEncoding[i]==32 || transferEncoding[i]==33 || (transferEncoding[i]>=35 && transferEncoding[i]<=91) || (transferEncoding[i]>=93 && transferEncoding[i]<=126)) {
         if (noeud!=NULL){
             createFilsSimple("qdtext", transferEncoding + i, 1, noeud);
         }
@@ -1861,7 +1885,7 @@ bool checkQuotedPair(char transferEncoding[], int *i, int longueur, Noeud *noeud
             createFilsSimple("VCHAR", transferEncoding + *i, 1, &noeud->fils[1]);
         }
     }
-    else if (transferEncoding[*i]>=128 && transferEncoding[*i]<=255){
+    else if ( ((int) transferEncoding[*i]) < 0 && ((int) transferEncoding[*i] >= -128)) {
         if (noeud!=NULL){
             createFilsSimple("obs-text", transferEncoding + *i, 1, &noeud->fils[1]);
         }
@@ -3137,3 +3161,29 @@ int CompteurHexdig(char requete[], int *i) {
     return CompteurHexdig;
 }
 
+//!===============================================================================
+//? Fonctions utiles pour parser le message-body
+
+bool checkMessageBody(char requete[], int *i, int longueur, Noeud *noeud) {
+    const int indice = *i;
+    int compteur = longueur - *i;
+
+    DEBUG("Compteur", compteur)
+
+    noeud->tag = "message-body";
+    noeud->valeur = requete + *i;
+    noeud->nombreFils = compteur;
+    noeud->longueur = compteur;
+    noeud->fils = malloc(compteur * sizeof(Noeud));
+
+    for (int j = 0; j < compteur; j++) {
+        createFilsSimple("OCTET", requete + *i, 1, &noeud->fils[j]);
+        (*i)++;
+    }
+
+    // while (*i < longueur && ((requete[*i] >= 0 && requete[*i] <= 127) || (((int) requete[*i]) < 0 && ((int) requete[*i]) >= -128))) {
+    //     compteur++;
+    // }
+    
+    return true;
+}
