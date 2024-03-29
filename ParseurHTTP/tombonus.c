@@ -192,13 +192,10 @@ bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud, int *TAIL
     return true;
 }
 
-bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud) { // Si le noeud est NULL alors *i ne bouge pas
-
-    DEBUG("i", *i)
-
-    const int indice = *i;
-    int nombreFils = 0;
-    int compteur = 0;
+bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE){ // Si le noeud est NULL alors *i ne bouge pas
+    const int indice= *i;
+    int nombreFils=0;
+    int compteur=0;
 
     int indice2;
     int nombreFils2;
@@ -221,10 +218,6 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud) { //
         // }
     }
 
-    if (noeud == NULL) {
-        return true;
-    }
-
     (*i)++;
     nombreFils++;
 
@@ -237,7 +230,7 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud) { //
         optionel = false;
     }
 
-    if (optionel) {
+    if (optionel){
         nombreFils++;
         (*i)++;
         DEBUG("i", *i)
@@ -253,7 +246,15 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud) { //
         (*i)++;
     }
 
-    if (optionel == false) { // Indice2= *i+1 et NombreFils=1
+    if (noeud==NULL){
+        if (TAILLE!=NULL){
+            *TAILLE=(*i)-indice;
+        }
+        (*i)=indice;
+        return true;
+    }
+
+    if (optionel==false){//Indice2= *i+1 et NombreFils=1
         noeud->fils = malloc(nombreFils2 * sizeof(Noeud));
         noeud->valeur = requete + indice;
         noeud->nombreFils = nombreFils2;
@@ -284,7 +285,6 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud) { //
             (*i)++;
         }
         checkField_Vchar(requete, i, longueur, &noeud->fils[compteur]);
-        (*i)++;
     }
     return true;
 }
@@ -298,22 +298,30 @@ bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud) { // e
     if (noeud == NULL) {
         return true;
     }
+    
 
-    int temp = 0;
-    int *TAILLE = &temp;
+    int temp=0;
+    int *TAILLE=&temp;
+
+    int temp1=0;
+    int *TAILLE2=&temp1;
+
+
 
     const int indice = *i;
     int nombreFils = 0;
 
     int compteur = 0; // Ce int servira à créer les différents noeuds
 
-    while (((checkField_Content(requete, i, longueur, NULL))) || (checkObs_Fold(requete, i, longueur, NULL, TAILLE))) {
-        if (checkObs_Fold(requete, i, longueur, NULL, TAILLE)) {
-            (*i) = (*i) + (*TAILLE);
-        } else {
-            (*i)++;
+    while (checkField_Content(requete, i, longueur, NULL, TAILLE2) || checkObs_Fold(requete, i, longueur,NULL, TAILLE)){
+        if(checkObs_Fold(requete, i, longueur,NULL, TAILLE)){
+            (*i)=(*i)+(*TAILLE);
+            nombreFils++;
         }
-        nombreFils++;
+        else{
+            (*i)=(*i)+(*TAILLE2);
+            nombreFils++;
+        }
     }
 
     noeud->valeur = requete + indice;
@@ -322,11 +330,11 @@ bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud) { // e
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
     (*i) = indice;
 
-    while (((checkField_Content(requete, i, longueur, NULL)) || (checkObs_Fold(requete, i, longueur, NULL, NULL)))) {
-        if (checkField_Content(requete, i, longueur, NULL)) {
-            // printf("i1 hahahahaha %d \n", *i);
-            checkField_Content(requete, i, longueur, &noeud->fils[compteur]);
-            // printf("i1 hahahahaha %d \n", *i);
+    while (compteur < nombreFils){
+        if(checkField_Content(requete, i, longueur, NULL,NULL)){
+            //printf("i1 hahahahaha %d \n", *i);
+            checkField_Content(requete, i, longueur, &noeud->fils[compteur], NULL);
+            //printf("i1 hahahahaha %d \n", *i);
             compteur++;
         }
 
@@ -362,21 +370,26 @@ bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud) { //( f
     int suppr_fils = 0; // Compteur qui nous servira à supprimer les fils si
                         // jamais on à un false
 
-    if (!checkToken(requete, i, longueur, &field_name->fils[0], "Tchar")) {
-        while (suppr_fils != nombreFils) {
-            free(&noeud->fils[suppr_fils]);
+    if(!checkToken( requete,i, longueur, &field_name->fils[0], "Tchar")){
+        //printf("boucle 1\n");
+        free(&field_name->fils[0]);
+        /*while(suppr_fils < nombreFils){
+            printf("%d\n",suppr_fils);
+        */free(&noeud->fils[suppr_fils]);/*
             suppr_fils++;
-        }
+        }*/
         free(noeud);
         return false;
     }
     field_name->longueur = *i - indice;
 
-    if (requete[*i] != ':') {
-        while (suppr_fils != nombreFils) {
-            free(&noeud->fils[suppr_fils]);
-            suppr_fils++;
-        }
+    if(requete[*i]!=':'){
+        //printf("2\n");
+        free(&field_name->fils[0]);
+        //while(suppr_fils < nombreFils){
+        free(&noeud->fils[suppr_fils]);
+        //    suppr_fils++;
+        //}
         free(noeud);
         return false;
     } else {
@@ -390,29 +403,36 @@ bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud) { //( f
         (*i)++;
     }
 
-    if (!checkOWS(requete, i, longueur, &noeud->fils[2])) {
-        while (suppr_fils != nombreFils) {
-            free(&noeud->fils[suppr_fils]);
-            suppr_fils++;
-        }
+    if(!checkOWS(requete, i, longueur, &noeud->fils[2])){
+        //printf("3\n");
+        free(&field_name->fils[0]);
+        //while(suppr_fils < nombreFils){
+        free(&noeud->fils[suppr_fils]);
+        //    suppr_fils++;
+       // }
         free(noeud);
         return false;
     }
 
-    if (!checkField_Value(requete, i, longueur, &noeud->fils[3])) {
-        while (suppr_fils != nombreFils) {
-            free(&noeud->fils[suppr_fils]);
-            suppr_fils++;
-        }
+    if(!checkField_Value(requete,  i, longueur, &noeud->fils[3])){
+        //printf("4\n");
+        free(&field_name->fils[0]);
+        //while(suppr_fils < nombreFils){
+        free(&noeud->fils[suppr_fils]);
+        //    suppr_fils++;
+        //}
         free(noeud);
         return false;
     }
 
-    if (!checkOWS(requete, i, longueur, &noeud->fils[4])) {
-        while (suppr_fils != nombreFils) {
-            free(&noeud->fils[suppr_fils]);
-            suppr_fils++;
-        }
+
+    if(!checkOWS(requete, i, longueur, &noeud->fils[4])){
+        free(&field_name->fils[0]);
+        //printf("5\n");
+        //while(suppr_fils < nombreFils){
+        free(&noeud->fils[suppr_fils]);
+        //    suppr_fils++;
+        //}
         free(noeud);
         return false;
     }
@@ -423,131 +443,160 @@ bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud) { //( f
 
 int main() {
 
-  // Noeud *test_noeud = malloc(sizeof(Noeud));
-  // bool test;
+    Noeud *test_noeud = malloc(sizeof(Noeud));
+    bool test;
 
-  /*int temp=0;
-  int *i=&temp;
-  test=checkVchar("w", i, 1, NULL); // !=33 et ~=126
-  if (test){
-      printf("C'est carré \n");
-  }
-  else{
-      printf("Maaaais nooon \n");
-  }
-  checkVchar("w", i, 1, test_noeud);
 
-  if (test_noeud != NULL) {
-      printArbre(test_noeud, 0);
-      freeArbre(test_noeud);
-  }*/
-
-  /*int temp=0;
-  int *i=&temp;
-  test=checkObs_Text("€", i, 1, NULL); // ÿ=255 et €=128
-  if (test){
-      printf("C'est carré \n");
-  }
-  else{
-      printf("Maaaais nooon \n");
-  }
-  checkObs_Text("ÿ", i, 1, test_noeud);
-
-  if (test_noeud != NULL) {
-      printArbre(test_noeud, 0);
-      freeArbre(test_noeud);
-  }*/
-
-  /*int temp=0;
-  int *i=&temp;
-  test=checkField_Vchar("a", i, 1, NULL); // ÿ=255 et €=128 et !=33 et ~=126
-  if (test){
-      printf("C'est carré \n");
-  }
-  else{
-      printf("Maaaais nooon \n");
-  }
-  checkField_Vchar("€", i, 1, test_noeud);
-
-  if (test_noeud != NULL) {
-      printArbre(test_noeud, 0);
-      freeArbre(test_noeud);
-  }*/
-
-  /*char sujet[]= {13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32, '\0'};
-  int temp=0;
-  int *i=&temp;
-  test=checkObs_Fold(sujet, i, 10000, NULL); // ÿ=255 et €=128 et !=33 et ~=126
-  if (test){
-      printf("C'est carré \n");
-  }
-  else{
-      printf("Maaaais nooon \n");
-  }
-  checkObs_Fold(sujet, i, 100, test_noeud);
-
-  if (test_noeud != NULL) {
-      printArbre(test_noeud, 0);
-      freeArbre(test_noeud);
-  }*/
-
-  // char sujet[]= {255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255, '\0'};
-  /*char sujet[]= {127, '\0'};
-  int temp=0;
-  int *i=&temp;
-  test=checkField_Content(sujet, i, 10000, NULL); // ÿ=255 et €=128 et !=33 et
-  ~=126 if (test){ printf("C'est carré \n");
-  }
-  else{
-      printf("Maaaais nooon \n");
-  }
-  checkField_Content(sujet, i, 100, test_noeud);
-  printf("Shees \n");
-
-  if (test_noeud != NULL) {
-      printArbre(test_noeud, 0);
-      freeArbre(test_noeud);
-  }*/
-
-  // printf("Chef \n");
-  // // char sujet[]= {13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32, '\0'};
-  // char sujet[] = " 	   	‡∂ ê R"; int temp=0; int *i=&temp;
-  // test=checkField_Value(sujet, i, strlen(sujet), NULL); // ÿ=255 et €=128 et
-  // !=33 et ~=126 if (test){
-  //     printf("C'est carré \n");
-  // }
-  // else{
-  //     printf("Maaaais nooon \n");
-  // }
-  // checkField_Value(sujet, i, strlen(sujet), test_noeud);
-  // printf("Shees \n");
-
-  // if (test_noeud != NULL) {
-  //     printArbre(test_noeud, 0);
-  //     freeArbre(test_noeud);
-  // }
-
-  // char requete[] = "";
-
-    char requete[] = "~  	 C			r";
-
-    Noeud *test = malloc(sizeof(Noeud));
-
-    int i = 0;
-
-    if (!checkField_Content(requete, &i, strlen(requete), test)) {
-        printf("Hello world\n");
-        test = NULL;
+    /*int temp=0;
+    int *i=&temp;
+    test=checkVchar("z", i, 1, NULL); // !=33 et ~=126
+    if (test){
+        printf("C'est carré \n");
+    }
+    else{
+        printf("Maaaais nooon \n");
+    }
+    if(!checkVchar("g", i, 1, test_noeud)){
+        test_noeud=NULL;
+        printf("Bon . \n");
     }
 
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+    free(test_noeud);*/
 
 
-    if (test != NULL) {
-        printArbre(test, 0);
-        freeArbre(test);
+    /*int temp=0;
+    int *i=&temp;
+    test=checkObs_Text("ÿ", i, 1, NULL); // ÿ=255 et €=128
+    if (test){
+        printf("C'est carré \n");
+    }
+    else{
+        printf("Maaaais nooon \n");
+    }
+    if (!checkObs_Text("ÿ", i, 1, test_noeud)){
+        test_noeud=NULL;
+        printf("Bon . \n");
     }
 
-    free(test);
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+    free(test_noeud);*/
 
+    /*int temp=0;
+    int *i=&temp;
+    test=checkField_Vchar("h", i, 1, NULL); // ÿ=255 et €=128 et !=33 et ~=126
+    if (test){
+        printf("C'est carré \n");
+    }
+    else{
+        printf("Maaaais nooon \n");
+    }
+    if(!checkField_Vchar("h", i, 1, test_noeud)){
+        test_noeud=NULL;
+        printf("Bon . \n");
+    }
+
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+    free(test_noeud);*/
+
+    /*char sujet[]= {13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32, '\0'};
+    int temp=0;
+    int *i=&temp;
+    int *TAILLE=NULL;
+    test=checkObs_Fold(sujet, i, 10000, NULL, TAILLE); // ÿ=255 et €=128 et !=33 et ~=126
+    if (test){
+        printf("C'est carré \n");
+    }
+    else{
+        printf("Maaaais nooon \n");
+    }
+    if(!checkObs_Fold(sujet, i, 100, test_noeud, TAILLE)){
+        test_noeud=NULL;
+        printf("Bon. \n");
+    }
+
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+    free(test_noeud);*/
+
+    /*//char sujet[]= {255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255, '\0'};
+    char sujet[]= {127, '\0'};
+    int temp=0;
+    int *i=&temp;
+    test=checkField_Content(sujet, i, 10000, NULL); // ÿ=255 et €=128 et !=33 et ~=126
+    if (test){
+        printf("C'est carré \n");
+    }
+    else{
+        printf("Maaaais nooon \n");
+    }
+    if(!checkField_Content(sujet, i, 100, test_noeud)){
+        test_noeud=NULL;
+        printf("Bon. \n");
+    }
+    printf("Shees \n");
+
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+
+    free(test_noeud);*/
+
+    /*printf("Chef \n");
+    char sujet[]= {255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32, '\0'};
+    int temp=0;
+    int *i=&temp;
+    test=checkField_Value(sujet, i, 100, NULL); // ÿ=255 et €=128 et !=33 et ~=126
+    if (test){
+        printf("C'est carré \n");
+    }
+    else{
+        printf("Maaaais nooon \n");
+    }
+    if(!checkField_Value(sujet, i, 100, test_noeud)){
+        test_noeud=NULL;
+        printf("Bon. \n");
+    }
+    printf("Shees \n");
+
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+    free(test_noeud);*/
+
+
+
+    printf("Chef \n");
+    //char sujet[]= {185,'a','B','#',':',' ',255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,' ',9, '\0'};
+    int temp=0;
+    char sujet[]= {'a','B','#',':',' ',255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,255, 32 , 32, 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,' ',9, '\0'};
+    int *i=&temp;
+
+    printf("Nononononono \n");
+
+    if(!checkLastHeader(sujet, i, 100, test_noeud)){
+        test_noeud=NULL;
+        printf("Bon. \n");
+    }
+    printf("Shees \n");
+
+    if (test_noeud != NULL) {
+        printArbre(test_noeud, 0);
+        freeArbre(test_noeud);
+    }
+    free(test_noeud);
     return 0;
 }

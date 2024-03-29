@@ -1,5 +1,6 @@
 all: functions.o affichage.o api.o main.o
 	gcc -o main functions.o affichage.o main.o api.o -fsanitize=address
+	rm *.o
 
 functions.o: functions.c
 	gcc -o functions.o -c functions.c
