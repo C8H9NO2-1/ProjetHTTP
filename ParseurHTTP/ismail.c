@@ -124,9 +124,11 @@ bool checkContentLenHeader(char requete[], int *i, int length, Noeud *noeud){
 	checkOWS(requete,i,length,&noeud->fils[4]);
 
     if (!checkCRLF(requete,i,length)){
-		free(noeud);
-        free(digitLength);
-        free(filsConLenH);
+	freeArbre(noeud)
+	free(noeud);
+		    
+        // free(digitLength);
+        // free(filsConLenH);
         return false;
     }
     createFilsSimple("CRLF", requete +*i, 2, &noeud->fils[5]);
