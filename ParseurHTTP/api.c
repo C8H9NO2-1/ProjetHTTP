@@ -5,7 +5,7 @@
 
 #include "structure.h"
 #include "functions.h"
-#include "affichage.h"
+// #include "affichage.h"
 #include "api.h"
 
 #define DEBUG(name, value) printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, __FUNCTION__, __LINE__, name, value);
@@ -137,12 +137,12 @@ void purgeTree(void *root) {
 
     if (strcmp(((Noeud *) root)->tag, "HTTP-message") == 0) {
         free(root);
-    } 
+    }
 }
 
 // TODO -> Ajouter les CRLF dans les noeuds fils de HTTP-message                    √
-// TODO -> Ajouter les headers génériques                                             
-// TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message       √  
+// TODO -> Ajouter les headers génériques
+// TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message       √
 // TODO -> Vérifier les fuites de mémoires                                          √
 // TODO -> Ajouter des noeuds intermédiaires header-field                           √
 
@@ -156,14 +156,14 @@ void purgeTree(void *root) {
     int nombreFils = 0;
 
     int i = 0;
-    
+
     int fin = checkCRLF(requete, longueur, i); //vaut indice où est le CRLF
-    
+
     if (fin == 0) {
         free(racine);
         return 0;
     }
-    
+
     Noeud *start = malloc(sizeof(Noeud));
     if (!checkStartLine(requete, &i, (fin+2), start)) { //+2 car le CRLF est dans la start line
         free(racine);
@@ -174,7 +174,7 @@ void purgeTree(void *root) {
 
     // fin = checkCRLF(requete, longueur, i);
 
-    //! La première fois qu'on appelle compteHeader, on ne sait pas combien on a de header donc on est obligé de parcourir une première fois 
+    //! La première fois qu'on appelle compteHeader, on ne sait pas combien on a de header donc on est obligé de parcourir une première fois
 
     int nombreHeader = compteHeader(requete, &i, longueur, NULL);
 
@@ -199,12 +199,12 @@ void purgeTree(void *root) {
 
     nombreFils += nombreHeader +  1 + 1; //? Les headers plus les CRLF plus la start-line plus le CRLF final plus le message si besoin
 
-    racine->fils = malloc(nombreFils * sizeof(Noeud)); 
+    racine->fils = malloc(nombreFils * sizeof(Noeud));
     racine->fils[0] = *start;
     racine->nombreFils = nombreFils;
 
     i = indiceAvantHeader;
-    
+
     int j = 1;
 
     for (j = 1; j <= nombreHeader; j++) {
@@ -214,21 +214,21 @@ void purgeTree(void *root) {
                 checkConnectionHeader(requete, &i, longueur, &racine->fils[j].fils[0]);
                 HEADER_FIELD1
                 break;
-            
+
             // case 2 :
             //     checkContentLengthHeader(requete, &i, longueur, &racine->fils[j]);
             //     break;
 
-            // case 3 : 
+            // case 3 :
             //     checkContentTypeHeader(requete, &i, longueur,  &racine->fils[j]);
             //     break;
-            
+
             case COOKIE:
                 HEADER_FIELD
                 checkCookieHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
                 HEADER_FIELD1
                 break;
-        
+
             case TRANSFER_ENCODING:
                 HEADER_FIELD
                 checkTransferEncodingHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
@@ -240,11 +240,14 @@ void purgeTree(void *root) {
                 checkExpectHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
                 HEADER_FIELD1
                 break;
-            
+
             case HOST:
                 HEADER_FIELD
                 checkHostHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
                 HEADER_FIELD1
+                break;
+            case GENERIC:
+                checkLastHeader(requete, &i, longueur, &racine->fils[j]);
                 break;
             case CRLF:
                 createFilsSimple("CRLF", requete + i, 2, &racine->fils[j]);

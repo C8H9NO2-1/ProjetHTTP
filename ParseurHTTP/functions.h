@@ -31,7 +31,7 @@ void freeArbre(Noeud *racine);
 //? Fonctions utiles pour parser la start-line
 /**
  * @brief Vériie si une chaîne est bien la start-line d'une requête HTTP
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -43,7 +43,7 @@ bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud); //? sta
 
 /**
  * @brief Vérifie qu'une partie de la chaîne requete est bien une method
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -55,7 +55,7 @@ bool checkMethod(char requete[], int *i, const int longueur, Noeud *noeud); //? 
 
 /**
  * @brief Vérifie si une chaîne est bien une request-target
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -67,7 +67,7 @@ bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud
 
 /**
  * @brief Vérifie si une chaîne est bien un absolute-path
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -79,7 +79,7 @@ bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud)
 
 /**
  * @brief Vérifie si une chaîne est bien un segment
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -91,7 +91,7 @@ bool checkSegment(char requete[], int *i, const int longueur, Noeud *noeud); //?
 
 /**
  * @brief Vérifie si une chaîne est bien un pchar
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -103,7 +103,7 @@ bool checkPChar(char requete[], int *i, const int longueur, Noeud *noeud); //? p
 
 /**
  * @brief Vérifie si une chaîne est bien un query
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -115,7 +115,7 @@ bool checkQuery(char requete[], int *i, const int longueur, Noeud *noeud); //? q
 
 /**
  * @brief Vérifie si une chaîne est bien une HTTP-version
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -130,7 +130,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un connection-header
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur longueur de requete
@@ -142,7 +142,7 @@ bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *no
 
 /**
  * @brief Vérifie si une chaîne est bien un connection-string
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le connection-option
@@ -153,7 +153,7 @@ bool checkConnectionString(char requete[], int *i, Noeud *noeud); //? "Connectio
 
 /**
  * @brief Vérifie si une chaîne est bien un connection
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur longueur de requete
@@ -165,7 +165,7 @@ bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud); 
 
 /**
  * @brief Vérifie si une chaîne est bien un connection-option
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur longueur de requete
@@ -180,7 +180,7 @@ bool checkConnectionOption(char requete[], int *i, const int longueur, Noeud *no
 
 /**
  * @brief Vériie si une chaîne est bien l'en-tête cookie d'une requête HTTP
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -192,7 +192,7 @@ bool checkCookieHeader(char cookie[], int *i, int longueur, Noeud *noeud);//? "C
 
 /**
  * @brief Vérifie si une chaîne est bien un cookie
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le cookie
@@ -203,7 +203,7 @@ bool checkCookie(char cookie[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un cookie-string
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -215,7 +215,7 @@ bool checkCookieString(char cookie[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un cookie-pair
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -227,7 +227,7 @@ bool checkCookiePair(char cookie[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un cookie-name
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -239,7 +239,7 @@ bool checkCookieName(char cookie[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un cookie-value
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -251,7 +251,7 @@ bool checkCookieValue(char cookie[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un cookie-octet
- * 
+ *
  * @param cookie en-tête cookie en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @return true Si la syntaxe est correcte
@@ -264,7 +264,7 @@ bool checkCookieOctet(const char cookie[], int *i);
 
 /**
  * @brief Vérifie si une chaîne est bien l'en-tête transfer-encoding d'une requête HTTP
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -276,7 +276,7 @@ bool checkTransferEncodingHeader(char transferEncoding[], int *i, int longueur, 
 
 /**
  * @brief Vérifie si une chaîne est bien un transfer-encoding mot
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le transfer-coding
@@ -287,7 +287,7 @@ bool checkTransferEncodingMot(char transferEncoding[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un transfer-encoding
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -299,7 +299,7 @@ bool checkTransferEncoding(char transferEncoding[], int *i, int longueur, Noeud 
 
 /**
  * @brief Vérifie si une chaîne est bien un transfer-coding
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -311,7 +311,7 @@ bool checkTransferCoding(char transferEncoding[], int *i, int longueur, Noeud *n
 
 /**
  * @brief Vérifie si une chaîne est bien un transfer-extension
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -323,7 +323,7 @@ bool checktransferExtension(char transferEncoding[], int *i, int longueur, Noeud
 
 /**
  * @brief Vérifie si une chaîne est bien un transfer-parameter
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -335,7 +335,7 @@ bool checkTransferParameter(char transferEncoding[], int *i, int longueur, Noeud
 
 /**
  * @brief Vérifie si une chaîne est bien un quoted-string
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -347,7 +347,7 @@ bool checkQuotedString(char transferEncoding[], int *i, int longueur, Noeud *noe
 
 /**
  * @brief Vérifie si une chaîne est bien un qdtext
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le qdtext
@@ -358,7 +358,7 @@ bool checkQdtext(char transferEncoding[], int i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un quoted-pair
- * 
+ *
  * @param transferEncoding en-tête transfer-encoding en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de l'en-tête
@@ -373,7 +373,7 @@ bool checkQuotedPair(char transferEncoding[], int *i, int longueur, Noeud *noeud
 
 /**
  * @brief Vérifie si une chaîne est bien l'expect-header d'une requête HTTP
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -385,7 +385,7 @@ bool checkExpectHeader(char requete[], int *i,int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un expect-string
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker l'expect-string
@@ -396,7 +396,7 @@ bool checkExpectString(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un expect
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker l'expect
@@ -410,7 +410,7 @@ bool checkExpect(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien l'host-header d'une requête HTTP
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -422,7 +422,7 @@ bool checkHostHeader(char requete[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un host-string
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker l'host-string
@@ -433,7 +433,7 @@ bool checkHostString(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un host
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -445,7 +445,7 @@ bool checkHost(char requete[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un uri-host
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -457,7 +457,7 @@ bool checkUriHost(char requete[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un port
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -469,7 +469,7 @@ bool checkPort(char requete[], int *i, int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un IP-literal
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le IP-literal
@@ -480,7 +480,7 @@ bool checkIPliteral(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un IPv4address
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le IPv4address
@@ -492,7 +492,7 @@ bool checkIPV4(char requete[], int *i, Noeud *noeud, bool stocker);
 
 /**
  * @brief Vérifie si une chaîne est bien un reg-name
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le reg-name
@@ -503,7 +503,7 @@ bool checkREGNAME(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un IPv6address
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le IPv6address
@@ -514,7 +514,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un IPvFuture
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le IFvFuture
@@ -525,7 +525,7 @@ bool checkIPfuture(char requete[], int *i, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un dec-octet
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le dec-octet
@@ -537,7 +537,7 @@ bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker);
 
 /**
  * @brief Compte le nombre de caractère hexa
- * 
+ *
  * @param requete Chaîne dans laquelle on compte
  * @param i Pointeur vers la position dans la chaîne
  * @return int Nombre de caractère hexa consécutifs
@@ -545,11 +545,28 @@ bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker);
 int CompteurHexdig(char requete[], int *i);
 
 //!===============================================================================
+//? Fonctions utiles pour parser le header générique
+
+bool checkVchar(char requete[], int *i, int longueur, Noeud *noeud);
+
+bool checkObs_Text(char requete[], int *i, int longueur, Noeud *noeud);
+
+bool checkField_Vchar(char requete[], int *i, int longueur, Noeud *noeud);
+
+bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE);
+
+bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE);
+
+bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud);
+
+bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud);
+
+//!===============================================================================
 //? Fonctions utiles pour parser le message-body
 
 /**
  * @brief Vérifie si une chaîne est bien un message-body
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requête

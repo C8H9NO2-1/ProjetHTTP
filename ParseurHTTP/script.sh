@@ -174,6 +174,21 @@ recherche
 rulename="port"
 recherche
 
+rulename="field-name"
+recherche
+
+rulename="field-value"
+recherche
+
+rulename="field-content"
+recherche
+
+rulename="field-vchar"
+recherche
+
+rulename="obs-fold"
+recherche
+
 rulename="message-body"
 recherche
 

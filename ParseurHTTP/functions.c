@@ -170,6 +170,20 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                 continue;
             }
 
+            j = indice;
+            test = malloc(sizeof(Noeud));
+            if(checkLastHeader(requete, &j, longueur,  test)) {
+                if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
+                    EXIT()
+                } else {
+                    k += 2;
+                    j += 2;
+                }
+                FREE()
+                continue;
+            }
+
             EXIT()
         }
     } else {
@@ -275,6 +289,23 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                     EXIT()
                 } else {
                     tabHeader[k] = HOST;
+                    k++;
+                    tabHeader[k] = CRLF;
+                    k++;
+                    j += 2;
+                }
+                FREE()
+                continue;
+            }
+
+            j = indice;
+            test = malloc(sizeof(Noeud));
+            if(checkLastHeader(requete, &j, longueur,  test)) {
+                if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
+                    EXIT()
+                } else {
+                    tabHeader[k] = GENERIC;
                     k++;
                     tabHeader[k] = CRLF;
                     k++;
@@ -3189,6 +3220,328 @@ int CompteurHexdig(char requete[], int *i) {
     }
 
     return CompteurHexdig;
+}
+
+//!===============================================================================
+//? Fonctions utiles pour parser le header générique
+
+bool checkVchar(char requete[], int *i, int longueur, Noeud *noeud) { // Si le noeud est NULL alors *i ne bouge pas
+
+    if ((requete[*i] >= 33) && (requete[*i] <= 126)) {
+        if (noeud == NULL) {
+            return true;
+        } else {
+            createFilsSimple("VCHAR", requete + *i, 1, noeud);
+            (*i)++;
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
+bool checkObs_Text(char requete[], int *i, int longueur, Noeud *noeud) { // Si le noeud est NULL alors *i ne bouge pas
+
+    if (((int)requete[*i] < 0) && ((int)requete[*i] >= -128)) {
+
+        if (noeud == NULL) {
+            return true;
+        } else {
+            createFilsSimple("obs-text", requete + *i, 1, noeud);
+            (*i)++;
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
+bool checkField_Vchar(char requete[], int *i, int longueur, Noeud *noeud) { // Si le noeud est NULL alors *i ne bouge pas
+
+    const int indice = *i;
+
+    if ((checkVchar(requete, i, longueur, NULL)) || (checkObs_Text(requete, i, longueur, NULL))) {
+
+        if (noeud == NULL) {
+            return true;
+        } else if (checkVchar(requete, i, longueur, NULL)) { // Si c'est un Field-Var on le stock
+
+            noeud->valeur = requete + indice;
+            noeud->tag = "field-vchar";
+            noeud->nombreFils = 1;
+            noeud->fils = malloc(1 * sizeof(Noeud));
+            noeud->longueur = 1;
+            checkVchar(requete, i, longueur, &noeud->fils[0]);
+            return true;
+        } else {
+            noeud->valeur = requete + indice; // Sinon on stock un OBS-text
+            noeud->tag = "field-vchar";
+            noeud->nombreFils = 1;
+            noeud->fils = malloc(1 * sizeof(Noeud));
+            noeud->longueur = 1;
+            checkObs_Text(requete, i, longueur, &noeud->fils[0]);
+            return true;
+        }
+
+    } else {
+        return false;
+    }
+}
+
+bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE) { // Si le noeud est NULL alors *i ne bouge pas
+
+    const int indice = *i;
+    int nombreFils = 0;
+    int compteur = 0;
+
+    if (!checkCRLFBool(requete, longueur, *i)) {
+        return false;
+    }
+
+    nombreFils++;
+    (*i) += 2;
+
+    if (requete[*i] != 32 && requete[*i] != 9) {
+        *i = indice;
+        return false;
+    }
+
+    nombreFils++;
+    (*i)++;
+
+    while (requete[*i] == 32 || requete[*i] == 9) {
+        nombreFils++;
+        (*i)++;
+    }
+
+    if (noeud == NULL) {
+        if (TAILLE != NULL) {
+            *TAILLE = (*i) - indice;
+        }
+        (*i) = indice;
+        return true;
+    }
+
+    // Maintenant on stock tout
+    noeud->valeur = requete + indice;
+    noeud->tag = "obs-fold";
+    noeud->nombreFils = nombreFils;
+    noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    noeud->longueur = *i - indice;
+    (*i) = indice;
+
+    createFilsSimple("CRLF", requete + *i, 2, &noeud->fils[compteur]);
+    compteur++;
+    (*i) += 2;
+
+    while (requete[*i] == 32 || requete[*i] == 9) {
+        if (requete[*i] == 32) {
+            createFilsSimple("SP", requete + *i, 1, &noeud->fils[compteur]);
+        } else {
+            createFilsSimple("HTAB", requete + *i, 1, &noeud->fils[compteur]);
+        }
+        compteur++;
+        (*i)++;
+    }
+
+    return true;
+}
+
+bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE) { // Si le noeud est NULL alors *i ne bouge pas
+
+    const int indice= *i;
+    int nombreFils=0;
+    int compteur=0;
+
+    int indice2;
+    int nombreFils2;
+
+    bool optionel = true;
+
+    if (!checkField_Vchar(requete, i, longueur, NULL)) {
+        return false;
+    }
+
+    (*i)++;
+    nombreFils++;
+
+    indice2 = *i;
+    nombreFils2 = nombreFils;
+
+    if (requete[*i] != 32 && requete[*i] != 9) { // On teste pour voir si il y a des choses optionnel ou non
+        optionel = false;
+    }
+
+    if (optionel) {
+        nombreFils++;
+        (*i)++;
+
+        while (requete[*i] == 32 || requete[*i] == 9) {
+            nombreFils++;
+            (*i)++;
+        }
+
+        if (!checkField_Vchar(requete, i, longueur, NULL)) {
+            optionel = false;
+        }
+        nombreFils++;
+        (*i)++;
+    }
+
+    if (noeud == NULL) {
+        if (TAILLE != NULL){
+            *TAILLE = (*i)-indice;
+        }
+        (*i)=indice;
+        return true;
+    }
+
+    if (!optionel){//Indice2= *i+1 et NombreFils=1
+        noeud->fils = malloc(nombreFils2 * sizeof(Noeud));
+        noeud->valeur = requete + indice;
+        noeud->nombreFils = nombreFils2;
+        noeud->tag = "field-content";
+        noeud->longueur = indice2 - indice;
+        *i = indice;
+        checkField_Vchar(requete, i, longueur, &noeud->fils[0]);
+        return true;
+    } else {
+        noeud->fils = malloc(nombreFils * sizeof(Noeud));
+        noeud->valeur = requete + indice;
+        noeud->nombreFils = nombreFils;
+        noeud->tag = "field-content";
+        noeud->longueur = *i - indice;
+        *i = indice;
+        checkField_Vchar(requete, i, longueur, &noeud->fils[compteur]);
+        compteur++;
+
+        while (requete[*i] == 32 || requete[*i] == 9) {
+            if (requete[*i] == 32) {
+                createFilsSimple("SP", requete + *i, 1, &noeud->fils[compteur]);
+            } else {
+                createFilsSimple("HTAB", requete + *i, 1, &noeud->fils[compteur]);
+            }
+            compteur++;
+            (*i)++;
+        }
+        checkField_Vchar(requete, i, longueur, &noeud->fils[compteur]);
+    }
+    return true;
+}
+
+bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud) { // erreur  segmentation fault
+
+    if (noeud == NULL) {
+        return true;
+    }
+
+
+    int temp = 0;
+    int *TAILLE = &temp;
+
+    int temp1 = 0;
+    int *TAILLE2 = &temp1;
+
+
+
+    const int indice = *i;
+    int nombreFils = 0;
+
+    int compteur = 0; // Ce int servira à créer les différents noeuds
+
+    while (*i < longueur) {
+        int indiceTemp = *i;
+        if (checkField_Content(requete, i, longueur, NULL, TAILLE2)) {
+            (*i) += *TAILLE2;
+            nombreFils++;
+        } else {
+            *i = indiceTemp;
+            if(checkObs_Fold(requete, i, longueur, NULL, TAILLE)) {
+                (*i) += *TAILLE;
+                nombreFils++;
+            } else {
+                break;
+            }
+        }
+    }
+
+    noeud->valeur = requete + indice;
+    noeud->tag = "field-value";
+    noeud->nombreFils = nombreFils;
+    if (nombreFils > 0) {
+        noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    }
+    (*i) = indice;
+
+    while (compteur < nombreFils){
+        if(checkField_Content(requete, i, longueur, NULL,NULL)) {
+            checkField_Content(requete, i, longueur, &noeud->fils[compteur], NULL);
+            compteur++;
+        } else {
+            checkObs_Fold(requete, i, longueur, &noeud->fils[compteur], NULL);
+            compteur++;
+        }
+    }
+
+    noeud->longueur = *i - indice;
+    return true;
+}
+
+bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud) { //( field-name ":" OWS field-value OWS )
+                                     // fonction pas encore tester
+    const int indice = *i;
+    int nombreFils = 5;
+
+    noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    noeud->valeur = requete + indice;
+    // On ne connaît pas encore noeud->longueur
+    noeud->nombreFils = nombreFils;
+    noeud->tag = "header-field";
+
+    Noeud *field_name = &noeud->fils[0];
+
+    field_name->fils = malloc(sizeof(Noeud));
+    field_name->valeur = requete + indice;
+    // On ne connaît pas encore noeud->longueur
+    field_name->nombreFils = 1;
+    field_name->tag = "field-name";
+
+    int suppr_fils = 0; // Compteur qui nous servira à supprimer les fils si
+                        // jamais on à un false
+
+    if(!checkToken( requete,i, longueur, &field_name->fils[0], "token")) {
+        free(field_name->fils);
+        free(noeud->fils);
+        free(noeud);
+        return false;
+    }
+    field_name->longueur = *i - indice;
+
+    if(requete[*i] != ':') {
+        freeArbre(&field_name->fils[0]);
+        free(field_name->fils);
+        free(noeud->fils);
+        free(noeud);
+        return false;
+    } else {
+        (&noeud->fils[1])->fils = NULL;
+        (&noeud->fils[1])->valeur = requete + *i;
+        // On ne connaît pas encore noeud->longueur
+        (&noeud->fils[1])->nombreFils = 0;
+        (&noeud->fils[1])->tag = "case_insensitive_string";
+        (&noeud->fils[1])->longueur = 1;
+
+        (*i)++;
+    }
+
+    checkOWS(requete, i, longueur, &noeud->fils[2]);
+
+    checkField_Value(requete,  i, longueur, &noeud->fils[3]);
+
+    checkOWS(requete, i, longueur, &noeud->fils[4]);
+
+    noeud->longueur = *i - indice;
+    return true;
 }
 
 //!===============================================================================
