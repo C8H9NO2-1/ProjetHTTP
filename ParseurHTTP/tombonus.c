@@ -104,7 +104,7 @@ bool checkField_Vchar(char requete[], int *i, int longueur, Noeud *noeud){ // Si
 
 }
 
-bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud){ // Si le noeud est NULL alors *i ne bouge pas
+bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE){ // Si le noeud est NULL alors *i ne bouge pas
     const int indice= *i;
     int nombreFils=0;
     int compteur=0;
@@ -151,6 +151,9 @@ bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud){ // Si le
     }
 
     if (noeud==NULL){
+        if (TAILLE!=NULL){
+            *TAILLE=(*i)-indice;
+        }
         (*i)=indice;
         return true;
     }
@@ -173,7 +176,7 @@ bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud){ // Si le
         else{
             createFilsSimple("HTAB", requete + *i, 1, &noeud->fils[compteur]);
         }
-        printf("%d \n", compteur);
+        //printf("%d \n", compteur);
         compteur++;
         (*i)++;
     }
@@ -192,7 +195,7 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud){ // 
 
     bool optionel=true;
 
-    printf("Bonsoir2 \n");
+    //printf("Bonsoir2 \n");
 
     if (!checkField_Vchar(requete, i, longueur, NULL)){
         if (noeud==NULL){
@@ -200,7 +203,7 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud){ // 
         }
 
         else{
-            printf("Bonsoir \n");
+            //printf("Bonsoir \n");
             free(noeud); /* segFault fuite de mémoire*/
             return false;
         }
@@ -272,40 +275,43 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud){ // 
 }
 
 bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud){ //erreur  segmentation fault
-    printf("Dudur \n");
+    if (noeud==NULL){
+        return true;
+    }
+    int temp=0;
+    int *TAILLE=&temp;
+
     const int indice= *i;
     int nombreFils=0;
 
     int compteur=0; //Ce int servira à créer les différents noeuds
-    printf("Dudurqvfqav \n");
-    noeud->valeur = requete + indice;
-    printf("Dudur3 \n");
-    noeud->tag = "field-value";
-    printf("Dudur2 \n");
 
-    while (((checkField_Content(requete, i, longueur, NULL))) || (checkObs_Fold(requete, i, longueur,NULL))){
-        if(checkField_Content(requete, i, longueur, NULL)){
-            (*i)++;
+    while (((checkField_Content(requete, i, longueur, NULL))) || (checkObs_Fold(requete, i, longueur,NULL, TAILLE))){
+        if(checkObs_Fold(requete, i, longueur,NULL, TAILLE)){
+            (*i)=(*i)+(*TAILLE);
         }
-        {
-            Noeud *test = malloc(sizeof(Noeud)); // Ce noeud nous sert à avancer (*i)
-            checkObs_Fold(requete, i, longueur,test);
-            free(test);
+        else{
+            (*i)++;
         }
         nombreFils++;
     }
 
+    noeud->valeur = requete + indice;
+    noeud->tag = "field-value";
     noeud->nombreFils = nombreFils;
     noeud->fils = malloc(nombreFils * sizeof(Noeud));
+    (*i)=indice;
 
-    while (((checkField_Content(requete, i, longueur, NULL)) || (checkObs_Fold(requete, i, longueur,NULL)))){
+    while (((checkField_Content(requete, i, longueur, NULL)) || (checkObs_Fold(requete, i, longueur,NULL,NULL)))){
         if(checkField_Content(requete, i, longueur, NULL)){
+            //printf("i1 hahahahaha %d \n", *i);
             checkField_Content(requete, i, longueur, &noeud->fils[compteur]);
+            //printf("i1 hahahahaha %d \n", *i);
             compteur++;
         }
 
         else{
-            checkObs_Fold(requete, i, longueur, &noeud->fils[compteur] );
+            checkObs_Fold(requete, i, longueur, &noeud->fils[compteur],NULL );
             compteur++;
         }
     }
@@ -468,7 +474,8 @@ int main(){
         freeArbre(test_noeud);
     }*/
 
-    /*char sujet[]= {255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255, '\0'};
+    //char sujet[]= {255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255, '\0'};
+    /*char sujet[]= {127, '\0'};
     int temp=0;
     int *i=&temp;
     test=checkField_Content(sujet, i, 10000, NULL); // ÿ=255 et €=128 et !=33 et ~=126
@@ -487,7 +494,7 @@ int main(){
     }*/
 
     printf("Chef \n");
-    char sujet[]= {255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255, '\0'};
+    char sujet[]= {13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32, '\0'};
     int temp=0;
     int *i=&temp;
     test=checkField_Value(sujet, i, 100, NULL); // ÿ=255 et €=128 et !=33 et ~=126
