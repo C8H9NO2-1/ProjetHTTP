@@ -7,9 +7,7 @@
 #include "functions.h"
 #include "structure.h"
 
-#define DEBUG(name, value)                                                     \
-  printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, \
-         __FUNCTION__, __LINE__, name, value);
+#define DEBUG(name, value) printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, __FUNCTION__, __LINE__, name, value);
 
 bool checkVchar(char requete[], int *i, int longueur, Noeud *noeud) { // Si le noeud est NULL alors *i ne bouge pas
 
@@ -57,7 +55,7 @@ bool checkObs_Text(char requete[], int *i, int longueur, Noeud *noeud) { // Si l
         }
 
         else {
-            free(noeud);
+            // free(noeud);
             return false;
         }
     }
@@ -102,7 +100,7 @@ bool checkField_Vchar(char requete[], int *i, int longueur, Noeud *noeud) { // S
         }
 
         else {
-            free(noeud);
+            // free(noeud);
             return false;
         }
     }
@@ -157,7 +155,7 @@ bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud, int *TAIL
         (*i)++;
     }
 
-    DEBUG("nombreFils", nombreFils)
+    // DEBUG("nombreFils", nombreFils)
 
     if (noeud == NULL) {
         if (TAILLE != NULL) {
@@ -192,7 +190,8 @@ bool checkObs_Fold(char requete[], int *i, int longueur, Noeud *noeud, int *TAIL
     return true;
 }
 
-bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE){ // Si le noeud est NULL alors *i ne bouge pas
+bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int *TAILLE) { // Si le noeud est NULL alors *i ne bouge pas
+
     const int indice= *i;
     int nombreFils=0;
     int compteur=0;
@@ -205,7 +204,6 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int 
     // printf("Bonsoir2 \n");
 
     if (!checkField_Vchar(requete, i, longueur, NULL)) {
-
         return false;
         // if (noeud == NULL) {
         //     return false;
@@ -224,17 +222,17 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int 
     indice2 = *i;
     nombreFils2 = nombreFils;
 
-    DEBUG("i", *i)
+    // DEBUG("i", *i)
 
-    if (((requete[*i] != 32)) && (requete[*i] != 9)) { // On teste pour voir si il y a des choses optionnel ou non
+    if (requete[*i] != 32 && requete[*i] != 9) { // On teste pour voir si il y a des choses optionnel ou non
         optionel = false;
     }
 
-    if (optionel){
+    if (optionel) {
         nombreFils++;
         (*i)++;
-        DEBUG("i", *i)
-        while (((requete[*i] == 32)) || (requete[*i] == 9)) {
+
+        while (requete[*i] == 32 || requete[*i] == 9) {
             nombreFils++;
             (*i)++;
         }
@@ -246,15 +244,15 @@ bool checkField_Content(char requete[], int *i, int longueur, Noeud *noeud, int 
         (*i)++;
     }
 
-    if (noeud==NULL){
-        if (TAILLE!=NULL){
-            *TAILLE=(*i)-indice;
+    if (noeud==NULL) {
+        if (TAILLE != NULL){
+            *TAILLE = (*i)-indice;
         }
         (*i)=indice;
         return true;
     }
 
-    if (optionel==false){//Indice2= *i+1 et NombreFils=1
+    if (!optionel){//Indice2= *i+1 et NombreFils=1
         noeud->fils = malloc(nombreFils2 * sizeof(Noeud));
         noeud->valeur = requete + indice;
         noeud->nombreFils = nombreFils2;
@@ -298,13 +296,13 @@ bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud) { // e
     if (noeud == NULL) {
         return true;
     }
-    
 
-    int temp=0;
-    int *TAILLE=&temp;
 
-    int temp1=0;
-    int *TAILLE2=&temp1;
+    int temp = 0;
+    int *TAILLE = &temp;
+
+    int temp1 = 0;
+    int *TAILLE2 = &temp1;
 
 
 
@@ -313,16 +311,24 @@ bool checkField_Value(char requete[], int *i, int longueur, Noeud *noeud) { // e
 
     int compteur = 0; // Ce int servira à créer les différents noeuds
 
-    while (checkField_Content(requete, i, longueur, NULL, TAILLE2) || checkObs_Fold(requete, i, longueur,NULL, TAILLE)){
-        if(checkObs_Fold(requete, i, longueur,NULL, TAILLE)){
-            (*i)=(*i)+(*TAILLE);
+    while (*i < longueur) {
+        int indiceTemp = *i;
+        if (checkField_Content(requete, i, longueur, NULL, TAILLE2)) {
+            (*i) += *TAILLE2;
             nombreFils++;
-        }
-        else{
-            (*i)=(*i)+(*TAILLE2);
-            nombreFils++;
+        } else {
+            *i = indiceTemp;
+            if(checkObs_Fold(requete, i, longueur, NULL, TAILLE)) {
+                (*i) += *TAILLE;
+                nombreFils++;
+            } else {
+                break;
+            }
         }
     }
+
+    DEBUG("i", *i)
+    DEBUG("nombreFils", nombreFils)
 
     noeud->valeur = requete + indice;
     noeud->tag = "field-value";
@@ -370,7 +376,7 @@ bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud) { //( f
     int suppr_fils = 0; // Compteur qui nous servira à supprimer les fils si
                         // jamais on à un false
 
-    if(!checkToken( requete,i, longueur, &field_name->fils[0], "Tchar")){
+    if(!checkToken( requete,i, longueur, &field_name->fils[0], "token")){
         //printf("boucle 1\n");
         free(&field_name->fils[0]);
         /*while(suppr_fils < nombreFils){
@@ -394,10 +400,10 @@ bool checkLastHeader(char requete[], int *i, int longueur, Noeud *noeud) { //( f
         return false;
     } else {
         (&noeud->fils[1])->fils = NULL;
-        (&noeud->fils[1])->valeur = requete + indice;
+        (&noeud->fils[1])->valeur = requete + *i;
         // On ne connaît pas encore noeud->longueur
         (&noeud->fils[1])->nombreFils = 0;
-        (&noeud->fils[1])->tag = "incensitive-case-string";
+        (&noeud->fils[1])->tag = "case_insensitive_string";
         (&noeud->fils[1])->longueur = 1;
 
         (*i)++;
@@ -581,22 +587,30 @@ int main() {
 
     printf("Chef \n");
     //char sujet[]= {185,'a','B','#',':',' ',255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,' ',9, '\0'};
-    int temp=0;
-    char sujet[]= {'a','B','#',':',' ',255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,255, 32 , 32, 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,' ',9, '\0'};
-    int *i=&temp;
+    // char sujet[]= {'a','B','#',':',' ',255, 32 , 32 , 32, 9,9,9,9,9,9,32,32,255,255, 32 , 32, 32, 9,9,9,9,9,9,32,32,255,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,13, 10, 32 , 32 , 32, 9,9,9,9,9,9,32,32,32,' ',9, '\0'};
+    //
+    // char sujet[] = "QMK5+': 						F  	 		 	@\r\n  ΩÖ	";
+    char sujet[] = "QMK5:";
+    // char sujet[] = "l97w: 	   	‡∂	 			  	 	ê\r\n					 	 R	 ";
+
+    int i = 0;
 
     printf("Nononononono \n");
 
-    if(!checkLastHeader(sujet, i, 100, test_noeud)){
+    if(!checkLastHeader(sujet, &i, strlen(sujet), test_noeud)) {
         test_noeud=NULL;
         printf("Bon. \n");
     }
+
+    DEBUG("i", i)
+
     printf("Shees \n");
 
     if (test_noeud != NULL) {
         printArbre(test_noeud, 0);
         freeArbre(test_noeud);
     }
+
     free(test_noeud);
     return 0;
 }
