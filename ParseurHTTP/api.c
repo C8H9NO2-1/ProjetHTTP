@@ -10,6 +10,13 @@
 
 #define DEBUG(name, value) printf("File => %s \t Function => %s \t Line => %d \t %s => %d\n", __FILE__, __FUNCTION__, __LINE__, name, value);
 
+#define HEADER_FIELD racine->fils[j].tag = "header-field"; \
+racine->fils[j].nombreFils = 1; \
+racine->fils[j].valeur = requete + i; \
+racine->fils[j].fils = malloc(sizeof(Noeud)); \
+
+#define HEADER_FIELD1 racine->fils[j].longueur = racine->fils[j].fils[0].longueur;
+
 Noeud *racine = NULL;
 
 void *getRootTree() {
@@ -134,9 +141,10 @@ void purgeTree(void *root) {
 }
 
 // TODO -> Ajouter les CRLF dans les noeuds fils de HTTP-message                    √
-// TODO -> Ajouter les headers génériques                                           
+// TODO -> Ajouter les headers génériques                                             
 // TODO -> Ajouter le contenu du message dans les noeuds fils de HTTP-message       √  
-// TODO -> Vérifier les fuites de mémoires 😭                                       √
+// TODO -> Vérifier les fuites de mémoires                                          √
+// TODO -> Ajouter des noeuds intermédiaires header-field                           √
 
  int parseur(char *requete, int longueur) {
 
@@ -202,7 +210,9 @@ void purgeTree(void *root) {
     for (j = 1; j <= nombreHeader; j++) {
         switch(tabHeader[j - 1]) {
             case CONNECTION:
-                checkConnectionHeader(requete, &i, longueur, &racine->fils[j]);
+                HEADER_FIELD
+                checkConnectionHeader(requete, &i, longueur, &racine->fils[j].fils[0]);
+                HEADER_FIELD1
                 break;
             
             // case 2 :
@@ -214,19 +224,27 @@ void purgeTree(void *root) {
             //     break;
             
             case COOKIE:
-                checkCookieHeader(requete, &i, longueur,  &racine->fils[j]);
+                HEADER_FIELD
+                checkCookieHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
+                HEADER_FIELD1
                 break;
         
             case TRANSFER_ENCODING:
-                checkTransferEncodingHeader(requete, &i, longueur,  &racine->fils[j]);
+                HEADER_FIELD
+                checkTransferEncodingHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
+                HEADER_FIELD1
                 break;
 
             case EXPECT:
-                checkExpectHeader(requete, &i, longueur,  &racine->fils[j]);
+                HEADER_FIELD
+                checkExpectHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
+                HEADER_FIELD1
                 break;
             
             case HOST:
-                checkHostHeader(requete, &i, longueur,  &racine->fils[j]);
+                HEADER_FIELD
+                checkHostHeader(requete, &i, longueur,  &racine->fils[j].fils[0]);
+                HEADER_FIELD1
                 break;
             case CRLF:
                 createFilsSimple("CRLF", requete + i, 2, &racine->fils[j]);

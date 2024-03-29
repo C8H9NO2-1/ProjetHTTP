@@ -1693,6 +1693,8 @@ bool checkExpectHeader(char requete[], int *i, int longueur, Noeud *noeud) {
     checkOWS(requete, i, longueur, &noeud->fils[j]);
     j++;
 
+    noeud->longueur = *i - indice;
+
     return true;
 }
 

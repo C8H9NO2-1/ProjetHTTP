@@ -1981,6 +1981,8 @@ bool checkExpectHeader(char requete[], int *i, int longueur, Noeud *noeud) {
     checkOWS(requete, i, longueur, &noeud->fils[j]);
     j++;
 
+    noeud->longueur = *i - indice;
+
     return true;
 }
 
@@ -2027,11 +2029,13 @@ bool checkExpect(char requete[], int *i, Noeud *noeud) {
     free(chaineContinue);
 
     // Si tout s'est bien passé, on créé le noeud contenant "100-continue"
-    noeud->fils = NULL;
+    noeud->fils = malloc(sizeof(Noeud));
     noeud->valeur = requete + indice;
     noeud->longueur = *i - indice;
-    noeud->nombreFils = 0;
-    noeud->tag = "case_insensitive_string";
+    noeud->nombreFils = 1;
+    noeud->tag = "Expect";
+
+    createFilsSimple("case_insensitive_string", requete + indice, *i - indice, &noeud->fils[0]);
 
     return true;    
 }
