@@ -558,6 +558,17 @@ bool checkConLen( char requete[], int i, Noeud *noeud);
 bool checkDigitS( char requete[],int i ,Noeud *noeud);
 
 //!===============================================================================
+//? Fonctions utiles pour parser le content-type-header
+
+bool checkContentTypeHeader(char requete[],int *i,int length,Noeud *noeud);
+
+bool checkConType( char requete[], int i, Noeud *noeud);
+
+bool checkMediaType( char requete[],int *i,int length,Noeud *noeud);
+
+bool checkParameter(char requete[],int *i,int length,Noeud *noeud);
+
+//!===============================================================================
 //? Fonctions utiles pour parser le header générique
 
 bool checkVchar(char requete[], int *i, int longueur, Noeud *noeud);

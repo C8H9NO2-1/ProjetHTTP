@@ -221,13 +221,11 @@ void purgeTree(void *root) {
                 HEADER_FIELD1
                 break;
 
-            // case 2 :
-            //     checkContentLengthHeader(requete, &i, longueur, &racine->fils[j]);
-            //     break;
-
-            // case 3 :
-            //     checkContentTypeHeader(requete, &i, longueur,  &racine->fils[j]);
-            //     break;
+            case CONTENT_TYPE:
+                HEADER_FIELD
+                checkContentTypeHeader(requete, &i, longueur, &racine->fils[j].fils[0]);
+                HEADER_FIELD1
+                break;
 
             case COOKIE:
                 HEADER_FIELD

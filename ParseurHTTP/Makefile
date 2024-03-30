@@ -1,21 +1,24 @@
-all: functions.o affichage.o api.o main.o
-	gcc -o main functions.o affichage.o main.o api.o -fsanitize=address
+all: functions.o affichage.o api.o main.o file.o
+	gcc -o main functions.o affichage.o main.o api.o file.o -fsanitize=address
 	rm *.o
 
 functions.o: functions.c
-	gcc -o functions.o -c functions.c
+	gcc -o functions.o -c functions.c -fsanitize=address
 
 # new.o: newElisa.c
 # 	gcc -o new.o -c newElisa.c -fsanitize=address
 
 main.o: main.c
-	gcc -o main.o -c main.c
+	gcc -o main.o -c main.c -fsanitize=address
 
 api.o: api.c
-	gcc -o api.o -c api.c
+	gcc -o api.o -c api.c -fsanitize=address
 
 affichage.o: affichage.c
-	gcc -c affichage.c -o affichage.o
+	gcc -c affichage.c -o affichage.o -fsanitize=address
+
+file.o: file.c
+	gcc -c file.c -o file.o -fsanitize=address
 
 #!===============================================
 
@@ -48,4 +51,3 @@ tom1: tom1.o affichage.o
 
 tom1.o: tom.c
 	gcc -c tom.c -o tom1.o
-

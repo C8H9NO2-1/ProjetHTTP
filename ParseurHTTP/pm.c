@@ -23,31 +23,31 @@ void freeArbre(Noeud *racine) {
     free(racine->fils);
 }
 
-int main(int argc, char *argv[]) {
+// int main(int argc, char *argv[]) {
 
-    // char requete[] = "GET /index.html HTTP/1.0\r\n";
-    // char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n ";
-    char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,  ";
-    // char requete[] = "CONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,";
+//     // char requete[] = "GET /index.html HTTP/1.0\r\n";
+//     // char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n ";
+//     char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,  ";
+//     // char requete[] = "CONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,";
 
-    Noeud *test = malloc(sizeof(Noeud));
+//     Noeud *test = malloc(sizeof(Noeud));
 
-    int i = 0;
+//     int i = 0;
 
-    if (!checkConnectionHeader(requete, &i, strlen(requete), test)) {
-        printf("Hello world\n");
-        test = NULL;
-    }
+//     if (!checkConnectionHeader(requete, &i, strlen(requete), test)) {
+//         printf("Hello world\n");
+//         test = NULL;
+//     }
 
-    if (test != NULL) {
-        printArbre(test, 0);
-        freeArbre(test);
-    }
+//     if (test != NULL) {
+//         printArbre(test, 0);
+//         freeArbre(test);
+//     }
 
-    free(test);
+//     free(test);
 
-    return 0;
-}
+//     return 0;
+// }
 
 //!==============================Fonctions générales==============================
 

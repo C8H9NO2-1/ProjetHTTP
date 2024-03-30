@@ -119,17 +119,20 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                 FREE()
                 continue;
             }
-            // j = indice
-            // test = malloc(sizeof(Noeud));
-            // if(checkContentTypeHeader(requete, &j, longueur,  test)) {
-            //     if (!checkCRLFBool(requete, longueur,j)) {
-                    // return k;
-                    // } else {
-                    //     k++;
-                    //     j += 2;
-                    // }
-                    // continue;
-            // }
+
+            j = indice;
+            test = malloc(sizeof(Noeud));
+            if(checkContentTypeHeader(requete, &j, longueur, test)) {
+                if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
+                    EXIT()
+                } else {
+                    k += 2;
+                    j += 2;
+                }
+                FREE()
+                continue;
+            }
 
             j = indice;
             test = malloc(sizeof(Noeud));
@@ -242,18 +245,22 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                 continue;
             }
 
-            // j = indice
-            // test = malloc(sizeof(Noeud));
-            // if(checkContentTypeHeader(requete, &j, longueur,  test)) {
-            //     if (!checkCRLFBool(requete, longueur,j)) {
-                    // return k;
-                    // } else {
-                        // tabHeader[k] = CONTENT_TYPE;
-                    //     k++;
-                    //     j += 2;
-                    // }
-                    // continue;
-            // }
+            j = indice;
+            test = malloc(sizeof(Noeud));
+            if(checkContentTypeHeader(requete, &j, longueur, test)) {
+                if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
+                    EXIT()
+                } else {
+                    tabHeader[k] = CONTENT_TYPE;
+                    k++;
+                    tabHeader[k] = CRLF;
+                    k++;
+                    j += 2;
+                }
+                FREE()
+                continue;
+            }
 
             j = indice;
             test = malloc(sizeof(Noeud));
@@ -3369,6 +3376,263 @@ bool checkDigitLen( char requete[],int *i, int length,Noeud *noeud){ // Content-
         (*i)++;
     }
 
+    return true;
+}
+
+//!===============================================================================
+//? Fonctions utiles pour parser le content-type-content
+
+bool checkContentTypeHeader(char requete[],int *i,int length,Noeud *noeud){
+
+    int nombreFils= 5;
+    const int indice =*i;
+    Noeud* filsContypeH=malloc(sizeof(Noeud));
+
+    // printf("%c\n", requete[*i]);
+
+    if (!checkConType(requete, *i,  filsContypeH)){
+        free(filsContypeH);
+        free(noeud);
+        *i=indice;
+        return false;
+    }
+
+    (*i) += 12;
+    if (requete[*i]!=58){
+        free(filsContypeH);
+        free(noeud);
+        *i=indice;
+        return false;
+    }
+    (*i)++;
+    // Noeud *filsOWS1=malloc(sizeof(Noeud));
+    checkOWS(requete,i,length,NULL);
+
+    Noeud *contentType=malloc(sizeof(Noeud));     //content-Type =media-type
+    if (!checkMediaType(requete,i ,length,contentType)){
+        free(filsContypeH);
+        free(contentType);
+        free(noeud);
+        *i=indice;
+        return false;
+
+    }
+
+    checkOWS(requete,i,length,NULL);
+
+    noeud->fils=malloc(nombreFils*sizeof(Noeud));
+    noeud->valeur=requete +indice;
+    noeud->longueur=*i-indice;
+    noeud->nombreFils=nombreFils;
+    noeud->tag="Content-Type-header";
+
+    *i=indice;
+
+    noeud->fils[0]=*filsContypeH;
+    free(filsContypeH);
+    (*i)+=noeud->fils[0].longueur;
+
+
+    createFilsSimple("case_insensitive_string",requete + *i, 1, &noeud->fils[1]);
+    (*i)++;
+
+
+    checkOWS(requete,i,length,&noeud->fils[2]);
+
+    noeud->fils[3] = *contentType;
+
+    (*i) += noeud->fils[3].longueur;
+
+
+	free(contentType);
+
+	checkOWS(requete,i,length,&noeud->fils[4]);
+
+	return true;
+
+}
+
+bool checkConType( char requete[], int i, Noeud *noeud) {
+	noeud->valeur=requete + i;
+	noeud->fils=NULL;
+	noeud->longueur=12;
+	noeud->tag="case_insensitive_string";
+	noeud->nombreFils=0;
+	char ConTypeMinuscule[13];
+
+	sousChaineMinuscule(requete + i,ConTypeMinuscule,0,12);
+    int a=strcmp("content-type",ConTypeMinuscule);
+	if (a!=0) {
+        return false;
+    } else {
+        return true;
+    }
+
+}
+
+bool checkMediaType(char requete[],int *i,int length,Noeud *noeud){
+
+    // media-type = type "/" subtype *( OWS ";" OWS parameter )
+    const int indice =*i;
+    int compteur=0;
+    bool owsCheked=false;
+
+    if (!checkToken(requete,i ,length,NULL,"")) {
+        *i=indice;
+        return false;
+    }
+
+	compteur++;
+    if (requete[*i]!=47) {
+        *i=indice;
+        return false;
+    }
+    (*i)++;
+	compteur++;
+
+    if(!checkToken(requete,i,length,NULL,"")){
+        *i=indice;
+        return false;
+    }
+
+    compteur++;
+
+
+    //  ========*( OWS ";" OWS parameter )
+    //
+
+    int const indice2=*i;
+    checkOWS(requete,i,length,NULL);
+
+    if (requete[*i] != ';') {
+        *i = indice2;
+    } else {
+        while(*i<length && requete[*i]==59) {
+            compteur+=2;
+
+            (*i)++;
+            checkOWS(requete,i,length,NULL);
+            if(!checkParameter(requete,i,length,NULL)){
+                compteur -=2;
+                (*i)=indice2;
+                break;
+            }
+            compteur +=2;
+            checkOWS(requete,i,length,NULL);
+        }
+    }
+
+
+    //remplir tout  fils en noued
+    if (noeud!=NULL){
+        noeud->valeur= requete+indice;
+        noeud->longueur = *i - indice;
+        noeud->tag= "media-type";
+        noeud->fils=malloc((compteur)*sizeof(Noeud));
+        noeud->nombreFils=compteur;
+
+        *i=indice;
+
+        checkToken(requete,i,length,&noeud->fils[0],"type");
+
+        createFilsSimple("case_insensitive_string", requete+*i, 1, &noeud->fils[1]);
+        (*i)++;
+        checkToken(requete,i,length,&noeud->fils[2],"subtype");
+
+
+        // media-type = type "/" subtype *( OWS ";" OWS parameter )
+
+        for (int j=3; j < compteur; j++){
+            int iTemp=*i;
+
+            if (requete[*i]==59){
+                if(!owsCheked){
+                    checkOWS(requete, i, length, &noeud->fils[j]);
+                    j++;
+                }
+                createFilsSimple("case_insensitive_string", requete + *i, 1 , &noeud->fils[j]);
+                (*i)++;
+                owsCheked=false;
+            }
+
+            else if(checkParameter(requete,i,length,NULL)){
+                *i=iTemp;
+
+
+                if(!owsCheked){
+                    checkOWS(requete, i, length, &noeud->fils[j]);
+
+
+                    j++;
+                }
+                checkParameter(requete,i,length,&noeud->fils[j]);
+                owsCheked=false;
+            }
+            else{
+
+                checkOWS(requete,i,length,&noeud->fils[j]);
+
+                owsCheked=true;
+            }
+
+        }
+    }
+    return true;
+}
+
+bool checkParameter(char requete[],int *i,int length,Noeud *noeud){
+    //parameter = token "=" ( token / quoted-string )
+    int compteur=0;
+    const int indice=*i;
+    int nombreFils=3;
+    bool quoted=false;
+
+    if (!checkToken(requete,i,length,NULL,"")) {
+        (*i)=indice;
+        return false;
+    }
+    compteur++;
+
+
+    if (requete[*i] != 61){
+        *i=indice;
+        return false;
+    }
+    (*i)++;
+    compteur++;
+    int Temp=*i;
+    if (checkQuotedString(requete,i,length,NULL)){
+        quoted=true;
+        compteur++;
+
+    } else{
+        if (!checkToken(requete,i,length,NULL,"")){
+            (*i)=indice;
+            return false;
+        }
+        compteur ++;
+    }
+
+	if (noeud!=NULL){
+		noeud->valeur= requete + indice;
+		noeud->longueur=*i- indice;
+		noeud->tag= "parameter";
+		noeud->fils=malloc(compteur*sizeof(Noeud));
+		noeud->nombreFils= compteur;
+
+		*i=indice;
+
+		checkToken(requete,i,length,&noeud->fils[0],"token");
+		createFilsSimple("case_insensitive_string",requete+ *i,1, &noeud->fils[1]);
+		(*i)++;
+		int iTemp=*i;
+
+        if (quoted){
+            checkQuotedString(requete,i,length,&noeud->fils[2]);
+        } else {
+            checkToken(requete,i,length,&noeud->fils[2],"token");
+        }
+	}
     return true;
 }
 
