@@ -3,6 +3,8 @@ elisa1
 elisa2
 main
 
+*.o
+
 .json
 
 .DS_Store

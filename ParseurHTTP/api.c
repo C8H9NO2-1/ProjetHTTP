@@ -215,6 +215,12 @@ void purgeTree(void *root) {
                 HEADER_FIELD1
                 break;
 
+            case CONTENT_LENGTH:
+                HEADER_FIELD
+                checkContentLenHeader(requete, &i, longueur, &racine->fils[j].fils[0]);
+                HEADER_FIELD1
+                break;
+
             // case 2 :
             //     checkContentLengthHeader(requete, &i, longueur, &racine->fils[j]);
             //     break;

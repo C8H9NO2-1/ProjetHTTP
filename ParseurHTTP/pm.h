@@ -1,6 +1,8 @@
 #ifndef PM_H
 #define PM_H
 
+void freeArbre(Noeud *racine);
+
 //! Fonctions qui sont très génériques
 //! Elles ne font aucun stockage, elles vérifient juste des syntaxes spécifiques qui peuvent être utiles autre part
 bool checkAlpha(const char requete[], int i);
@@ -24,7 +26,7 @@ void sousChaineMinuscule(const char chaine1[], char chaine2[], int i, int j);
 //? Fonctions utiles pour parser la start-line
 /**
  * @brief Vériie si une chaîne est bien la start-line d'une requête HTTP
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -36,7 +38,7 @@ bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud); //? sta
 
 /**
  * @brief Vérifie qu'une partie de la chaîne requete est bien une method
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -48,7 +50,7 @@ bool checkMethod(char requete[], int *i, const int longueur, Noeud *noeud); //? 
 
 /**
  * @brief Vérifie si une chaîne est bien une request-target
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -60,7 +62,7 @@ bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud
 
 /**
  * @brief Vérifie si une chaîne est bien un absolute-path
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -72,7 +74,7 @@ bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud)
 
 /**
  * @brief Vérifie si une chaîne est bien un segment
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -84,7 +86,7 @@ bool checkSegment(char requete[], int *i, const int longueur, Noeud *noeud); //?
 
 /**
  * @brief Vérifie si une chaîne est bien un pchar
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -96,7 +98,7 @@ bool checkPChar(char requete[], int *i, const int longueur, Noeud *noeud); //? p
 
 /**
  * @brief Vérifie si une chaîne est bien un query
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -108,7 +110,7 @@ bool checkQuery(char requete[], int *i, const int longueur, Noeud *noeud); //? q
 
 /**
  * @brief Vérifie si une chaîne est bien une HTTP-version
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur Longueur de requete
@@ -123,7 +125,7 @@ bool checkHTTPVersion(char requete[], int *i, const int longueur, Noeud *noeud);
 
 /**
  * @brief Vérifie si une chaîne est bien un connection-header
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur longueur de requete
@@ -135,7 +137,7 @@ bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *no
 
 /**
  * @brief Vérifie si une chaîne est bien un connection-string
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param noeud Pointeur vers le noeud dans lequel on va stocker le connection-option
@@ -146,7 +148,7 @@ bool checkConnectionString(char requete[], int *i, Noeud *noeud); //? "Connectio
 
 /**
  * @brief Vérifie si une chaîne est bien un connection
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur longueur de requete
@@ -158,7 +160,7 @@ bool checkConnection(char requete[], int *i, const int longueur, Noeud *noeud); 
 
 /**
  * @brief Vérifie si une chaîne est bien un connection-option
- * 
+ *
  * @param requete Requête HTTP en cours de parsing
  * @param i Pointeur vers l'indice de début de la chaîne à vérifier
  * @param longueur longueur de requete

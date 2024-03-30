@@ -4,9 +4,9 @@
 
 /**
  * @brief verifie si la requete est bien correspand a Content-Length-header
- * 
+ *
  * @param requete la requete correspandante
- * @param i Pointeur 
+ * @param i Pointeur
  * @return tr
 */
 
@@ -17,7 +17,7 @@ bool checkContentLenHeader(char requete[], int *i, int length, Noeud*Noeud);
 // bool checkOWS(t char requete[], int *i, int longueur, Noeud *noeud); //OWS = *( SP / HTAB )
 bool compareCaseInse(char chaine1[], char chaine2[]);
 bool checkDigitLen(char requete[],int *i, int length,Noeud *noeud);// Content-Length = 1*DIGIT
-bool checkConLen( char requete[] ,Noeud *noeud); // "Content-Length"
+bool checkConLen( char requete[], int i, Noeud *noeud); // "Content-Length"
 
 bool checkDigitS( char requete[],int i ,Noeud *noeud);
 bool checkCRLF(char requete[],int *i,const int length);

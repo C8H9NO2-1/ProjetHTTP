@@ -24,7 +24,7 @@ void freeArbre(Noeud *racine) {
 }
 
 int main(int argc, char *argv[]) {
-    
+
     // char requete[] = "GET /index.html HTTP/1.0\r\n";
     // char requete[] = "EKr1czBS+P*RAja /6Q@_C;IqPpdWi:I/4:b9Hra7UELY2tN/!xDzvl9mpYm)Y.j/MS!zM,C2P'!Z0l@ HTTP/4.0\r\n ";
     char requete[] = "CoNNEctIon: , Keep-alive,     	keep-alive, 	close,	test,  ";
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     }
 
     free(test);
-    
+
     return 0;
 }
 
@@ -74,7 +74,7 @@ bool checkUnreserved(const char requete[], int i) {
         case '~':
             return true;
             break;
-        
+
         default:
             break;
     }
@@ -101,7 +101,7 @@ bool checkSubDelims(const char requete[], int i) {
         case '=':
             return true;
             break;
-        
+
         default:
             return false;
             break;
@@ -149,7 +149,7 @@ bool checkTChar(char requete[], int i, Noeud *noeud) {
         case '~':
             return true;
             break;
-        
+
         default:
             break;
     }
@@ -205,7 +205,7 @@ bool checkToken(char requete[], int *i, int longueur, Noeud *noeud, char nom[]) 
             (*i)++;
         }
     }
-    
+
     return true;
 }
 
@@ -322,13 +322,13 @@ bool checkStartLine(char requete[], int *i, int longueur, Noeud *noeud) {
     noeud->tag = "start-line";
 
     *i = indice; // On réinitialise i
-    
+
     noeud->fils[0] = *filsMethod;
     (*i) += noeud->fils[0].longueur;
-    
+
     createFilsSimple("SP", requete + *i, 1, &noeud->fils[1]);
     (*i)++;
-    
+
     noeud->fils[2] = *filsRequestTarget;
     (*i) += noeud->fils[2].longueur;
 
@@ -362,7 +362,7 @@ bool checkRequestTarget(char requete[], int *i, const int longueur, Noeud *noeud
     // On remplit ce qu'on sait déjà du noeud
     noeud->valeur = requete + *i;
     noeud->tag = "request-target";
-    
+
     // On est certain d'avoir une absolute-path comme fils
     Noeud *filsPath = malloc(sizeof(Noeud));
     Noeud *filsQuery1 = NULL;
@@ -439,7 +439,7 @@ bool checkAbsolutePath(char requete[], int *i, const int longueur, Noeud *noeud)
         (*i)++;
         checkSegment(requete, i, longueur, &noeud->fils[j + 1]); // On a pas besoin de récupérer la valeur de retour cette fois-ci
     }
-    
+
     return true;
 }
 
@@ -455,7 +455,7 @@ bool checkSegment(char requete[], int *i, const int longueur, Noeud *noeud) {
         compteur++;
     }
 
-    if (noeud != NULL) {    
+    if (noeud != NULL) {
         // On stocke les données nécessaires pour le noeud courant
         noeud->valeur = requete + indice;
         noeud->longueur = *i - indice;
@@ -474,7 +474,7 @@ bool checkSegment(char requete[], int *i, const int longueur, Noeud *noeud) {
             (*i)++;
         }
     }
-    
+
     return true;
 }
 
@@ -510,7 +510,7 @@ bool checkPChar(char requete[], int *i, const int longueur, Noeud *noeud) {
             case '@':
                 return true;
                 break;
-        
+
             default:
                 break;
         }
@@ -533,7 +533,7 @@ bool checkQuery(char requete[], int *i, const int longueur, Noeud *noeud) {
     const int indice = *i;
 
     // On compte le nombre de fils dans le champ courant
-    
+
     while (*i < longueur && (checkPChar(requete, i, longueur, NULL) || requete[*i] == '/' || requete[*i] == '?')) {
         (*i)++;
         compteur++;
@@ -561,7 +561,7 @@ bool checkQuery(char requete[], int *i, const int longueur, Noeud *noeud) {
         checkPChar(requete, i, longueur, &noeud->fils[j]);
         (*i)++;
     }
-    
+
     return true;
 }
 
@@ -768,12 +768,12 @@ bool checkOWS(char requete[], int *i, const int longueur, Noeud *noeud) {
             if (requete[*i] == 32) {
                 createFilsSimple("SP", requete + *i, 1, &noeud->fils[j]);
             } else {
-                createFilsSimple("HTAB", requete + *i, 1, &noeud->fils[j]);               
+                createFilsSimple("HTAB", requete + *i, 1, &noeud->fils[j]);
             }
             (*i)++;
         }
     }
-    
+
     return true;
 }
 

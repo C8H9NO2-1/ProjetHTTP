@@ -10,31 +10,29 @@
 #include "ismail.h"
 #include"pm.h"
 
+// void freeArbre(Noeud *racine) {
+//     for (int i=0;i<(racine->nombreFils) !=0;i++){
+//         if (racine->fils[i].nombreFils!=0){
+//             freeArbre(&racine->fils[i]);
+//         }
 
-
-void freeArbre(Noeud *racine){
-    for (int i=0;i<(racine->nombreFils) !=0;i++){
-        if (racine->fils[i].nombreFils!=0){
-            freeArbre(&racine->fils[i]);
-        }
-        
-    }
-    free(racine->fils);
-}
+//     }
+//     free(racine->fils);
+// }
 
 int main (int argc, char *argv[]){
-    char requete[]="Content-length:	 55	 \r\n";
+    char requete[]=";;;Content-length:	 55	 ";
     //e.g: Content-Length: 56
     //"Content-Length-header = \"Content-Length\" \":\" OWS Content-Length OWS";
 
     Noeud *test = malloc(sizeof(Noeud));
 
-    int i=0;
+    int i=3;
     if (!checkContentLenHeader(requete,&i,strlen(requete),test)){
         printf("error \n");
         // freeArbre(test);
 
-        test= NULL;    
+        test= NULL;
     }
 
     if (test!=NULL){
@@ -46,20 +44,20 @@ int main (int argc, char *argv[]){
 }
 
 bool checkContentLenHeader(char requete[], int *i, int length, Noeud *noeud){
-    int nombreFils=6;
-     int indice = *i;
+    int nombreFils=5;
+    int indice = *i;
     Noeud *filsConLenH=malloc (sizeof(Noeud));
 
-    if (!checkConLen(requete,filsConLenH)){
+    if (!checkConLen(requete, *i, filsConLenH)){
         free(filsConLenH);
         free(noeud);
         // free(filsConLenH);
-        printf("erreur in checkConlen\n");
+        // printf("erreur in checkConlen\n");
         *i=indice;
         return false;
     }
-    *i=14;   // strlen("Content-length")
-    if(requete[*i]!=58){
+    (*i) += 14;   // strlen("Content-length")
+    if(requete[*i]!=58) {
         free(noeud);
 		free(filsConLenH);
         *i=indice;
@@ -79,12 +77,12 @@ bool checkContentLenHeader(char requete[], int *i, int length, Noeud *noeud){
     //     return false;
     // }
     Noeud *digitLength= malloc(sizeof(Noeud));
-    if (!checkDigitLen(requete,i,length,digitLength)){
+    if (!checkDigitLen(requete,i,length,digitLength)) {
         free(noeud);
         free(digitLength);
         free(filsConLenH);
         // free(filsOWS1);
-        printf("checkDigitlen \n");
+        // printf("checkDigitlen \n");
 
         *i=indice;
         return false;
@@ -92,22 +90,22 @@ bool checkContentLenHeader(char requete[], int *i, int length, Noeud *noeud){
 	checkOWS(requete,i,length,NULL);
 
     // Noeud *filsOWS2=malloc(sizeof(Noeud));
-    
+
     noeud->fils=malloc(nombreFils* sizeof(Noeud));
     noeud->valeur=requete +indice;
     noeud->longueur=*i-indice;
     noeud->nombreFils=nombreFils;
-    noeud->tag="Content-Length-Header";
+    noeud->tag="Content-Length-header";
 
-    
+
     *i=indice;
 
-    noeud->fils[0]=*filsConLenH;
+    noeud->fils[0] = *filsConLenH;
 	free(filsConLenH);
     (*i) += noeud->fils[0].longueur;
 
-    createFilsSimple("case-insensitive-string",requete + *i, 1, &noeud->fils[1]);
-    (*i)++; 
+    createFilsSimple("case_insensitive_string",requete + *i, 1, &noeud->fils[1]);
+    (*i)++;
 
     // noeud->fils[2] = *filsOWS1;
     // (*i) += noeud->fils[2].longueur;
@@ -123,20 +121,21 @@ bool checkContentLenHeader(char requete[], int *i, int length, Noeud *noeud){
 	// free(filsOWS2);
 	checkOWS(requete,i,length,&noeud->fils[4]);
 
-    if (!checkCRLF(requete,i,length)){
-	freeArbre(noeud)
-	free(noeud);
-		    
-        // free(digitLength);
-        // free(filsConLenH);
-        return false;
-    }
-    createFilsSimple("CRLF", requete +*i, 2, &noeud->fils[5]);
-    (*i) += noeud->fils[5].longueur;
-    
+ //    if (!checkCRLF(requete,i,length)){
+	// freeArbre(noeud);
+	// free(noeud);
+
+ //        // free(digitLength);
+ //        // free(filsConLenH);
+ //        return false;
+ //    }
+ //    createFilsSimple("CRLF", requete +*i, 2, &noeud->fils[5]);
+ //    (*i) += noeud->fils[5].longueur;
+
     return true;
 
 }
+
 bool checkCRLF(char requete[],int *i,const int length){
     if ((*i +1) >length ){
         return false;
@@ -147,7 +146,7 @@ bool checkCRLF(char requete[],int *i,const int length){
     return false;
 }
 
-bool compareCaseInse(char chaine1[], char chaine2[]){
+bool compareCaseInse(char chaine1[], char chaine2[]) {
     int n =strlen(chaine1);
     int m=strlen(chaine2);
     int j=0;
@@ -161,22 +160,24 @@ bool compareCaseInse(char chaine1[], char chaine2[]){
     }
     return true;
 }
-bool checkConLen(   char requete[] ,Noeud *noeud){ // "Content-Length"
-    
-   
+
+bool checkConLen(char requete[], int i, Noeud *noeud) { // "Content-Length"
+
    char try[15];    // char correcte[]="Content-Length"; pourquoi ne fonctionne pas !!!
    char *correcte="Content-Length";
-   strncpy(try,requete,sizeof(try));
+   strncpy(try,requete + i,sizeof(try));
    try[14]='\0';               // try[sizeof(try)/sizeof(*try)-1] ='\0'
     // int i =strcmp(try,correcte); // for case-insensitive we could compare tolower of the two string
     // int  i= strcmp(tolower(*try),tolower(*correcte));
+    //
+    printf("%s\n", try);
     if (compareCaseInse(try,correcte)){
-        noeud->valeur=requete;
+        noeud->valeur=requete + i;
         noeud->fils=NULL;
         noeud->longueur=14;
-        noeud->tag="Content-Length";
+        noeud->tag="case_insensitive_string";
         noeud->nombreFils=0;
-        
+
         return true;
     }
     else {
@@ -191,15 +192,15 @@ bool checkDigitS( char requete[],int i ,Noeud *noeud){
         noeud->valeur =requete+ i;
         noeud->longueur = 1;
         noeud->nombreFils = 0;
-        noeud->tag = "Digit";
+        noeud->tag = "DIGIT";
     }
 
     if (checkDigit(requete,i)){
         return true;
     }
-    if (noeud !=NULL){
-        free(noeud);
-    }
+    // if (noeud !=NULL){
+    //     free(noeud);
+    // }
 
     return false;
 }
@@ -208,13 +209,13 @@ bool checkDigitS( char requete[],int i ,Noeud *noeud){
 bool checkDigitLen( char requete[],int *i, int length,Noeud *noeud){ // Content-Length = 1*DIGIT
     int indice =*i;
     int compteur =0;
-   
+
     while(*i<length && checkDigit(requete,*i) ){ //checkTChar(requete,i,NULL)&& checkDigit(requete,*i)
             (*i)++;
             compteur++;;
     }
     // printf("compteur = %d\n",compteur);
-    
+
     if (compteur==0){
 		// printf("pas de digit\n");
         // free(noeud);
@@ -225,7 +226,7 @@ bool checkDigitLen( char requete[],int *i, int length,Noeud *noeud){ // Content-
     noeud->tag="Content-Length";
     noeud->fils=malloc(compteur*sizeof(Noeud));
     noeud->nombreFils=compteur;
-    *i=indice;   // 
+    *i=indice;   //
 
     for (int j=0;j<compteur;j++){
         checkDigitS(requete,*i,&noeud->fils[j]);
@@ -234,5 +235,3 @@ bool checkDigitLen( char requete[],int *i, int length,Noeud *noeud){ // Content-
 
     return true;
 }
-
-

@@ -545,6 +545,19 @@ bool checkDecoctet(char requete[], int *i, Noeud *noeud, bool stocker);
 int CompteurHexdig(char requete[], int *i);
 
 //!===============================================================================
+//? Fonctions utiles pour parser le content-length-header
+
+bool checkContentLenHeader(char requete[], int *i, int length, Noeud*Noeud);
+
+bool compareCaseInse(char chaine1[], char chaine2[]);
+
+bool checkDigitLen(char requete[],int *i, int length,Noeud *noeud);
+
+bool checkConLen( char requete[], int i, Noeud *noeud);
+
+bool checkDigitS( char requete[],int i ,Noeud *noeud);
+
+//!===============================================================================
 //? Fonctions utiles pour parser le header générique
 
 bool checkVchar(char requete[], int *i, int longueur, Noeud *noeud);

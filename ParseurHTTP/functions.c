@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "structure.h"
 // #include "affichage.h"
@@ -105,17 +106,19 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                 continue;
             }
 
-            // j = indice;
-            // test = malloc(sizeof(Noeud));
-            // if(checkContentLengthHeader(requete, &j, longueur, test)) {
-            //     if (!checkCRLFBool(requete, longueur,j)) {
-                    // return k;
-                    // } else {
-                    //     k++;
-                    //     j += 2;
-                    // }
-                    // continue;
-            // }
+            j = indice;
+            test = malloc(sizeof(Noeud));
+            if(checkContentLenHeader(requete, &j, longueur, test)) {
+                if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
+                    EXIT()
+                } else {
+                    k += 2;
+                    j += 2;
+                }
+                FREE()
+                continue;
+            }
             // j = indice
             // test = malloc(sizeof(Noeud));
             // if(checkContentTypeHeader(requete, &j, longueur,  test)) {
@@ -222,18 +225,23 @@ int compteHeader(char requete[], int *i, int longueur, Header tabHeader[]) {
                 continue;
             }
 
-            // j = indice;
-            // test = malloc(sizeof(Noeud));
-            // if(checkContentLengthHeader(requete, &j, longueur, test)) {
-            //     if (!checkCRLFBool(requete, longueur,j)) {
-                    // return k;
-                    // } else {
-                        // tabHeader[k] = CONTENT_LENGTH;
-                    //     k++;
-                    //     j += 2;
-                    // }
-                    // continue;
-            // }
+            j = indice;
+            test = malloc(sizeof(Noeud));
+            if(checkContentLenHeader(requete, &j, longueur, test)) {
+                if (!checkCRLFBool(requete, longueur,j)) {
+                    FREE()
+                    EXIT()
+                } else {
+                    tabHeader[k] = CONTENT_LENGTH;
+                    k++;
+                    tabHeader[k] = CRLF;
+                    k++;
+                    j += 2;
+                }
+                FREE()
+                continue;
+            }
+
             // j = indice
             // test = malloc(sizeof(Noeud));
             // if(checkContentTypeHeader(requete, &j, longueur,  test)) {
@@ -3220,6 +3228,148 @@ int CompteurHexdig(char requete[], int *i) {
     }
 
     return CompteurHexdig;
+}
+
+//!===============================================================================
+//? Fonctions utiles pour parser le content-length-header
+
+bool checkContentLenHeader(char requete[], int *i, int length, Noeud *noeud) {
+    int nombreFils=5;
+    int indice = *i;
+    Noeud *filsConLenH=malloc (sizeof(Noeud));
+
+    if (!checkConLen(requete, *i, filsConLenH)){
+        free(filsConLenH);
+        free(noeud);
+        *i=indice;
+        return false;
+    }
+    (*i) += 14;   // strlen("Content-length")
+    if(requete[*i]!=58) {
+        free(noeud);
+		free(filsConLenH);
+        *i=indice;
+        return false;
+    }
+    (*i)++;
+
+	checkOWS(requete,i,length,NULL);
+
+    Noeud *digitLength= malloc(sizeof(Noeud));
+    if (!checkDigitLen(requete,i,length,digitLength)) {
+        free(noeud);
+        free(digitLength);
+        free(filsConLenH);
+
+        *i=indice;
+        return false;
+    }
+	checkOWS(requete,i,length,NULL);
+
+    noeud->fils=malloc(nombreFils* sizeof(Noeud));
+    noeud->valeur=requete +indice;
+    noeud->longueur=*i-indice;
+    noeud->nombreFils=nombreFils;
+    noeud->tag="Content-Length-header";
+
+
+    *i=indice;
+
+    noeud->fils[0] = *filsConLenH;
+	free(filsConLenH);
+    (*i) += noeud->fils[0].longueur;
+
+    createFilsSimple("case_insensitive_string",requete + *i, 1, &noeud->fils[1]);
+    (*i)++;
+
+	checkOWS(requete,i,length,&noeud->fils[2]);
+
+    noeud->fils[3] = *digitLength;
+    (*i) += noeud->fils[3].longueur;
+	free(digitLength);
+
+	checkOWS(requete,i,length,&noeud->fils[4]);
+
+    return true;
+}
+
+bool compareCaseInse(char chaine1[], char chaine2[]) {
+    int n =strlen(chaine1);
+    int m=strlen(chaine2);
+    int j=0;
+    if (n!=m)
+        return false;
+    for (int i=0 ; i<n ;i++ ){
+        if (tolower(chaine1[i])!=tolower(chaine2[j])){
+            return false;
+        }
+        j++;
+    }
+    return true;
+}
+
+bool checkConLen(char requete[], int i, Noeud *noeud) { // "Content-Length"
+
+   char try[15];    // char correcte[]="Content-Length"; pourquoi ne fonctionne pas !!!
+   char *correcte="Content-Length";
+   strncpy(try,requete + i, sizeof(try));
+   try[14]='\0';
+
+    if (compareCaseInse(try,correcte)){
+        noeud->valeur=requete + i;
+        noeud->fils=NULL;
+        noeud->longueur=14;
+        noeud->tag="case_insensitive_string";
+        noeud->nombreFils=0;
+
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool checkDigitS( char requete[], int i ,Noeud *noeud){
+     if (noeud != NULL) {
+        noeud->fils = NULL;
+        noeud->valeur =requete + i;
+        noeud->longueur = 1;
+        noeud->nombreFils = 0;
+        noeud->tag = "DIGIT";
+    }
+
+    if (checkDigit(requete,i)) {
+        return true;
+    }
+
+    return false;
+}
+
+bool checkDigitLen( char requete[],int *i, int length,Noeud *noeud){ // Content-Length = 1*DIGIT
+    int indice = *i;
+    int compteur = 0;
+
+    while(*i<length && checkDigit(requete,*i) ){ //checkTChar(requete,i,NULL)&& checkDigit(requete,*i)
+            (*i)++;
+            compteur++;;
+    }
+
+    if (compteur == 0) {
+        return false;
+    }
+    noeud->valeur = requete + indice;
+    noeud->longueur = *i - indice;
+    noeud->tag = "Content-Length";
+    noeud->fils = malloc(compteur*sizeof(Noeud));
+    noeud->nombreFils = compteur;
+    *i=indice;   //
+
+    for (int j=0;j<compteur;j++){
+        checkDigitS(requete,*i,&noeud->fils[j]);
+        (*i)++;
+    }
+
+    return true;
 }
 
 //!===============================================================================
