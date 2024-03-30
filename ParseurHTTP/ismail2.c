@@ -146,8 +146,8 @@ bool checkContentTypeHeader(char requete[],int *i,int length,Noeud *noeud){
     createFilsSimple("case_insensitive_string",requete + *i, 1, &noeud->fils[1]);
     (*i)++;
     printf("apres 1 create of 58\n");
-    // Noeud *filsOWS1=malloc(sizeof(Noeud));
-	// checkOWS(requete, i, length, filsOWS1);
+  // checkOWS(requete, i, length, filsOWS1);  
+    // mon programe de marche pas avec seulement cette methode
 
     // noeud->fils[2] = *filsOWS1;
     // (*i) += noeud->fils[2].longueur;
