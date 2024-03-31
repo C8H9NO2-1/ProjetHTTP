@@ -19,7 +19,7 @@ char *lireFichier(const char *nom) {
         // printf("%c", caractereActuel); // On l'affiche
     } while (caractereActuel != EOF); // On continue tant que fgetc n'a pas retourné EOF (fin de fichier)
 
-    char *req = malloc((compteur + 1) * sizeof(char));
+    char *req = malloc(compteur * sizeof(char));
     int i = 0;
     rewind(testFile);
 
@@ -27,7 +27,7 @@ char *lireFichier(const char *nom) {
         req[i] = fgetc(testFile);
     }
 
-    req[compteur] = '\0';
+    req[compteur - 1] = '\0';
 
     // printf("%s\n", req);
 

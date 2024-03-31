@@ -2,7 +2,7 @@
 
 recherche() {
     echo -e "Recherche de $rulename\n..."
-    ./main "$rulename"
+    ./main "$rulename" "testFile/test18.txt"
 
     echo -e "\n====================================================================================================\n"
 }
@@ -218,4 +218,3 @@ recherche
 
 rulename="token"
 recherche
-

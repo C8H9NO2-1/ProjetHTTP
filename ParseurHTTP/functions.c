@@ -1736,7 +1736,7 @@ bool checktransferExtension(char transferEncoding[], int *i, int longueur, Noeud
 
     if (noeud!=NULL) {
         noeud->valeur = transferEncoding + indice;
-        noeud->longueur = *i - indice;
+        // noeud->longueur = *i - indice;
         noeud->tag = "transfer-extension";
         noeud->fils = malloc(compteur * sizeof(Noeud));
         noeud->nombreFils =compteur;
@@ -1773,6 +1773,7 @@ bool checktransferExtension(char transferEncoding[], int *i, int longueur, Noeud
                 owsChecked = true;
             }
         }
+        noeud->longueur = *i - indice;
     }
     return true;
 }
@@ -2629,7 +2630,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
 
         NombreFils= 6 + 6 + 1; //? 6 H16 + 6 :  + 1 addresseipv4
         noeud->fils = malloc(NombreFils*sizeof(Noeud));
-        noeud->longueur = *i - indice;
+        // noeud->longueur = *i - indice;
         noeud->nombreFils = NombreFils ;
 
         if (checkIPV4(requete, i, &noeud->fils[NombreFils - 1], true)) {
@@ -2664,6 +2665,9 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
                 somme++;
                 a++;
             }
+
+            noeud->longueur = *i - indice;
+
             return true;
         } else {
             *i=indice;
@@ -2810,7 +2814,7 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
     }
 
     noeud->fils = malloc(NombreFils*sizeof(Noeud));
-    noeud->longueur = *i - indice;
+    // noeud->longueur = *i - indice;
     noeud->nombreFils = NombreFils;
 
     j=0;
@@ -2951,8 +2955,9 @@ bool checkIPV6(char requete[], int *i, Noeud *noeud) {
                 (*i)++;
             }
         }
-
     }
+
+   noeud->longueur = *i - indice;
 
     return true;
 }
@@ -3526,7 +3531,6 @@ bool checkMediaType(char requete[],int *i,int length,Noeud *noeud){
     //remplir tout  fils en noued
     if (noeud!=NULL){
         noeud->valeur= requete+indice;
-        noeud->longueur = *i - indice;
         noeud->tag= "media-type";
         noeud->fils=malloc((compteur)*sizeof(Noeud));
         noeud->nombreFils=compteur;
@@ -3576,6 +3580,7 @@ bool checkMediaType(char requete[],int *i,int length,Noeud *noeud){
             }
 
         }
+        noeud->longueur = *i - indice;
     }
     return true;
 }
@@ -3656,7 +3661,7 @@ bool checkVchar(char requete[], int *i, int longueur, Noeud *noeud) { // Si le n
 
 bool checkObs_Text(char requete[], int *i, int longueur, Noeud *noeud) { // Si le noeud est NULL alors *i ne bouge pas
 
-    if (((int)requete[*i] < 0) && ((int)requete[*i] >= -128)) {
+    if (((signed char)requete[*i] < 0) && ((signed char)requete[*i] >= -128)) {
 
         if (noeud == NULL) {
             return true;
