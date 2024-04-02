@@ -2,7 +2,7 @@
 
 recherche() {
     echo -e "Recherche de $rulename\n..."
-    ./main "$rulename" "testFile/test18.txt"
+    ./main "$rulename"
 
     echo -e "\n====================================================================================================\n"
 }
@@ -19,10 +19,10 @@ rulename="method"
 recherche
 
 rulename="tchar"
-#recherche
+recherche
 
 rulename="SP"
-#recherche
+recherche
 
 rulename="request-target"
 recherche
@@ -31,7 +31,7 @@ rulename="absolute-path"
 recherche
 
 rulename="case_insensitive_string"
-#recherche
+recherche
 
 rulename="segment"
 recherche
@@ -49,10 +49,10 @@ rulename="HTTP-name"
 recherche
 
 rulename="DIGIT"
-#recherche
+recherche
 
 rulename="CRLF"
-#recherche
+recherche
 
 rulename="header-field"
 recherche
@@ -61,7 +61,7 @@ rulename="Connection-header"
 recherche
 
 rulename="OWS"
-#recherche
+recherche
 
 rulename="Connection"
 recherche
@@ -85,10 +85,10 @@ rulename="cookie-value"
 recherche
 
 rulename="DQUOTE"
-#recherche
+recherche
 
 rulename="cookie-octet"
-#recherche
+recherche
 
 rulename="Transfer-Encoding-header"
 recherche
@@ -109,19 +109,19 @@ rulename="quoted-string"
 recherche
 
 rulename="qdtext"
-#recherche
+recherche
 
 rulename="quoted-pair"
-#recherche
+recherche
 
 rulename="HTAB"
-#recherche
+recherche
 
 rulename="VCHAR"
-#recherche
+recherche
 
 rulename="obs-text"
-#recherche
+recherche
 
 rulename="Expect-header"
 recherche
@@ -151,7 +151,7 @@ rulename="IPvFuture"
 recherche
 
 rulename="HEXDIG"
-#recherche
+recherche
 
 rulename="unreserved"
 recherche
@@ -163,7 +163,7 @@ rulename="IPv4address"
 recherche
 
 rulename="dec-octet"
-#recherche
+recherche
 
 rulename="reg-name"
 recherche

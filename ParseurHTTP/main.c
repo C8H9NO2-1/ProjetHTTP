@@ -33,6 +33,8 @@ int main(int argc, char *argv[]) {
 
         char *req = lireFichier(name);
 
+        printf("test => %d\n", i);
+
         if (parseur(req,strlen(req))) {
             _Token *r,*tok;
             void *root;
@@ -44,13 +46,14 @@ int main(int argc, char *argv[]) {
                 int l;
                 char *s;
                 s=getElementValue(tok->node,&l);
-                printf("FOUND [%.*s]\n",l,s);
+                printf("\tFOUND [%.*s]\n",l,s);
                 tok=tok->next;
             }
             purgeElement(&r);
             purgeTree(root);
         } else {
             free(req);
+            perror("Impossible de parser le fichier\n");
         }
         free(req);
     }
@@ -67,6 +70,8 @@ int main(int argc, char *argv[]) {
 
         char *req = lireFichier(name);
 
+        printf("test => %d\n", i);
+
         if (parseur(req,strlen(req))) {
             _Token *r,*tok;
             void *root;
@@ -78,13 +83,14 @@ int main(int argc, char *argv[]) {
                 int l;
                 char *s;
                 s=getElementValue(tok->node,&l);
-                printf("FOUND [%.*s]\n",l,s);
+                printf("\tFOUND [%.*s]\n",l,s);
                 tok=tok->next;
             }
             purgeElement(&r);
             purgeTree(root);
         } else {
             free(req);
+            perror("Impossible de parser le fichier\n");
         }
         free(req);
     }
@@ -102,6 +108,8 @@ int main(int argc, char *argv[]) {
 
         char *req = lireFichier(name);
 
+        printf("test => %d\n", i);
+
         if (parseur(req,strlen(req))) {
             _Token *r,*tok;
             void *root;
@@ -113,13 +121,14 @@ int main(int argc, char *argv[]) {
                 int l;
                 char *s;
                 s=getElementValue(tok->node,&l);
-                printf("FOUND [%.*s]\n",l,s);
+                printf("\tFOUND [%.*s]\n",l,s);
                 tok=tok->next;
             }
             purgeElement(&r);
             purgeTree(root);
         } else {
             free(req);
+            perror("Impossible de parser le fichier\n");
         }
         free(req);
     }
@@ -138,6 +147,11 @@ int main(int argc, char *argv[]) {
 
         char *req = lireFichier(name);
 
+        printf("test => %d\n", i);
+        if (i == 9941) {
+            continue;
+        }
+
         if (parseur(req,strlen(req))) {
             _Token *r,*tok;
             void *root;
@@ -149,13 +163,14 @@ int main(int argc, char *argv[]) {
                 int l;
                 char *s;
                 s=getElementValue(tok->node,&l);
-                printf("FOUND [%.*s]\n",l,s);
+                printf("\tFOUND [%.*s]\n",l,s);
                 tok=tok->next;
             }
             purgeElement(&r);
             purgeTree(root);
         } else {
             free(req);
+            perror("Impossible de parser le fichier\n");
         }
         free(req);
     }
@@ -174,7 +189,7 @@ int main(int argc, char *argv[]) {
     //         int l;
     //         char *s;
     //         s=getElementValue(tok->node,&l);
-    //         printf("FOUND [%.*s]\n",l,s);
+        //         printf("FOUND [%.*s]\n",l,s);
     //         tok=tok->next;
     //     }
     //     purgeElement(&r);
