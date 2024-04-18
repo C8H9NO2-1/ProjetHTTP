@@ -20,159 +20,30 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    char name[100] = "testFile/test";
+    char name[] = "/Users/pim/Downloads/premier-jeu-test/get11";
 
-    for (int i = 0; i < 10; i++) {
+    char *req = lireFichier(name);
 
-        name[13] = '0' + i;
-        name[14] = '.';
-        name[15] = 't';
-        name[16] = 'x';
-        name[17] = 't';
-        name[18] = '\0';
+    if (parseur(req,strlen(req))) {
+        _Token *r,*tok;
+        void *root;
+        root=getRootTree();
 
-        char *req = lireFichier(name);
-
-        printf("test => %d\n", i);
-
-        if (parseur(req,strlen(req))) {
-            _Token *r,*tok;
-            void *root;
-            root=getRootTree();
-
-            r=searchTree(root,argv[1]);
-            tok=r;
-            while (tok) {
-                int l;
-                char *s;
-                s=getElementValue(tok->node,&l);
-                printf("\tFOUND [%.*s]\n",l,s);
-                tok=tok->next;
-            }
-            purgeElement(&r);
-            purgeTree(root);
-        } else {
-            free(req);
-            perror("Impossible de parser le fichier\n");
+        r=searchTree(root,argv[1]);
+        tok=r;
+        while (tok) {
+            int l;
+            char *s;
+            s=getElementValue(tok->node,&l);
+            printf("\tFOUND [%.*s]\n",l,s);
+            tok=tok->next;
         }
+        purgeElement(&r);
+        purgeTree(root);
         free(req);
-    }
-
-    for (int i = 10; i < 100; i++) {
-
-        name[13] = '0' + i / 10;
-        name[14] = '0' + i % 10;
-        name[15] = '.';
-        name[16] = 't';
-        name[17] = 'x';
-        name[18] = 't';
-        name[19] = '\0';
-
-        char *req = lireFichier(name);
-
-        printf("test => %d\n", i);
-
-        if (parseur(req,strlen(req))) {
-            _Token *r,*tok;
-            void *root;
-            root=getRootTree();
-
-            r=searchTree(root,argv[1]);
-            tok=r;
-            while (tok) {
-                int l;
-                char *s;
-                s=getElementValue(tok->node,&l);
-                printf("\tFOUND [%.*s]\n",l,s);
-                tok=tok->next;
-            }
-            purgeElement(&r);
-            purgeTree(root);
-        } else {
-            free(req);
-            perror("Impossible de parser le fichier\n");
-        }
+    } else {
         free(req);
-    }
-
-    for (int i = 100; i < 1000; i++) {
-
-        name[13] = '0' + i / 100;
-        name[14] = '0' + (i % 100) / 10;
-        name[15] = '0' + i % 10;
-        name[16] = '.';
-        name[17] = 't';
-        name[18] = 'x';
-        name[19] = 't';
-        name[20] = '\0';
-
-        char *req = lireFichier(name);
-
-        printf("test => %d\n", i);
-
-        if (parseur(req,strlen(req))) {
-            _Token *r,*tok;
-            void *root;
-            root=getRootTree();
-
-            r=searchTree(root,argv[1]);
-            tok=r;
-            while (tok) {
-                int l;
-                char *s;
-                s=getElementValue(tok->node,&l);
-                printf("\tFOUND [%.*s]\n",l,s);
-                tok=tok->next;
-            }
-            purgeElement(&r);
-            purgeTree(root);
-        } else {
-            free(req);
-            perror("Impossible de parser le fichier\n");
-        }
-        free(req);
-    }
-
-    for (int i = 1000; i < 10000; i++) {
-
-        name[13] = '0' + i / 1000;
-        name[14] = '0' + (i % 1000) / 100;
-        name[15] = '0' + (i % 100) / 10;
-        name[16] = '0' + i % 10;
-        name[17] = '.';
-        name[18] = 't';
-        name[19] = 'x';
-        name[20] = 't';
-        name[21] = '\0';
-
-        char *req = lireFichier(name);
-
-        printf("test => %d\n", i);
-        if (i == 9941) {
-            continue;
-        }
-
-        if (parseur(req,strlen(req))) {
-            _Token *r,*tok;
-            void *root;
-            root=getRootTree();
-
-            r=searchTree(root,argv[1]);
-            tok=r;
-            while (tok) {
-                int l;
-                char *s;
-                s=getElementValue(tok->node,&l);
-                printf("\tFOUND [%.*s]\n",l,s);
-                tok=tok->next;
-            }
-            purgeElement(&r);
-            purgeTree(root);
-        } else {
-            free(req);
-            perror("Impossible de parser le fichier\n");
-        }
-        free(req);
+        perror("Impossible de parser le fichier\n");
     }
 
     // if (parseur(req,strlen(req))) {

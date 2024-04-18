@@ -1,5 +1,7 @@
 #!bin/bash
 
+make all
+
 recherche() {
     echo -e "Recherche de $rulename\n..."
     ./main "$rulename"
