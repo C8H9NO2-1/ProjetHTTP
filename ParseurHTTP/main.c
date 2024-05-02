@@ -15,14 +15,18 @@ int main(int argc, char *argv[]) {
     // char req[] = "C /V%D1/$P/%46?gZ? HTTP/3.7\r\nTransfer-Encoding: 	,compress		   		, 				  	uw7!3				   ;3~E	 		 			   =   	 	    	 \"\\´>‹Ø\" 	  		 	;	 			  	k = \"\\Ì\\ó˙\\…⁄\\U\" ,	\r\nHost: 	 			  25.222.77.231	\r\ncOntenT-TYpE:     XWsaqXcenry0vyS/Ey!g3$TdM_WdMB%; SL`Nr-LeQ!ygkKS=^ZvA4%%QuytrP0%  	\r\nConnection:,   	 ,  	 ,,	 	, 		0juQdM_,  	    	   	l2xVM&D4		,  	  	,		^mWhhr.,   ,+ ,E  ,		,,	   		#	\r\nContent-length:	 55	 \r\nCookie:4=~a; 8D=; kp3YvMrh=""; xGj=\"]XA\"; dY=\"\"; '+K=\"-\"\r\nHost:		 	[9::6:235.228.253.155]				\r\nHost:250.0.0.239  							  	\r\nl97w: 	   	‡∂	 			  	 	ê\r\n					 	 R	 \r\nj7:\r\n\r\n";
     // char req[] = "GET / HTTP/1.0\r\nCONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,\r\nCONNeCtION:, 		, ,5_p8ck0lJ|vM-lx	,\r\n";
 
+    // char req[] = "GET / HTTP/1.0\r\nConnection: {EVIL}\r\n\r\n";
+
     if (argc != 2 ) {
         printf("usage: %s <rulename>\n", argv[0]);
         return 0;
     }
 
-    char name[] = "/Users/pim/Downloads/premier-jeu-test/get11";
+    char name[] = "tests/connection/test_11";
 
     char *req = lireFichier(name);
+
+    printf("%s\n", req);
 
     if (parseur(req,strlen(req))) {
         _Token *r,*tok;
