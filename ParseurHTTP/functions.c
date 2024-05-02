@@ -963,6 +963,10 @@ bool checkConnectionHeader(char requete[], int *i, const int longueur, Noeud *no
     j++;
 
     if (!checkConnection(requete, i, longueur, &noeud->fils[j])) {
+        // Si on a créé un OWS, il faut le supprimer
+        if (noeud->fils[j - 1].nombreFils != 0) {
+            free(noeud->fils[j - 1]->fils);
+        }
         free(noeud->fils);
         free(noeud);
         *i = indice;
