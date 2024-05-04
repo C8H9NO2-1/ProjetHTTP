@@ -1,9 +1,29 @@
-all: main.o
-	gcc -o prog main.o -Wall -fsanitize=address
+CFLAGS = -Wall
 
-main.o: main.c
-	gcc -o main.o -c main.c -Wall -fsanitize=address
+vpath %.c src
+
+objects = bin/main.o bin/functions.o bin/api.o bin/checkRessource.o
+src = src/
+bin = bin/
+exec = prog
+
+all : $(exec)
+
+$(exec) : $(objects)
+	gcc -o $(exec) $(objects) -fsanitize=address
+
+bin/main.o : main.c
+	gcc $(CFLAGS) -c $(src)main.c -o $(bin)main.o
+
+bin/functions.o : functions.c
+	gcc $(CFLAGS) -c $(src)functions.c -o $(bin)functions.o
+
+bin/api.o : api.c
+	gcc $(CFLAGS) -c $(src)api.c -o $(bin)api.o
+
+bin/checkRessource.o : checkRessource.c
+	gcc $(CFLAGS) -c $(src)checkRessource.c -o $(bin)checkRessource.o
 
 clean:
-	rm *.o
+	rm bin/*.o
 	rm prog
