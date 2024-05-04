@@ -41,13 +41,14 @@ bool checkPath(char *path, int len) {
  * - Soit on a un champ Host avec le nom du répertoire et dans ce cas c'est très facile
  * - Soit on a un champ Host avec une adresse IP et dans ce cas je ne sais pas trop quoi faire (on a une adresse IP pour tous nos sites web ???)
  * - Soit on a pas de champ Host et dans ce cas il faut explorer les ressources présentes dans notre base de données pour voir si la ressource demandée est unique
+ * Les deux derniers cas sont les mêmes car on a une seule adresse IP pour tous nos sites web => 127.0.0.1 ou [::1] (il faut faire attention avec les @IPv6 car il y a plusieurs façon des les écrires), donc celle-ci ne peut pas nous aider à les identifier
  */
 
 /*
  * Cette fonction est le cas très facile, lorsqu'on a le nom du répertoire
  * On devrait pouvoir étendre les capacités de cette fonction pour pouvoir lire le contenu de la ressource
  */
-bool checkExistence(char *path, int lenPath, char *host, int lenHost) {
+bool checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
 
     FILE *file;
 
@@ -90,4 +91,12 @@ bool checkExistence(char *path, int lenPath, char *host, int lenHost) {
         fclose(file);
         return true;
     }
+}
+
+/*
+ * Cette fonction s'occupe de vérifier les deux derniers cas
+ * Pour ça, on vérifie si la ressource demandée est unique dans notre architecture
+ */
+bool checkExistence(char *path, int len) {
+    return true;
 }

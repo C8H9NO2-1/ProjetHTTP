@@ -2,6 +2,7 @@
 #define CHECK_RESSOURCE_H
 
 bool checkPath(char *path, int len);
-bool checkExistence(char *path, int lenPath, char *host, int lenHost);
+bool checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost);
+bool checkExistence(char *path, int len);
 
 #endif
