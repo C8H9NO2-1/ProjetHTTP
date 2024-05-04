@@ -96,7 +96,63 @@ bool checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
 /*
  * Cette fonction s'occupe de vérifier les deux derniers cas
  * Pour ça, on vérifie si la ressource demandée est unique dans notre architecture
+ * On devrait pouvoir étendre les fonctionnalités pour lire la ressource
  */
 bool checkExistence(char *path, int len) {
-    return true;
+    // On va coder en dur nos trois sites web
+    char *webSite1 = "racine/www.hilopt.com";
+    char *webSite2 = "racine/www.paphypu.fr";
+    char *webSite3 = "racine/www.wichopool.com";
+
+    char *pathCopy = malloc((len + 1) * sizeof(char));
+    for (int i = 0; i < len; i++) {
+        pathCopy[i] = path[i];
+    }
+    pathCopy[len] = '\0';
+
+    int count = 0; // On va compter le nombre de fois où la ressource apparait
+
+    FILE *file = NULL;
+    // Premier site web
+    int lenFileName = strlen(webSite1) + len;
+    char *fileName = malloc((lenFileName + 1) * sizeof(char));
+    strcpy(fileName, webSite1);
+    strcat(fileName, pathCopy);
+    printf("path of the file: %s\n", fileName);
+    file = fopen(fileName, "r");
+    if (file != NULL) {
+        count++;
+        fclose(file);
+    }
+    free(fileName);
+
+    // Deuxième site web
+    lenFileName = strlen(webSite2) + len;
+    fileName = malloc((lenFileName + 1) * sizeof(char));
+    strcpy(fileName, webSite2);
+    strcat(fileName, pathCopy);
+    printf("path of the file: %s\n", fileName);
+    file = fopen(fileName, "r");
+    if (file != NULL) {
+        count++;
+        fclose(file);
+    }
+    free(fileName);
+
+    // Troisième site web
+    lenFileName = strlen(webSite3) + len;
+    fileName = malloc((lenFileName + 1) * sizeof(char));
+    strcpy(fileName, webSite3);
+    strcat(fileName, pathCopy);
+    printf("path of the file: %s\n", fileName);
+    file = fopen(fileName, "r");
+    if (file != NULL) {
+        count++;
+        fclose(file);
+    }
+    free(fileName);
+
+    free(pathCopy);
+
+    return (count == 1);
 }

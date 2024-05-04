@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
     /*char req[] = "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";*/
-    char req[] = "GET /index.html HTTP/1.1\r\nHost: [::1]\r\n\r\n";
+    char req[] = "GET /test HTTP/1.1\r\nHost: [::1]\r\n\r\n";
     
     printf("%s", req);
     printf("===========\n");
@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
         printf("%.*s\n", l2, s2);
 
         /*checkExistence(s, l, s2, l2);*/
+        checkExistence(s, l);
 
         purgeElement(&r);
         purgeElement(&r2);
