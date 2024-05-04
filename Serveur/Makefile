@@ -32,8 +32,9 @@ $(bin)server.o : server.c
 
 $(server) : $(objects) $(main2)
 	gcc -fsanitize=address -o server $(objects) $(main2) -L./$(bin) -lrequest -fsanitize=address
-	export LD_LIBRARY_PATH=./$(bin)
+	export LD_LIBRARY_PATH=./bin
 
 clean:
 	rm bin/*.o
 	rm prog
+	rm server
