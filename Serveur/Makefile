@@ -2,7 +2,9 @@ CFLAGS = -Wall
 
 vpath %.c src
 
-objects = bin/main.o bin/functions.o bin/api.o bin/checkRessource.o
+objects = bin/functions.o bin/api.o bin/checkRessource.o
+main1 = bin/main.o
+main2 = bin/server.o
 src = src/
 bin = bin/
 exec = prog
@@ -10,8 +12,8 @@ server = server
 
 all : $(exec)
 
-$(exec) : $(objects)
-	gcc -o $(exec) $(objects) -fsanitize=address
+$(exec) : $(objects) $(main1)
+	gcc -o $(exec) $(objects) $(main1) -fsanitize=address
 
 $(bin)main.o : main.c
 	gcc $(CFLAGS) -c $(src)main.c -o $(bin)main.o
@@ -25,8 +27,11 @@ $(bin)api.o : api.c
 $(bin)checkRessource.o : checkRessource.c
 	gcc $(CFLAGS) -c $(src)checkRessource.c -o $(bin)checkRessource.o
 
-$(server) : $(objects)
-	gcc -fsanitize=address -o server $(objects) -L./$(bin) -lrequest -fsanitize=address
+$(bin)server.o : server.c
+	gcc $(CFLAGS) -c $(src)server.c -o $(bin)server.o
+
+$(server) : $(objects) $(main2)
+	gcc -fsanitize=address -o server $(objects) $(main2) -L./$(bin) -lrequest -fsanitize=address
 	export LD_LIBRARY_PATH=./$(bin)
 
 clean:
