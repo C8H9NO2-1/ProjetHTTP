@@ -2,7 +2,7 @@ CFLAGS = -Wall
 
 vpath %.c src
 
-objects = bin/functions.o bin/api.o bin/checkRessource.o
+objects = bin/functions.o bin/api.o bin/pm.o
 main1 = bin/main.o
 main2 = bin/server.o
 src = src/
@@ -24,8 +24,8 @@ $(bin)functions.o : functions.c
 $(bin)api.o : api.c
 	gcc $(CFLAGS) -c $(src)api.c -o $(bin)api.o
 
-$(bin)checkRessource.o : checkRessource.c
-	gcc $(CFLAGS) -c $(src)checkRessource.c -o $(bin)checkRessource.o
+$(bin)pm.o : pm.c
+	gcc $(CFLAGS) -c $(src)pm.c -o $(bin)pm.o
 
 $(bin)server.o : server.c
 	gcc $(CFLAGS) -c $(src)server.c -o $(bin)server.o
