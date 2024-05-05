@@ -11,7 +11,7 @@
 #include "header/checkRessource.h"
 
 #define REPONSE1 "HTTP/1.0 200 OK\r\n"
-#define REPONSE2 "\r\n"
+#define REPONSE2 "\r\n<html><head><title>Test</title></head><body><p>This is a test</p></body></html>"
 
 int main(int argc, char *argv[]) {
     message *requete;

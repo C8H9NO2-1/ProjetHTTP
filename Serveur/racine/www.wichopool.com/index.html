@@ -1,9 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
-		<title>Wichopool.com</title>
+		<meta charset="utf-8">
+		<title>Wichopool</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+        <script src="script.js" defer> </script>
 	</head>
 	<body>
-        This is a test of the third website 
+		<!-- Menu at the right of the page -->
+		<div class="menu">
+			<header>
+				<img class="profil" src="img/profil.png" alt="Profil picture" />
+				<h1 class="name">Paracetamol</h1>
+                <p class="description">Working on an HTTP server</p>
+			</header>
+
+			<div class="end-menu">
+				<nav>
+					<a href="#about" class="navigation1">About</a>
+					<a href="#things" class="navigation1">Things I Can Do</a>
+					<a href="#accomplishments" class="navigation1">A Few Accomplishments</a>
+					<a href="#contact" class="navigation2">Contact</a>
+				</nav>
+
+				<footer class="social">
+					<a href="https://twitter.com"><img src="icons/twitter.png" alt="Twitter icon" /></a>
+					<a href="https://discord.gg"><img src="icons/discord.png" alt="Discord icon" /></a>
+					<a href="https://github.com"><img src="icons/github.png" alt="GitHub icon" /></a>
+					<a href="mailto:paracetamol.C8H9NO2@icloud.com"><img src="icons/email.png" alt="Mail icon" /></a>
+				</footer>
+			</div>
+		</div>
+
+		<!-- Main part of the website starting with the banner -->
+		<div class="section">
+			<div class="container-banner">
+				<div>
+					<img src="img/banner.jpg" class="banner" alt="banner" />
+				</div>
+				<article id="about">
+					<h2 class="title">Read only</h2>
+					<h3>About Me</h3>
+					<p class="paragraph1">
+                        With three other students, we are trying to build an HTTP server and this website is just an example of a ressource on said server.
+                        I am probably going to try to add some JavaScript to this webpage but I'm not to sure the result will look good.
+                        Well the point is just to try to have a really simple website working for a demo.
+                    </p>
+				</article>
+			</div>
+
+			<article id="things">
+				<h3>Things I Can Do</h3>
+				<p class="paragraph">Here is a list of things that I am proud of saying that I can do on my own:</p>
+				<ul class="icons">
+					<li><img src="icons/web.png" alt="Web icon" />Make a simple website like this one.</li>
+					<li><img src="icons/mouse.png" alt="Mouse icon" />Click on some random articles.</li>
+					<li><img src="icons/mute.png" alt="Mute icon" />Find the mute button on your computer.</li>
+					<li><img src="icons/calc.png" alt="Calculator icon" />Do some basic calculation.</li>
+					<li><img src="icons/battery.png" alt="Battery icon" />Charge my phone.</li>
+					<li><img src="icons/dev.png" alt="Code icon" />Do some casual programming.</li>
+				</ul>
+				<p class="test"> </p>
+			</article>
+
+			<article id="accomplishments">
+				<h3>A Few Accomplishments</h3>
+				<p class="paragraph">Here is a list of one of my best accomplishments through my entire life</p>
+				<ul class="list">
+					<li class="border">
+						<div class="container">
+							<div><img src="img/spacetime.jpg" class="image" alt="Spacetime" id="firstImage" /></div>
+							<div><h4>Possibly broke spacetime</h4><p id="firstDescription">It seems like something is missing in the grand scheme of things.</p></div>
+						</div>
+					</li>
+					<li class="border">
+						<div class="container">
+							<div><img src="img/moon.jpg" class="image" alt="Terraformed Moon" id="secondImage" /></div>
+							<div><h4>Terraformed a small moon</h4><p id="secondDescription">That was actually a lot more fun than what you think.</p></div>
+						</div>
+					</li>
+					<li>
+						<div class="container">
+							<div><img src="img/dark-matter.jpg" class="image" alt="Dark matter" id="thirdImage" /></div>
+							<div><h4>Snapped dark matter in the wild</h4><p id="thirdDescription">I was aimlessly walking in the wild when I spoted it. It was looking at a little pool nearby, so I had time to take a few photos.</p></div>
+						</div>
+					</li>
+				</ul>
+			</article>
+
+			<article id="contact">
+				<h3>Contact Me</h3>
+                <p class="paragraph">You may try to contact me </p>
+			</article>
+		</div>
+
+		<!-- Part that is at the bottom of the page -->
+		<footer class="credit">
+			<p></p>
+			<p class="paragraph">
+				&copy; Ibex. All right reserved.&nbsp;&nbsp; | &nbsp;&nbsp;Design : <a href="https://html5up.net">HTML5 UP</a>&nbsp;&nbsp; | &nbsp;&nbsp;Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> and <a href="https://www.flaticon.com/authors/icongeek26" title="Icongeek26">Icongeek26</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+			</p>
+			<p></p>
+		</footer>
 	</body>
 </html>

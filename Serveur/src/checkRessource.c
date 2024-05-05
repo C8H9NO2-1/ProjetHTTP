@@ -42,6 +42,8 @@ bool checkPath(char *path, int len) {
  * - Soit on a un champ Host avec une adresse IP et dans ce cas je ne sais pas trop quoi faire (on a une adresse IP pour tous nos sites web ???)
  * - Soit on a pas de champ Host et dans ce cas il faut explorer les ressources présentes dans notre base de données pour voir si la ressource demandée est unique
  * Les deux derniers cas sont les mêmes car on a une seule adresse IP pour tous nos sites web => 127.0.0.1 ou [::1] (il faut faire attention avec les @IPv6 car il y a plusieurs façon des les écrires), donc celle-ci ne peut pas nous aider à les identifier
+ *
+ * Il y a aussi le cas où la ressource demandée est / dans ce cas il faut renvoyer le fichier par défaut (ou tous les fichiers nécessaires, je ne sais pas)
  */
 
 /*
@@ -60,17 +62,8 @@ bool checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
 
     // On fait des copies des paramètres pour s'assurer que ce qu'on fait est correct
     // Car sinon, on va avoir un problème de longueur
-    char *pathCopy = malloc((lenPath + 1) * sizeof(char));
-    for (int i = 0; i < lenPath; i++) {
-        pathCopy[i] = path[i];
-    }
-    pathCopy[lenPath] = '\0';
-
-    char *hostCopy = malloc((lenHost + 1) * sizeof(char));
-    for (int i = 0; i < lenHost; i++) {
-        hostCopy[i] = host[i];
-    }
-    hostCopy[lenHost] = '\0';
+    char *pathCopy = copy(path, lenPath);
+    char *hostCopy = copy(host, lenHost);
 
     strcat(fileName, hostCopy);
     strcat(fileName, pathCopy);
@@ -78,16 +71,14 @@ bool checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
     free(pathCopy);
     free(hostCopy);
 
-    printf("path of the file from the root system => %s\n", fileName);
+    /*printf("path of the file from the root system => %s\n", fileName);*/
 
     file = fopen(fileName, "r");
     free(fileName);
 
     if (file == NULL) {
-        printf("La ressource n'existe pas\n");
         return false;
     } else {
-        printf("La ressource existe\n");
         fclose(file);
         return true;
     }
@@ -104,55 +95,103 @@ bool checkExistence(char *path, int len) {
     char *webSite2 = "racine/www.paphypu.fr";
     char *webSite3 = "racine/www.wichopool.com";
 
-    char *pathCopy = malloc((len + 1) * sizeof(char));
-    for (int i = 0; i < len; i++) {
-        pathCopy[i] = path[i];
-    }
-    pathCopy[len] = '\0';
+    char *pathCopy = copy(path, len);
 
     int count = 0; // On va compter le nombre de fois où la ressource apparait
+    int last = 0;
 
     FILE *file = NULL;
     // Premier site web
     int lenFileName = strlen(webSite1) + len;
-    char *fileName = malloc((lenFileName + 1) * sizeof(char));
-    strcpy(fileName, webSite1);
-    strcat(fileName, pathCopy);
-    printf("path of the file: %s\n", fileName);
-    file = fopen(fileName, "r");
+    char *fileName1 = malloc((lenFileName + 1) * sizeof(char));
+    strcpy(fileName1, webSite1);
+    strcat(fileName1, pathCopy);
+    /*printf("path of the file: %s\n", fileName1);*/
+    file = fopen(fileName1, "r");
     if (file != NULL) {
+        last = 1;
         count++;
         fclose(file);
     }
-    free(fileName);
 
     // Deuxième site web
     lenFileName = strlen(webSite2) + len;
-    fileName = malloc((lenFileName + 1) * sizeof(char));
-    strcpy(fileName, webSite2);
-    strcat(fileName, pathCopy);
-    printf("path of the file: %s\n", fileName);
-    file = fopen(fileName, "r");
+    char *fileName2 = malloc((lenFileName + 1) * sizeof(char));
+    strcpy(fileName2, webSite2);
+    strcat(fileName2, pathCopy);
+    /*printf("path of the file: %s\n", fileName2);*/
+    file = fopen(fileName2, "r");
     if (file != NULL) {
+        last = 2;
         count++;
         fclose(file);
     }
-    free(fileName);
 
     // Troisième site web
     lenFileName = strlen(webSite3) + len;
-    fileName = malloc((lenFileName + 1) * sizeof(char));
-    strcpy(fileName, webSite3);
-    strcat(fileName, pathCopy);
-    printf("path of the file: %s\n", fileName);
-    file = fopen(fileName, "r");
+    char *fileName3 = malloc((lenFileName + 1) * sizeof(char));
+    strcpy(fileName3, webSite3);
+    strcat(fileName3, pathCopy);
+    /*printf("path of the file: %s\n", fileName3);*/
+    file = fopen(fileName3, "r");
     if (file != NULL) {
+        last = 3;
         count++;
         fclose(file);
     }
-    free(fileName);
+
+    if (count == 1) {
+        switch (last) {
+            case 1:
+                printf("Le chemin est %s\n", fileName1);
+                break;
+            case 2:
+                printf("Le chemin est %s\n", fileName2);
+                break;
+            case 3:
+                printf("Le chemin est %s\n", fileName3);
+                break;
+            default:
+                printf("Problème dans la fonction\n");
+        }
+    }
 
     free(pathCopy);
 
+    free(fileName1);
+    free(fileName2);
+    free(fileName3);
+
     return (count == 1);
+}
+
+/*
+ * Cette fonction permet de gérer le cas par défaut (/)
+ * Le cas par défaut est le fichier index.html
+ */
+bool defaultPath(char *host, int len) {
+
+    char *hostCopy = copy(host, len);
+    
+    if (strcmp(hostCopy, "www.hilopt.com") == 0) {
+        printf("Fichiers par défaut pour www.hilopt.com\n");
+    } else if (strcmp(hostCopy, "www.paphypu.fr") == 0) {
+        printf("Fichiers par défaut pour www.paphypu.fr\n");
+    } else if (strcmp(hostCopy, "www.wichopool.com") == 0) {
+        printf("Fichiers par défaut pour www.wichopool.com\n");
+    } else {
+        printf("Problème dans le champ host\n");
+    }
+
+    return true;
+}
+
+char *copy(char *str, int len) {
+    char *strCopy = malloc((len + 1) * sizeof(char));
+    for (int i = 0; i < len; i++) {
+        strCopy[i] = str[i];
+    }
+    strCopy[len] = '\0';
+
+    return strCopy;
 }
