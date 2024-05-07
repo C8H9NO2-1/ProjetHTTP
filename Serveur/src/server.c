@@ -8,13 +8,17 @@
 
 #include "header/request.h"
 #include "header/api.h"
-#include "header/checkRessource.h"
+#include "header/pm.h"
 
-#define REPONSE1 "HTTP/1.0 200 OK\r\n"
+#define REPONSE1 "HTTP/1.0 200 OK\r\nContent-type=image/png\r\n"
 #define REPONSE2 "\r\n<html><head><title>Test</title></head><body><p>This is a test</p></body></html>"
+
+//! Pour exécuter: cat ... | ./server
 
 int main(int argc, char *argv[]) {
     message *requete;
+
+    int c;
 
     while (true) {
         if ((requete = getRequest(8080)) == NULL) {
@@ -64,7 +68,13 @@ int main(int argc, char *argv[]) {
 
 
         writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
-        writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));
+        /*writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));*/
+        while ((c = getchar()) != EOF) {
+            char temp[2]; 
+            temp[0] = (char) c;
+            temp[1] = '\0';
+            writeDirectClient(requete->clientId, temp, 1);
+        }
         endWriteDirectClient(requete->clientId);
         requestShutdownSocket(requete->clientId);
 
