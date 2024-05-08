@@ -5,8 +5,6 @@
  * Mais aussi à la vérification de la start-line et du header Connection (sémantique)
  */
 
-//TODO Il faut peut-être aussi trouver un moyen de renvoyer le type du fichier
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,16 +25,16 @@ bool semanticStartLine(void *root, Method *method, int *version) {
     int l;
     char *s;
     s = getElementValue(tokenMethod->node, &l);
-    char *methodName = copy(s, l);
-    if (strcmp(methodName, "GET") == 0) {
+    if (strncmp(s, "GET", l) == 0) {
         *method = GET;
-    } else if (strcmp(methodName, "HEAD") == 0) {
+    } else if (strncmp(s, "HEAD", l) == 0) {
         *method = HEAD;
+    } else if (strncmp(s, "POST", l) == 0) {
+        *method = POST;
     } else {
         printf("Erreur => method inconnue\n");
         b = false;
     }
-    free(methodName);
     purgeElement(&tokenMethod);
 
     if (!b) {
@@ -49,19 +47,61 @@ bool semanticStartLine(void *root, Method *method, int *version) {
     int l2;
     char *s2;
     s2 = getElementValue(tokenVersion->node, &l2);
-    char *versionName = copy(s2, l2);
-    if (strcmp(versionName, "HTTP/1.0") == 0) {
+    if (strncmp(s2, "HTTP/1.0", l2) == 0) {
         *version = 0;
-    } else if (strcmp(versionName, "HTTP/1.1") == 0) {
+    } else if (strncmp(s2, "HTTP/1.1", l2) == 0) {
         *version = 1;
     } else {
         printf("Erreur => version non supportée\n");
         b = false;
     }
-    free(versionName);
     purgeElement(&tokenVersion);
 
     return b;
+}
+
+bool semanticConnection(void *root, ConnectionState *state, int version) {
+    //? Es-ce possible d'avoir plusieurs Connection-headers ?
+    // A priori oui mais dans ce cas, il faut regarder pour voir si les options n'entrent pas en conflit
+
+    // On regarde les options de connexions pour voir ce qu'on doit faire
+    bool close = false;
+    bool keepAlive = false;
+    _Token *r;
+    r = searchTree(root, "connection-option");
+    while (r != NULL) {
+        int l;
+        char *s;
+        s = getElementValue(r->node, &l);
+        if (strncmp(s, "close", l) == 0) {
+            close = true;
+        } else if (strncmp(s, "keep-alive", l) == 0) {
+            keepAlive = true;
+        } else {
+            printf("Option de connexion inconnue\n");
+        }
+        r = r->next;
+    }
+
+    purgeElement(&r);
+
+    // On liste tous les cas possibles
+    if (close && keepAlive) {
+        printf("Impossible de déterminer la bonne option de connexion\n");
+        return false;
+    }
+
+    if (close) {
+        *state = CLOSE;
+    } else if (version == 1) {
+        *state = KEEPALIVE;
+    } else if (version == 0 && keepAlive) {
+        *state = KEEPALIVE;
+    } else {
+        *state = CLOSE;
+    }
+
+    return true;
 }
 
 /*
@@ -113,16 +153,8 @@ FILE* checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
     char *fileName = malloc((len + 1) * sizeof(char));
     strcpy(fileName, root);
 
-    // On fait des copies des paramètres pour s'assurer que ce qu'on fait est correct
-    // Car sinon, on va avoir un problème de longueur
-    char *pathCopy = copy(path, lenPath);
-    char *hostCopy = copy(host, lenHost);
-
-    strcat(fileName, hostCopy);
-    strcat(fileName, pathCopy);
-
-    free(pathCopy);
-    free(hostCopy);
+    strncat(fileName, host, lenHost);
+    strncat(fileName, path, lenPath);
 
     file = fopen(fileName, "r");
     free(fileName);
@@ -142,7 +174,6 @@ FILE* checkExistence(char *path, int len) {
         return false;
     }
 
-    char *pathCopy = copy(path, len);
     int count = 0; // On va compter le nombre de fois où la ressource apparait
     int last = 0; // Contient l'indice du site web dans la liste qui contient la ressource
 
@@ -165,7 +196,7 @@ FILE* checkExistence(char *path, int len) {
         char *fileName = malloc((lenFileName + 1) * sizeof(char));
         strcpy(fileName, base);
         strcat(fileName, website);
-        strcat(fileName, pathCopy);
+        strncat(fileName, path, len);
         /*printf("path of the file: %s\n", fileName);*/
         ressource = fopen(fileName, "r");
         if (ressource != NULL) {
@@ -179,7 +210,6 @@ FILE* checkExistence(char *path, int len) {
 
     if (count != 1) {
         fclose(file);
-        free(pathCopy);
         return NULL;
     }
 
@@ -199,11 +229,10 @@ FILE* checkExistence(char *path, int len) {
     char *fileName = malloc((lenFileName + 1) * sizeof(char));
     strcpy(fileName, base);
     strcat(fileName, website);
-    strcat(fileName, pathCopy);
+    strncat(fileName, path, len);
     /*printf("Chemin vers la ressource unique => %s\n", fileName);*/
     ressource = fopen(fileName, "r");
 
-    free(pathCopy);
     free(fileName);
 
     return ressource; //! Meme chose ici, penser a faire des fclose dans les fonctions appelantes
@@ -217,28 +246,19 @@ FILE* defaultPath(char *host, int len) {
     char *base = "racine/";
     int lenBase = strlen(base);
 
-    char *hostCopy = copy(host, len);
-
     char *defaultFile = "/index.html";
     int lenFile = strlen(defaultFile);
 
     int lenFileName = lenBase + len + lenFile;
     char *fileName = malloc((lenFileName + 1) * sizeof(char));
     strcpy(fileName, base);
-    strcat(fileName, hostCopy);
+    strncat(fileName, host, len);
     strcat(fileName, defaultFile);
 
     FILE *file = fopen(fileName, "r");
 
+    free(fileName);
+
     return file;
 }
 
-char *copy(char *str, int len) {
-    char *strCopy = malloc((len + 1) * sizeof(char));
-    for (int i = 0; i < len; i++) {
-        strCopy[i] = str[i];
-    }
-    strCopy[len] = '\0';
-
-    return strCopy;
-}

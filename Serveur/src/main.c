@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     printf("===========\n");
 
     if (parseur(req, strlen(req)) != 0) {
-        _Token *r, *r2;
+        _Token *r, *r2, *r3;
         void *root;
 
         root = getRootTree();
@@ -33,27 +33,40 @@ int main(int argc, char *argv[]) {
         }
 
         /*On recupere la request-target (il n'y en a qu'une normalement)*/
+        /*De plus, nous sommes certains qu'il y a une start-line grace au parseur*/
         r = searchTree(root, "request-target");
         int l;
         char *s;
         s = getElementValue(r->node, &l);
         /*printf("%.*s\n", l, s);*/
 
+        /*On vérifie la validité du chemin donné par le client*/
         if (checkPath(s, l)) {
             printf("C'est OK\n");
         } else {
             printf("alert\n");
         }
 
+        /*Il faudra penser à vérifier qu'il y a un champ Host, car ce n'est pas certain*/
         r2 = searchTree(root, "host");
         int l2;
         char *s2;
         s2 = getElementValue(r2->node, &l2);
-        /*printf("%.*s\n", l2, s2);*/
 
-        /*FILE *file = checkExistenceWithHost(s, l, s2, l2);*/
+        ConnectionState connection;
+        r3 = searchTree(root, "Connection-header");
+        if (r3 != NULL) {
+            bool temp = semanticConnection(root, &connection, version);
+            if (temp) {
+                printf("Option de connexion identifiée\n");
+            } else {
+                printf("Option de connexion non identifiée\n");
+            }
+        }
+
+        FILE *file = checkExistenceWithHost(s, l, s2, l2);
         /*FILE *file = checkExistence(s, l);*/
-        FILE *file= defaultPath(s2, l2);
+        /*FILE *file= defaultPath(s2, l2);*/
 
         if (file != NULL) {
             printf("La ressource à été identifiée\n");
