@@ -67,12 +67,13 @@ bool semanticConnection(void *root, ConnectionState *state, int version) {
     // On regarde les options de connexions pour voir ce qu'on doit faire
     bool close = false;
     bool keepAlive = false;
-    _Token *r;
+    _Token *r, *tok;
     r = searchTree(root, "connection-option");
-    while (r != NULL) {
+    tok = r;
+    while (tok != NULL) {
         int l;
         char *s;
-        s = getElementValue(r->node, &l);
+        s = getElementValue(tok->node, &l);
         if (strncmp(s, "close", l) == 0) {
             close = true;
         } else if (strncmp(s, "keep-alive", l) == 0) {
@@ -80,7 +81,7 @@ bool semanticConnection(void *root, ConnectionState *state, int version) {
         } else {
             printf("Option de connexion inconnue\n");
         }
-        r = r->next;
+        tok = tok->next;
     }
 
     purgeElement(&r);
