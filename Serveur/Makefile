@@ -8,7 +8,7 @@ exec = prog
 server = server
 objects = $(addprefix $(bin),functions.o api.o pm.o)
 main1 = $(bin)main.o
-main2 = $(bin)bin/server.o
+main2 = $(bin)server.o
 
 all : $(exec)
 
