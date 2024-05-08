@@ -12,6 +12,7 @@
 
 #define REPONSE1 "HTTP/1.0 200 OK\r\nContent-Type: image/png\r\n"
 #define REPONSE2 "\r\n<html><head><title>Test</title></head><body><p>This is a test</p></body></html>"
+#define REPONSE3 "Connection: close\r\n"
 
 //! Pour exécuter: cat ... | ./server
 
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]) {
     message *requete;
 
     int c;
+    ConnectionState connection;
 
     while (true) {
         if ((requete = getRequest(8080)) == NULL) {
@@ -37,6 +39,10 @@ int main(int argc, char *argv[]) {
             void *root;
 
             root = getRootTree();
+
+            Method method;
+            int version;
+            semanticStartLine(root, &method, &version);
 
             /*On recupere la request-target (il n'y en a qu'une normalement)*/
             r = searchTree(root, "request-target");
@@ -59,6 +65,17 @@ int main(int argc, char *argv[]) {
 
             checkExistenceWithHost(s, l, s2, l2);
 
+            _Token *r3 = searchTree(root, "Connection-header");
+            if (r3 != NULL) {
+                bool temp = semanticConnection(root, &connection, version);
+            } else {
+                if (version == 1) {
+                    connection = KEEPALIVE;
+                } else if (version == 0) {
+                    connection = CLOSE;
+                }
+            }
+
             purgeElement(&r);
             purgeElement(&r2);
             purgeTree(root);
@@ -68,16 +85,19 @@ int main(int argc, char *argv[]) {
 
 
         writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
-        /*writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));*/
-        writeDirectClient(requete->clientId, "\r\n", strlen("\r\n"));
-        while ((c = getchar()) != EOF) {
-            char temp[2]; 
-            temp[0] = (char) c;
-            temp[1] = '\0';
-            writeDirectClient(requete->clientId, temp, 1);
-        }
+        writeDirectClient(requete->clientId, REPONSE3, strlen(REPONSE3));
+        writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));
+        /*writeDirectClient(requete->clientId, "\r\n", strlen("\r\n"));*/
+        /*while ((c = getchar()) != EOF) {*/
+            /*char temp[2]; */
+            /*temp[0] = (char) c;*/
+            /*temp[1] = '\0';*/
+            /*writeDirectClient(requete->clientId, temp, 1);*/
+        /*}*/
         endWriteDirectClient(requete->clientId);
-        requestShutdownSocket(requete->clientId);
+        if (connection == CLOSE) {
+            requestShutdownSocket(requete->clientId);
+        }
 
         freeRequest(requete);
     }
