@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
         char *s2;
         s2 = getElementValue(r2->node, &l2);
 
+        // On vérifie si il y a un champ de connexion
         ConnectionState connection;
         r3 = searchTree(root, "Connection-header");
         if (r3 != NULL) {
@@ -61,6 +62,12 @@ int main(int argc, char *argv[]) {
                 printf("Option de connexion identifiée\n");
             } else {
                 printf("Option de connexion non identifiée\n");
+            }
+        } else {
+            if (version == 1) {
+                connection = KEEPALIVE;
+            } else if (version == 0) {
+                connection = CLOSE;
             }
         }
 
@@ -77,6 +84,7 @@ int main(int argc, char *argv[]) {
 
         purgeElement(&r);
         purgeElement(&r2);
+        purgeElement(&r3);
         purgeTree(root);
     } else {
         printf("Impossible de parser la requête\n");
