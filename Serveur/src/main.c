@@ -12,7 +12,8 @@ int main(int argc, char *argv[]) {
     system("ls racine > liste.txt");
 
     /*char req[] = "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";*/
-    char req[] = "GET /index.html HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";
+    char req[] = "GET /test/../inDex%2eHtml HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";
+    /*char req[] = "GET /test/../test1 HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";*/
 
     printf("%s", req);
     printf("===========\n");

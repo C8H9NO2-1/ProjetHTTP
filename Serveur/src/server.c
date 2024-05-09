@@ -10,7 +10,7 @@
 #include "header/api.h"
 #include "header/pm.h"
 
-#define REPONSE1 "HTTP/1.0 200 OK\r\nContent-Type: image/png\r\n"
+#define REPONSE1 "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n"
 #define REPONSE2 "\r\n<html><head><title>Test</title></head><body><p>This is a test</p></body></html>"
 #define REPONSE3 "Connection: close\r\n"
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     message *requete;
 
     int c;
-    ConnectionState connection;
+    ConnectionState connection = CLOSE;
 
     while (true) {
         if ((requete = getRequest(8080)) == NULL) {

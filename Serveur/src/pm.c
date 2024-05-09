@@ -145,20 +145,30 @@ bool checkPath(char *path, int len) {
  * On devrait pouvoir étendre les capacités de cette fonction pour pouvoir lire le contenu de la ressource
  */
 FILE* checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
+    //! Changement drastique de cette fonction, en se basant sur la RFC 3986
 
     FILE *file;
 
     char *root = "racine/";
 
-    int len = strlen(root) + lenPath + lenHost;
+    // Il faut normaliser le chemin
+    char *pathNormalized = URINormalization(path, lenPath);
+    int newLenPath = strlen(pathNormalized);
+
+    // Il faut normaliser le champ host
+    char *hostNormalized = URINormalization(host, lenHost);
+    int newLenHost = strlen(hostNormalized);
+
+    int len = strlen(root) + newLenPath + newLenHost;
     char *fileName = malloc((len + 1) * sizeof(char));
     strcpy(fileName, root);
-
-    strncat(fileName, host, lenHost);
-    strncat(fileName, path, lenPath);
+    
+    strncat(fileName, hostNormalized, newLenHost);
+    strncat(fileName, pathNormalized, newLenPath);
 
     file = fopen(fileName, "r");
     free(fileName);
+    free(pathNormalized);
 
     return file; //! Il faudra bien penser à faire des fclose
 }
@@ -174,6 +184,10 @@ FILE* checkExistence(char *path, int len) {
         printf("Erreur => Impossible d'accéder à la structure du serveur web\n");
         return false;
     }
+
+    // On normalise le chemin
+    char *pathNormalized = URINormalization(path, len);
+    int newLen = strlen(pathNormalized);
 
     int count = 0; // On va compter le nombre de fois où la ressource apparait
     int last = 0; // Contient l'indice du site web dans la liste qui contient la ressource
@@ -193,11 +207,11 @@ FILE* checkExistence(char *path, int len) {
         // On vérifie ensuite ce qu'on veut vérifier
         // C'est-à-dire l'unicité ou non de la ressource
         FILE *ressource = NULL;
-        int lenFileName = lenBase + strlen(website) + len;
+        int lenFileName = lenBase + strlen(website) + newLen;
         char *fileName = malloc((lenFileName + 1) * sizeof(char));
         strcpy(fileName, base);
         strcat(fileName, website);
-        strncat(fileName, path, len);
+        strncat(fileName, pathNormalized, newLen);
         /*printf("path of the file: %s\n", fileName);*/
         ressource = fopen(fileName, "r");
         if (ressource != NULL) {
@@ -209,8 +223,10 @@ FILE* checkExistence(char *path, int len) {
         free(fileName);
     }
 
+
     if (count != 1) {
         fclose(file);
+        free(pathNormalized);
         return NULL;
     }
 
@@ -226,14 +242,15 @@ FILE* checkExistence(char *path, int len) {
     int temp = strlen(website);
     website[temp - 1] = '\0';
     FILE *ressource = NULL;
-    int lenFileName = lenBase + strlen(website) + len;
+    int lenFileName = lenBase + strlen(website) + newLen;
     char *fileName = malloc((lenFileName + 1) * sizeof(char));
     strcpy(fileName, base);
     strcat(fileName, website);
-    strncat(fileName, path, len);
+    strncat(fileName, pathNormalized, newLen);
     /*printf("Chemin vers la ressource unique => %s\n", fileName);*/
     ressource = fopen(fileName, "r");
 
+    free(pathNormalized);
     free(fileName);
 
     return ressource; //! Meme chose ici, penser a faire des fclose dans les fonctions appelantes
@@ -250,10 +267,14 @@ FILE* defaultPath(char *host, int len) {
     char *defaultFile = "/index.html";
     int lenFile = strlen(defaultFile);
 
-    int lenFileName = lenBase + len + lenFile;
+    // On normalise le champ host
+    char *hostNormalized = URINormalization(host, len);
+    int newLen = strlen(hostNormalized);
+
+    int lenFileName = lenBase + newLen + lenFile;
     char *fileName = malloc((lenFileName + 1) * sizeof(char));
     strcpy(fileName, base);
-    strncat(fileName, host, len);
+    strncat(fileName, hostNormalized, newLen);
     strcat(fileName, defaultFile);
 
     FILE *file = fopen(fileName, "r");
@@ -263,3 +284,158 @@ FILE* defaultPath(char *host, int len) {
     return file;
 }
 
+/*
+ * Cette fonction va faire toute la normalisation nécessaire
+ */
+char *URINormalization(char *path, int len) {
+    // On commence par faire une copie assez grande
+    // Cette copie sera probablement trop grande mais ce n'est pas grave
+    char *result1 = malloc((len + 1) * sizeof(char));
+    int j = 0; // Cet indice va nous permettre de parcourir result
+
+    /* Il va falloir faire les 2 normalisations à la fois
+     * - Changer toutes les lettres en minuscule (Sauf pour percent-encoded qui doivent tous être en majuscule)
+     * - Changer tous les %.. qui correspondent à des unreserved
+     */
+    for (int i = 0; i < len; i++) {
+        if (path[i] == '%') {
+            int temp = convertHexdig(path + i + 1);
+            if (isUnreserved(temp)) {
+                result1[j] = (char) temp;
+            } else {
+                result1[j] = '%';
+                for (int k = 1; k <= 2; k++) {
+                    if (path[i + k] >= 'a' && path[i + k] <= 'f') {
+                        result1[j + k] = path[i + k] - 'a' + 'A';
+                    } else {
+                        result1[j + k] = path[i + k];
+                    }
+                }
+                j += 2;
+            }
+            i += 2; // On passe les deux caractères suivant
+        } else {
+            if (path[i] >= 'A' && path[i] <= 'Z') {
+                result1[j] = path[i] - 'A' + 'a';
+            } else {
+                result1[j] = path[i];
+            }
+        }
+        // Il ne faut pas oublier d'incrémenter j
+        j++;
+    }
+
+    // On ajoute la sentinelle à la fin
+    result1[j] = '\0';
+
+    /*? On applique ensuite l'algorithme de "dot removal"*/
+    char *result2 = dotRemoval(result1, j);
+
+    free(result1);
+
+    return result2;
+}
+
+int convertHexdig(char *str) {
+    int result = 0;
+
+    for (int i = 0; i < 2; i++) {
+        if (str[i] >= '0' && str[i] <= '9') {
+            result = str[i] - '0' + (result * 16 * i);
+        } else if (str[i] >= 'A' && str[i] <= 'F') {
+            result = str[i] - 'A' + 10 + (result * 16 * i);
+        } else if (str[i] >= 'a' && str[i] <= 'f') {
+            result = str[i] - 'a' + 10 + (result * 16 * i);
+        }
+    }
+
+    /*printf("Result => %d\n", result);*/
+
+    return result;
+}
+
+bool isUnreserved(int x) {
+    bool b = false;
+
+    if (x >= 'A' && x <= 'Z') {
+        b = true;
+    } else if (x >= 'a' && x <= 'z') {
+        b = true;
+    } else if (x >= '0' && x <= '9') {
+        b = true;
+    } else {
+        switch (x) {
+            case '-':
+            case '.':
+            case '_':
+            case '~':
+                b = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    return b;
+}
+
+char *dotRemoval(char *path, int len) {
+    /*? On ne va pas faire exactement comme la RFC 3986, on va en effet utiliser un indice et un buffer et non deux buffers*/
+    /*! Il y a quelques situations que nous allons ignorer, il faudra voir si cela posera des problèmes plus tard*/
+    char *temp = malloc((len + 1) * sizeof(char));
+    int j = 0; // Cet indice va nous permettre de parcourir les 2 chaines en même temps
+
+    bool done = false;
+    for (int i = 0; i < len; i++) {
+        // A
+        if (!done && (i + 2) < len && strncmp(path, "../", 3) == 0) {
+            i += 2;
+        } else if (!done && (i + 1) < len && strncmp(path, "./", 2) == 0) {
+            i += 1;
+        }
+        // B
+        else if ((i + 2) < len && strncmp(path + i, "/./", 3) == 0) {
+            i += 1; // On veut garder le dernier /
+        }
+        // C
+        else if ((i + 3) < len && strncmp(path + i, "/../", 4) == 0) {
+            i += 2; // On veut garder le dernier /
+            // On retire le dernier segment dans la chaine de résultat
+            if (j > 0) {
+                j--;
+            }
+            while (j >= 0 && temp[j] != '/') {
+                j--;
+            }
+        }
+        // D
+        else if ((i + 1) == len && path[i] == '.') {
+            i += 1;
+        } else if ((i + 2) == len && strncmp(path + i, "..", 2) == 0) {
+            i += 2;
+        }
+        // E
+        else {
+            temp[j] = path[i];
+            j++;
+            i++;
+            while (i < len && path[i] != '/') {
+                temp[j] = path[i];
+                j++;
+                i++;
+            }
+            i--; // Peut être inutile, don't know
+        }
+    }
+
+    temp[j] = '\0';
+
+    // On rend tout cela un peu plus propre en faisant une chaine de la bonne longueur maintenant qu'on la connait
+    char *result = malloc((j + 1) * sizeof(char));
+    strncpy(result, temp, j);
+    result[j] = '\0';
+
+    free(temp);
+
+    return result;
+}
