@@ -169,6 +169,7 @@ FILE* checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
     file = fopen(fileName, "r");
     free(fileName);
     free(pathNormalized);
+    free(hostNormalized);
 
     return file; //! Il faudra bien penser à faire des fclose
 }
@@ -280,6 +281,7 @@ FILE* defaultPath(char *host, int len) {
     FILE *file = fopen(fileName, "r");
 
     free(fileName);
+    free(hostNormalized);
 
     return file;
 }
