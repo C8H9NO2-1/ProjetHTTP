@@ -477,18 +477,22 @@ bool acceptHeaderVerification(void *root, ContentType content) {
     char comp[] = "accept:";
     int len = strlen(comp);
 
+    bool b = false;
+    bool found = false;
+
     while (token != NULL) {
         int l;
         char *s;
         s = getElementValue(token->node, &l);
         if (compareCaseInsensitive(s, comp, len)) {
+            found = true;
             /*printf("=> %.*s\n", l, s);*/
             char *header = malloc((l + 1) * sizeof(char));
             sprintf(header, "%.*s", l, s);
             // On regarde si le pattern */* est présent
             // Si c'est le cas alors c'est gagné
             if (auxAccept(header, "*/*")) {
-                return true;
+                b = true;
             }
 
             // Sinon on regarde les autres patterns en se basant sur le type de la ressource
@@ -500,56 +504,59 @@ bool acceptHeaderVerification(void *root, ContentType content) {
                 case CSS:
                 case JAVASCRIPT:
                     if (auxAccept(header, "text/*")) {
-                        return true;
+                        b = true;
                     }
                     break;
                 case PNG:
                 case JPEG:
                 case GIF:
                     if (auxAccept(header, "image/*")) {
-                        return true;
+                        b = true;
                     }
                     break;
             }
             switch (content) {
                 case HTML:
                     if (auxAccept(header, "text/html")) {
-                        return true;
+                        b = true;
                     }
                     break;
                 case CSS:
                     if (auxAccept(header, "text/css")) {
-                        return true;
+                        b = true;
                     }
                     break;
                 case JAVASCRIPT:
                     if (auxAccept(header, "text/javascript")) {
-                        return true;
+                        b = true;
                     }
                     break;
                 case PNG:
                     if (auxAccept(header, "image/png")) {
-                        return true;
+                        b = true;
                     }
                     break;
                 case JPEG:
                     if (auxAccept(header, "image/jpeg")) {
-                        return true;
+                        b = true;
                     }
                     break;
                 case GIF:
                     if (auxAccept(header, "image/gif")) {
-                        return true;
+                        b = true;
                     }
                     break;
             }
-            // Si on n'a pas trouvé dans le header Accept, on ne peut pas renvoyer le fichier
-            return false;
+            free(header);
         }
         token = token->next;
     }
 
     purgeElement(&r);
+
+    if (found) {
+        return b;
+    }
     
     // Si il n'y a pas de header Accept, c'est qu'on est bon
     return true;
