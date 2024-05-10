@@ -12,3 +12,8 @@ Les types de fichiers que j'ai testé qui fonctionne sont:
     - Les images jpeg avec image/jpeg
     - Les gifs avec image/gif
 Donc pour le moment notre serveur va supporter tous ces fichiers (à priori)
+
+Il ne faut pas envoyer de champ Transfer-Encoding si la version du client est HTTP/1.0
+Le seul Transfer-Encoding que l'on va faire sera chunked (pour le moment)
+
+En fait non, on peut faires les trois autres simplement car il existe des utilitaires qui s'en occupe: gzip, compress et la fonction deflate dans zlib.h

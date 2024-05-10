@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "../1.3.1/include/zlib.h"
+
 #include "header/request.h"
 #include "header/api.h"
 #include "header/pm.h"

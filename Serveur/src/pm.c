@@ -643,7 +643,7 @@ bool extensionMatch(const char *name, const char *ext) {
 }
 
 ContentType typeFromPath(char *path, int len) {
-    char *temp = URINormalization(path, len); 
+    char *temp = URINormalization(path, len);
 
     ContentType result;
 
@@ -667,4 +667,12 @@ ContentType typeFromPath(char *path, int len) {
     free(temp);
 
     return result;
+}
+
+/*
+ * Le type de retour de cette fonction devra être changé plus tard
+ * Cette fonction détermine l'encoding à utiliser en fonction de ce que le client demande
+ */
+void acceptEncodingHeaderVerification(void *root) {
+
 }
