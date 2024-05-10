@@ -32,5 +32,6 @@ bool auxAccept(char *header, const char *str);
 bool checkAcceptString(char *str);
 bool priorityVerification(char *str);
 bool extensionMatch(const char *name, const char *ext);
+ContentType typeFromPath(char *path, int len);
 
 #endif

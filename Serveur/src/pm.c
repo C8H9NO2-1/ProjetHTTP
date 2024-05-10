@@ -557,7 +557,7 @@ bool acceptHeaderVerification(void *root, ContentType content) {
     if (found) {
         return b;
     }
-    
+
     // Si il n'y a pas de header Accept, c'est qu'on est bon
     return true;
 }
@@ -571,13 +571,6 @@ bool auxAccept(char *header, const char *str) {
     }
 
     return false;
-}
-
-bool extensionMatch(const char *name, const char *ext) {
-    int len = strlen(name);
-    int extLen = strlen(ext);
-
-    return len >= extLen && !strcmp(name + len - extLen, ext);
 }
 
 /*
@@ -640,4 +633,38 @@ bool priorityVerification(char *str) {
     }
 
     return false;
+}
+
+bool extensionMatch(const char *name, const char *ext) {
+    int len = strlen(name);
+    int extLen = strlen(ext);
+
+    return len >= extLen && !strcmp(name + len - extLen, ext);
+}
+
+ContentType typeFromPath(char *path, int len) {
+    char *temp = URINormalization(path, len); 
+
+    ContentType result;
+
+    if (extensionMatch(temp, ".html")) {
+        result = HTML;
+    } else if (extensionMatch(temp, ".css")) {
+        result = CSS;
+    } else if (extensionMatch(temp, ".js")) {
+        result = JAVASCRIPT;
+    } else if (extensionMatch(temp, ".png")) {
+        result = PNG;
+    } else if (extensionMatch(temp, ".jpg") || extensionMatch(temp, ".jpeg")) {
+        result = JPEG;
+    } else if (extensionMatch(temp, ".gif")) {
+        result = GIF;
+    } else {
+        // Par défaut on renvoie une page html
+        result = HTML;
+    }
+
+    free(temp);
+
+    return result;
 }
