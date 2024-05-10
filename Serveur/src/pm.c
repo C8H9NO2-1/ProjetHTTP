@@ -51,6 +51,8 @@ bool semanticStartLine(void *root, Method *method, int *version) {
         *version = 0;
     } else if (strncmp(s2, "HTTP/1.1", l2) == 0) {
         *version = 1;
+    } else if (strncmp(s2, "HTTP/1.", l2 - 1) == 0) { // Il faut supporter toutes les sous-versions
+        *version = 1; // On considère que la requête a été faite avec HTTP/1.1
     } else {
         printf("Erreur => version non supportée\n");
         b = false;
@@ -74,9 +76,9 @@ bool semanticConnection(void *root, ConnectionState *state, int version) {
         int l;
         char *s;
         s = getElementValue(tok->node, &l);
-        if (strncmp(s, "close", l) == 0) {
+        if (compareCaseInsensitive(s, "close", l)) {
             close = true;
-        } else if (strncmp(s, "keep-alive", l) == 0) {
+        } else if (compareCaseInsensitive(s, "keep-alive", l)) {
             keepAlive = true;
         } else {
             printf("Option de connexion inconnue\n");
@@ -162,7 +164,7 @@ FILE* checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost) {
     int len = strlen(root) + newLenPath + newLenHost;
     char *fileName = malloc((len + 1) * sizeof(char));
     strcpy(fileName, root);
-    
+
     strncat(fileName, hostNormalized, newLenHost);
     strncat(fileName, pathNormalized, newLenPath);
 
@@ -440,4 +442,195 @@ char *dotRemoval(char *path, int len) {
     free(temp);
 
     return result;
+}
+
+/*
+ * Cette fonction fait une comparaison sans tenir compte de la casse de str1
+ * str2 doit être tout en minuscule pour que la fonction fonctionne
+ */
+bool compareCaseInsensitive(char *str1, char *str2, int len) {
+    bool b = true;
+
+    for (int i = 0; i < len; i++) {
+        if (str1[i] >= 'A' && str1[i] <= 'Z') {
+            if (str2[i] != str1[i] - 'A' + 'a') {
+                b = false;
+            }
+        } else if (str1[i] != str2[i]) {
+            b = false;
+        }
+    }
+
+    return b;
+}
+
+/*
+ * Cette fonction vérifie que le type de la ressource demandée correspond bien à un champ dans le header Accept
+ * On pourrait avoir plusieurs représentations d'une même ressource mais pour le moment non
+ * Donc cette fonction est relativement simple
+ * ? Il faudra peut-être ajouter un paramètre pour le type du contenu
+ */
+bool acceptHeaderVerification(void *root, ContentType content) {
+    _Token *r = searchTree(root, "header-field");
+    _Token *token = r;
+
+    char comp[] = "accept:";
+    int len = strlen(comp);
+
+    while (token != NULL) {
+        int l;
+        char *s;
+        s = getElementValue(token->node, &l);
+        if (compareCaseInsensitive(s, comp, len)) {
+            /*printf("=> %.*s\n", l, s);*/
+            char *header = malloc((l + 1) * sizeof(char));
+            sprintf(header, "%.*s", l, s);
+            // On regarde si le pattern */* est présent
+            // Si c'est le cas alors c'est gagné
+            if (auxAccept(header, "*/*")) {
+                return true;
+            }
+
+            // Sinon on regarde les autres patterns en se basant sur le type de la ressource
+            // On fait deux vérifications:
+            // - Une première qui sera un peu générique
+            // - Une deuxième plus fine
+            switch (content) {
+                case HTML:
+                case CSS:
+                case JAVASCRIPT:
+                    if (auxAccept(header, "text/*")) {
+                        return true;
+                    }
+                    break;
+                case PNG:
+                case JPEG:
+                case GIF:
+                    if (auxAccept(header, "image/*")) {
+                        return true;
+                    }
+                    break;
+            }
+            switch (content) {
+                case HTML:
+                    if (auxAccept(header, "text/html")) {
+                        return true;
+                    }
+                    break;
+                case CSS:
+                    if (auxAccept(header, "text/css")) {
+                        return true;
+                    }
+                    break;
+                case JAVASCRIPT:
+                    if (auxAccept(header, "text/javascript")) {
+                        return true;
+                    }
+                    break;
+                case PNG:
+                    if (auxAccept(header, "image/png")) {
+                        return true;
+                    }
+                    break;
+                case JPEG:
+                    if (auxAccept(header, "image/jpeg")) {
+                        return true;
+                    }
+                    break;
+                case GIF:
+                    if (auxAccept(header, "image/gif")) {
+                        return true;
+                    }
+                    break;
+            }
+            // Si on n'a pas trouvé dans le header Accept, on ne peut pas renvoyer le fichier
+            return false;
+        }
+        token = token->next;
+    }
+
+    purgeElement(&r);
+    
+    // Si il n'y a pas de header Accept, c'est qu'on est bon
+    return true;
+}
+
+bool auxAccept(char *header, const char *str) {
+    char *temp;
+    if ((temp = strstr(header, str)) != NULL) {
+        if (priorityVerification(temp + strlen(str))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool extensionMatch(const char *name, const char *ext) {
+    int len = strlen(name);
+    int extLen = strlen(ext);
+
+    return len >= extLen && !strcmp(name + len - extLen, ext);
+}
+
+/*
+ * Cette fonction vérifie que le paramètre q n'est pas nul
+ * J'ai pris quelques libertées dans la fonction mais à priori ça fonctionne
+ */
+bool priorityVerification(char *str) {
+    int i = 0;
+    // On commence par vérifier si il y a un ;
+    if (str[i] != ';') {
+        return true; // Car cela veut dire qu'il n'y a pas de poids
+    }
+    i++;
+
+    // Ensuite on cherche 'q'
+    while (str[i] != '\0' && str[i] != 'q') {
+        if (str[i] != 9 && str[i] != 32) {
+            return false;
+        }
+        i++;
+    }
+
+    if (str[i] == '\0') {
+        return false;
+    }
+    i++;
+
+    if (str[i] != '\0' && str[i] != '=') {
+        return false;
+    }
+    i++;
+
+    // On vérifie le premier digit est soit 0 soit 1
+    if (str[i] != '\0') {
+        if (str[i] == '1') {
+            return true;
+        } else if (str[i] != '0') {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    i++;
+
+    if (str[i] != '\0' && str[i] != '.') {
+        return false;
+    }
+    i++;
+
+    if (str[i] == '\0') {
+        return false;
+    }
+
+    for (int k = 0; k < 3; k++) {
+        if (str[i + k] > '0' && str[i + k] <= '9') {
+            return true;
+        } else if (str[i + k] != '0') {
+            return false;
+        }
+    }
+
+    return false;
 }

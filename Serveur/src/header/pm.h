@@ -11,6 +11,11 @@ enum ConnectionState {
     CLOSE, KEEPALIVE
 };
 
+typedef enum ContentType ContentType;
+enum ContentType {
+    HTML, CSS, JAVASCRIPT, PNG, JPEG, GIF
+};
+
 bool semanticStartLine(void *root, Method *method, int *version);
 bool semanticConnection(void *root, ConnectionState *state, int version);
 bool checkPath(char *path, int len);
@@ -21,5 +26,11 @@ char *URINormalization(char *path, int len);
 int convertHexdig(char *str);
 bool isUnreserved(int x);
 char *dotRemoval(char *path, int len);
+bool compareCaseInsensitive(char *str1, char *str2, int len);
+bool acceptHeaderVerification(void *root, ContentType content);
+bool auxAccept(char *header, const char *str);
+bool checkAcceptString(char *str);
+bool priorityVerification(char *str);
+bool extensionMatch(const char *name, const char *ext);
 
 #endif

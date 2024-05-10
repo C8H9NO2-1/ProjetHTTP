@@ -1,3 +1,14 @@
 Tous les fichiers de notre serveur vont se trouver dans le dossier racine
 Il va y avoir plusieurs sites web (3 dans un premier temps)
 Ils ont tous la meme adresse IP (pas certain de ce que je fais)
+
+Pour la version HTTP, il faut toujours renvoyer HTTP/1.1 (RFC 7230 section 2.6)
+
+Les types de fichiers que j'ai testé qui fonctionne sont:
+    - Les fichiers html avec text/html
+    - Les fichiers css avec text/css
+    - Les fichiers javascript avec text/javascript
+    - Les images png avec image/png
+    - Les images jpeg avec image/jpeg
+    - Les gifs avec image/gif
+Donc pour le moment notre serveur va supporter tous ces fichiers (à priori)
