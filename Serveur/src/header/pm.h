@@ -33,5 +33,9 @@ bool checkAcceptString(char *str);
 bool priorityVerification(char *str);
 bool extensionMatch(const char *name, const char *ext);
 ContentType typeFromPath(char *path, int len);
+bool acceptEncodingHeaderVerification(void *root, EncodingState *coding);
+bool auxAcceptEncoding(char *header);
+EncodingState maximumPriority(char *header);
+float priorityValue(char *str);
 
 #endif

@@ -3,10 +3,11 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "../1.3.1/include/zlib.h"
+/*#include "../1.3.1/include/zlib.h"*/
 
 #include "header/request.h"
 #include "header/api.h"
+#include "header/elisa.h"
 #include "header/pm.h"
 
 int main(int argc, char *argv[]) {
@@ -14,7 +15,8 @@ int main(int argc, char *argv[]) {
     system("ls racine > liste.txt");
 
     /*char req[] = "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";*/
-    char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\n\r\n";
+    /*char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\n\r\n";*/
+    char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept-Encoding: gzip;q=0.9, deflate;q=0.345, compress;q=0, identity;q=0.0\r\nConnection: close\r\n\r\n";
     /*char req[] = "GET /test/../test1 HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";*/
 
     printf("%s", req);
@@ -79,6 +81,28 @@ int main(int argc, char *argv[]) {
             printf("Le client accepte notre réprésentation\n");
         } else {
             printf("Le client ne veut pas de notre réprésentation\n");
+        }
+        
+        EncodingState coding;
+        if (acceptEncodingHeaderVerification(root, &coding)) {
+            printf("Le client accepte l'encoding de notre représentation\n");
+        } else {
+            printf("Le client ne veut pas de l'encoding de notre représentation\n");
+            printf("Mais il accepte l'encoding suivant: ");
+            switch (coding) {
+                case GZIP:
+                    printf("gzip");
+                    break;
+                case DEFLATE:
+                    printf("deflate");
+                    break;
+                case COMPRESS:
+                    printf("compress");
+                    break;
+                default:
+                    printf("Grosse erreur dans la vérification du l'encoding\n");
+            }
+            printf("\n");
         }
 
         FILE *file = checkExistenceWithHost(s, l, s2, l2);
