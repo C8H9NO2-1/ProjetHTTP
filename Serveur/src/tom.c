@@ -35,11 +35,11 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 1:
 
-        printf("Secteur1 \n");
+        //printf("Secteur1 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<5)){
 
-            printf("Voyons voir : %c ", inside[j]);
+            //printf("Voyons voir : %c ", inside[j]);
             if(inside[j]==':'){
                 not_passed=false;
                 j++;
@@ -65,7 +65,7 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 2
 
-        printf("Secteur2 \n");
+        //printf("Secteur2 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<5)){
 
@@ -94,7 +94,7 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 3
 
-        printf("Secteur3 \n");
+        //printf("Secteur3 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<5)){
 
@@ -123,7 +123,7 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 4:
 
-        printf("Secteur4 \n");
+        //printf("Secteur4 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<5)){
 
@@ -152,7 +152,7 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 5:
 
-        printf("Secteur5 \n");
+        //printf("Secteur5 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<5)){
 
@@ -186,7 +186,7 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 6
 
-        printf("Secteur6 \n");
+        //printf("Secteur6 \n");
 
 
         while (((j)<taille) && (not_passed) && (compteur<1)){
@@ -217,7 +217,7 @@ bool isIPV6(char *inside, int taille){
 
         //secteur 7
 
-        printf("Secteur7 \n");
+        //printf("Secteur7 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<1)){
 
@@ -242,7 +242,7 @@ bool isIPV6(char *inside, int taille){
         //secteur 8
 
 
-        printf("Secteur8 \n");
+        //printf("Secteur8 \n");
 
         while (((j)<taille) && (not_passed) && (compteur<4)){
             if((inside[j]=='1') && (inside[j+1]==']') ){
@@ -367,7 +367,7 @@ bool semanticHost(void *root, int version){
 
     purgeElement(&host);
 
-    printf("El testo \n");
+    //printf("El testo \n");
 
     return true;
 
@@ -375,11 +375,11 @@ bool semanticHost(void *root, int version){
     free(inside);
 
     purgeElement(&host);
-    printf("El fausseto \n");
+    //printf("El fausseto \n");
     return false; 
 }
 
-int main(int argc, char *argv[]) {
+/*int main(int argc, char *argv[]) {
 char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: [::ffff:7f00:1]\r\nAccept-Encoding: gzip;q=0.9, deflate;q=0.345, compress;q=0, identity;q=0.0\r\nConnection: close\r\n\r\n";
 
 //	::ffff:7f00:1    	0:0:0:0:0:ffff:7f00:0001    0000:0000:0000:0000:0000:ffff:7f00:0001
@@ -394,4 +394,4 @@ semanticHost(root,1);
 
 return 0;
 
-}
+}*/
