@@ -7,6 +7,7 @@
 
 #include "header/request.h"
 #include "header/api.h"
+#include "header/elisa.h"
 #include "header/pm.h"
 #include "header/elisa.h"
 
@@ -18,6 +19,7 @@ int main(int argc, char *argv[]) {
     char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\nTransfer-Encoding: deflate, gzip, chunked\r\n\r\n";
 
     /*char req[] = "GET /test/../test1 HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";*/
+    char req[] = "GET /../ParseurHTTP/main.c HTTP/1.1\r\nHost: www.wichopool.com\r\n\r\n";
 
     printf("%s", req);
     printf("===========\n");
@@ -60,13 +62,6 @@ int main(int argc, char *argv[]) {
         s = getElementValue(r->node, &l);
         /*printf("%.*s\n", l, s);*/
 
-        /*On vérifie la validité du chemin donné par le client*/
-        if (checkPath(s, l)) {
-            printf("C'est OK\n");
-        } else {
-            printf("alert\n");
-        }
-
         /*Il faudra penser à vérifier qu'il y a un champ Host, car ce n'est pas certain*/
         r2 = searchTree(root, "host");
         int l2;
@@ -74,6 +69,8 @@ int main(int argc, char *argv[]) {
         s2 = getElementValue(r2->node, &l2);
 
         // On vérifie si il y a un champ de connexion
+        // Et on implémente le début de la gestion de la connexion
+        // Le reste sera fait lors de l'envoi de la réponse
         ConnectionState connection;
         r3 = searchTree(root, "Connection-header");
         if (r3 != NULL) {
@@ -96,6 +93,28 @@ int main(int argc, char *argv[]) {
             printf("Le client accepte notre réprésentation\n");
         } else {
             printf("Le client ne veut pas de notre réprésentation\n");
+        }
+
+        EncodingState coding;
+        if (acceptEncodingHeaderVerification(root, &coding)) {
+            printf("Le client accepte l'encoding de notre représentation\n");
+        } else {
+            printf("Le client ne veut pas de l'encoding de notre représentation\n");
+            printf("Mais il accepte l'encoding suivant: ");
+            switch (coding) {
+                case GZIP:
+                    printf("gzip");
+                    break;
+                case DEFLATE:
+                    printf("deflate");
+                    break;
+                case COMPRESS:
+                    printf("compress");
+                    break;
+                default:
+                    printf("Grosse erreur dans la vérification du l'encoding\n");
+            }
+            printf("\n");
         }
 
         FILE *file = checkExistenceWithHost(s, l, s2, l2);

@@ -9,8 +9,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "header/api.h"
+#include "header/elisa.h"
 #include "header/pm.h"
 
 #define MAX_LENGTH 100
@@ -109,6 +111,7 @@ bool semanticConnection(void *root, ConnectionState *state, int version) {
 
 /*
  * Cette fonction vérifie que l'utilisateur reste bien dans le dossier dans lequel il a le droit d'être
+ * ! Cette fonction est obsolète maintenant que l'algorithme de dot removal à été implémenté
  */
 bool checkPath(char *path, int len) {
     // Il faut vérifier que l'on ne remonte pas plus loin que ce qui est possible
@@ -673,6 +676,179 @@ ContentType typeFromPath(char *path, int len) {
  * Le type de retour de cette fonction devra être changé plus tard
  * Cette fonction détermine l'encoding à utiliser en fonction de ce que le client demande
  */
-void acceptEncodingHeaderVerification(void *root) {
+bool acceptEncodingHeaderVerification(void *root, EncodingState *coding) {
+    // À priori, nous n'avons aucun encoding pour nos ressources
+    // cependant si le client refuse que la ressource soit envoyé sans content-coding,
+    // alors il va falloir coder la ressource avec les options que l'on a à notre disposition
 
+    // On cherche pour savoir si l'encoding identity (sans encoding) a une valeur de préférence nulle
+    _Token *r, *token;
+    r = searchTree(root, "header-field");
+    token = r;
+
+    char comp[] = "accept-encoding:";
+    int len = strlen(comp);
+
+    bool b = false;
+    bool found = false;
+
+    while (token != NULL) {
+        int l;
+        char *s;
+        s = getElementValue(token->node, &l);
+        if (compareCaseInsensitive(s, comp, len)) {
+            found = true;
+            /*printf("=> %.*s\n", l, s);*/
+            char *header = malloc((l + 1) * sizeof(char));
+            sprintf(header, "%.*s", l, s);
+
+            // On veut d'abord vérifier le cas le plus simple (la présence du champ identity avec une valeur non nulle)
+            char *temp = strstr(header, "identity");
+            if (temp != NULL) {
+                float priority = priorityValue(temp + strlen("identity"));
+                b = priority != 0;
+                if (!b) {
+                    // Il faut vérifier l'encoding acceptable
+                    *coding = maximumPriority(header);
+                }
+            } else if (auxAcceptEncoding(header)) {
+                // On doit ensuite vérifier que le symbole * n'est pas présent avec une priorité nulle
+                // On ne peut donc pas tout à fait utiliser la fonction auxAccept car ce n'est pas son job
+                b = true;
+            } else {
+                // Finalement, on renvoie faux mais on doit déterminer l'encodage prioritaire à utiliser parmi les trois (gzip, compress, deflate)
+                b = false;
+                *coding = maximumPriority(header);
+            }
+            free(header);
+        }
+        token = token->next;
+    }
+
+    purgeElement(&r);
+
+    if (found) {
+        return b;
+    }
+
+    return true;
+}
+
+/*
+ * Cette fonction sert uniquement à vérifier si le symbole * n'est pas présent avec une priorité nulle
+ */
+bool auxAcceptEncoding(char *header) {
+    char *temp;
+    char *str = "*";
+    if ((temp = strstr(header, str)) != NULL) {
+        // Si le symbole est présent, on vérifie que la priorité est non nulle
+        if (priorityVerification(temp + strlen(str))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+/*
+ * Cette fonction n'est pas codé pour être utilisable autre que pour Accept-Encoding
+ * Ce n'est pas terrible mais c'est pour ne pas trop me compliquer la vie
+ */
+EncodingState maximumPriority(char *header) {
+    EncodingState coding = GZIP;
+    float values[3] = {0, 0, 0};
+
+    char *temp;
+    char *strs[3] = { "gzip", "deflate", "compress" };
+
+    for (int i = 0; i < 3; i++) {
+        if ((temp = strstr(header, strs[i])) != NULL) {
+            values[i] = priorityValue(temp + strlen(strs[i]));
+        }
+    }
+
+    int maxIndex = 0;
+    for (int i = 1; i < 3; i++) {
+        if (values[i] > values[maxIndex]) {
+            maxIndex = i;
+        }
+    }
+
+    switch (maxIndex) {
+        case 0:
+            coding = GZIP;
+            break;
+        case 1:
+            coding = DEFLATE;
+            break;
+        case 2:
+            coding = COMPRESS;
+            break;
+        default:
+            printf("Erreur critique dans la fonction maximumPriority\n");
+    }
+
+    return coding;
+}
+
+float priorityValue(char *str) {
+    int i = 0;
+    // On commence par vérifier si il y a un ;
+    if (str[i] != ';') {
+        return 1; // Car cela veut dire qu'il n'y a pas de poids
+    }
+    i++;
+
+    // Ensuite on cherche 'q'
+    while (str[i] != '\0' && str[i] != 'q') {
+        if (str[i] != 9 && str[i] != 32) {
+            return 0; // Car c'est mal écrit donc on ne peut en tirer de conclusion
+        }
+        i++;
+    }
+
+    if (str[i] == '\0') {
+        return 0;
+    }
+    i++;
+
+    if (str[i] != '\0' && str[i] != '=') {
+        return 0;
+    }
+    i++;
+
+    // On vérifie le premier digit est soit 0 soit 1
+    if (str[i] != '\0') {
+        if (str[i] == '1') {
+            return 1;
+        } else if (str[i] != '0') {
+            return 0;
+        }
+    } else {
+        return 0;
+    }
+    i++;
+
+    if (str[i] != '\0' && str[i] != '.') {
+        return 0;
+    }
+    i++;
+
+    if (str[i] == '\0') {
+        return 0;
+    }
+
+    // Il faut calculer la valeur de retour
+    float result = 0;
+    for (int k = 0; k < 3; k++) {
+        if (str[i + k] >= '0' && str[i + k] <= '9') {
+            result += (float) (str[i + k] - '0') / pow(10, k + 1);
+        } else {
+            return result;
+        }
+    }
+
+    return result;
+    return 0;
 }

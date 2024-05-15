@@ -18,7 +18,6 @@ enum ContentType {
 
 bool semanticStartLine(void *root, Method *method, int *version);
 bool semanticConnection(void *root, ConnectionState *state, int version);
-bool checkPath(char *path, int len);
 FILE* checkExistenceWithHost(char *path, int lenPath, char *host, int lenHost);
 FILE* checkExistence(char *path, int len);
 FILE* defaultPath(char *host, int len);
@@ -33,5 +32,9 @@ bool checkAcceptString(char *str);
 bool priorityVerification(char *str);
 bool extensionMatch(const char *name, const char *ext);
 ContentType typeFromPath(char *path, int len);
+bool acceptEncodingHeaderVerification(void *root, EncodingState *coding);
+bool auxAcceptEncoding(char *header);
+EncodingState maximumPriority(char *header);
+float priorityValue(char *str);
 
 #endif
