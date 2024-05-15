@@ -13,7 +13,7 @@ typedef struct listeEncodage {
 
 bool semanticCookie(void *root);
 bool semanticTransferCodings(void *root, listeEncodage *liste, int version);
-void sousChaineMinuscule(const char *chaine1, char chaine2[], int n, int j);
+void sousChaineMinuscule2(const char *chaine1, char chaine2[], int n, int j);
 void purgeListeEncodage(listeEncodage **r);
 
 #endif

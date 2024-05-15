@@ -11,7 +11,9 @@
 bool semanticCookie(void *root){
     _Token *r;
     r = searchTree(root, "Cookie-header");
-
+    if (r == NULL) {
+        return true;
+    }
     /* Il ne doit y avoir qu'un seul cookie header */
     if (r->next != NULL){
         purgeElement(&r);
@@ -33,7 +35,8 @@ bool semanticTransferCodings(void *root, listeEncodage *liste, int version) {
     /* If any transfer coding other than chunked is applied to a request payload body, the sender MUST apply chunked as the final transfer coding */
     /* --> Ainsi on a forcément un unique chunked en dernière position */
 
-    bool chunkedLast = false;
+    bool first = true;
+    bool boucle = false;
 
     char minuscule[9];
 
@@ -42,59 +45,57 @@ bool semanticTransferCodings(void *root, listeEncodage *liste, int version) {
         char *s;
         s = getElementValue(tok->node, &l);
 
-        sousChaineMinuscule(s, minuscule, l, 7);
-        if (strcmp("chunked", minuscule)==0){
-            if (tok -> next !=NULL){
-                purgeListeEncodage(&liste);
-                printf("chunked n'est pas en dernière position \n");
-                return false;
-            }
-            else {
-                element->value = CHUNKED;
-                chunkedLast = true;
-            }
-        } 
+        sousChaineMinuscule2(s, minuscule, l, 7);
+        if (first && strcmp("chunked", minuscule)==0){
+            boucle = true;
+            first = false;
+            element->value = CHUNKED;
+        }
+        else if (first || strcmp("chunked", minuscule)==0){
+            element->next = NULL;
+            purgeListeEncodage(&liste);
+            printf("chunked n'est pas une unique fois en dernière position \n");
+            return false;
+        }
 
-        sousChaineMinuscule(s, minuscule, l, 4);
+        sousChaineMinuscule2(s, minuscule, l, 4);
         if (strcmp("gzip", minuscule)==0){
+            boucle = true;
             element->value = GZIP;
         } 
 
-        sousChaineMinuscule(s, minuscule, l, 8);
+        sousChaineMinuscule2(s, minuscule, l, 8);
         if (strcmp("compress", minuscule) == 0) {
+            boucle = true;
             element->value = COMPRESS;
         } 
 
-        sousChaineMinuscule(s, minuscule, l, 7);
+        sousChaineMinuscule2(s, minuscule, l, 7);
         if (strcmp("deflate", minuscule) == 0){
+            boucle = true;
             element->value = DEFLATE;
         }
 
-        else {
-            printf("Option de connexion inconnue, il faut renvoyer 501\n");
+        if (boucle == false){
+            printf("Option de encoding inconnu, il faut renvoyer 501\n");
+            return false;
         }
 
+        boucle = false; // permet de faire les vérifications dans la boucle  
         listeEncodage *suite = malloc(sizeof(listeEncodage));
+        suite->next = NULL;
         element->next = suite ; 
         element = suite ; 
         tok = tok->next;
     }
-    free(element);
+    //free(element);
     purgeElement(&r);
-
-    // On liste tous les cas possibles
-    if (!chunkedLast) {
-        purgeListeEncodage(&liste);
-        printf(" Un message doit être chunked \n");
-        return false;
-    }
-
     return true;
 }
 
 
 /* J'ai volé ta fonction de function.c en l'adaptant pour remplacer const char chaine1[] par char *chaine1 */
-void sousChaineMinuscule(const char *chaine1, char chaine2[], int n, int j) {
+void sousChaineMinuscule2(const char *chaine1, char chaine2[], int n, int j) {
     int diff = 'a' - 'A';
     for (int k = 0; k < j; k++) {
         if (k < n) {
@@ -110,8 +111,9 @@ void sousChaineMinuscule(const char *chaine1, char chaine2[], int n, int j) {
 
 void purgeListeEncodage(listeEncodage **r) {
     listeEncodage *tmp = *r;
+    listeEncodage *suivant ;
     while (tmp != NULL) {
-        listeEncodage *suivant = tmp->next;
+        suivant = tmp->next;
         free(tmp);
         tmp = suivant;
     }
