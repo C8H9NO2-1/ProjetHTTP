@@ -1,0 +1,4 @@
+HEAD / HTTP/1.1
+Host: www.wichopool.com
+Accept-Encoding: gzip;q=0.8, identity;q=0.0, deflate;q=0.9
+

@@ -111,6 +111,7 @@ bool semanticConnection(void *root, ConnectionState *state, int version) {
 
 /*
  * Cette fonction vérifie que l'utilisateur reste bien dans le dossier dans lequel il a le droit d'être
+ * ! Cette fonction est obsolète maintenant que l'algorithme de dot removal à été implémenté
  */
 bool checkPath(char *path, int len) {
     // Il faut vérifier que l'on ne remonte pas plus loin que ce qui est possible
