@@ -16,8 +16,9 @@ int main(int argc, char *argv[]) {
 
     /*char req[] = "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";*/
     /*char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\n\r\n";*/
-    char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept-Encoding: gzip;q=0.9, deflate;q=0.345, compress;q=0, identity;q=0.0\r\nConnection: close\r\n\r\n";
+    /*char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept-Encoding: gzip;q=0.9, deflate;q=0.345, compress;q=0, identity;q=0.0\r\nConnection: close\r\n\r\n";*/
     /*char req[] = "GET /test/../test1 HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";*/
+    char req[] = "GET /../ParseurHTTP/main.c HTTP/1.1\r\nHost: www.wichopool.com\r\n\r\n";
 
     printf("%s", req);
     printf("===========\n");
@@ -45,13 +46,6 @@ int main(int argc, char *argv[]) {
         s = getElementValue(r->node, &l);
         /*printf("%.*s\n", l, s);*/
 
-        /*On vérifie la validité du chemin donné par le client*/
-        if (checkPath(s, l)) {
-            printf("C'est OK\n");
-        } else {
-            printf("alert\n");
-        }
-
         /*Il faudra penser à vérifier qu'il y a un champ Host, car ce n'est pas certain*/
         r2 = searchTree(root, "host");
         int l2;
@@ -59,6 +53,8 @@ int main(int argc, char *argv[]) {
         s2 = getElementValue(r2->node, &l2);
 
         // On vérifie si il y a un champ de connexion
+        // Et on implémente le début de la gestion de la connexion
+        // Le reste sera fait lors de l'envoi de la réponse
         ConnectionState connection;
         r3 = searchTree(root, "Connection-header");
         if (r3 != NULL) {
@@ -82,7 +78,7 @@ int main(int argc, char *argv[]) {
         } else {
             printf("Le client ne veut pas de notre réprésentation\n");
         }
-        
+
         EncodingState coding;
         if (acceptEncodingHeaderVerification(root, &coding)) {
             printf("Le client accepte l'encoding de notre représentation\n");
