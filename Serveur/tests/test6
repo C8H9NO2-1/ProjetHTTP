@@ -1,4 +1,4 @@
 HEAD /images/logo.png HTTP/1.0
-Accept: text/html, images/png
+Accept: text/html, image/png
 Accept-Encoding: gzip, identity;q=0
 

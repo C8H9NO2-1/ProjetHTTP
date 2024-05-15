@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
             r = searchTree(root, "request-target");
             int lengthTarget;
             char *valueTarget;
-            s = getElementValue(r->node, &l);
+            valueTarget = getElementValue(r->node, &lengthTarget);
             /*printf("%.*s\n", l, s);*/
 
             FILE *file = NULL;
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
             _Token *r3 = searchTree(root, "Connection-header");
             if (r3 != NULL) {
-                bool temp = semanticConnection(root, &connection, version);
+                semanticConnection(root, &connection, version);
             } else {
                 if (version == 1) {
                     connection = KEEPALIVE;
@@ -144,13 +144,15 @@ int main(int argc, char *argv[]) {
             reset();
 
             //? Transfert Encoging
-            listeEncodage *encoding;
+            listeEncodage *encoding = malloc(sizeof(listeEncodage));
             if (semanticTransferCodings(root, encoding, version)) {
                 green();
                 printf("Les valeurs dans le champ Transfer-Encoding sont bien reconnues\n");
                 reset();
-                printf("Il faut:\n");
                 listeEncodage *temp = encoding;
+                if (temp != NULL) {
+                    printf("Il faut:\n");
+                }
                 while (temp != NULL) {
                     switch (temp->value) {
                         case CHUNKED:
@@ -183,6 +185,7 @@ int main(int argc, char *argv[]) {
                 printf("Le client accepte le type de notre représentation\n");
                 reset();
                 printf("Celle-ci est: ");
+                blue();
                 switch (ressourceType) {
                     case HTML:
                         printf("text/html\n");
@@ -203,6 +206,7 @@ int main(int argc, char *argv[]) {
                         printf("image/gif\n");
                         break;
                 }
+                reset();
             } else {
                 red();
                 printf("Le client n'accepte pas le type de notre représentation\n");

@@ -21,7 +21,7 @@ $(bin)%.o : %.c
 	gcc $(CFLAGS) -c $< $(OUTPUT_OPTION) 
 
 $(server) : $(objects) $(main2)
-	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -L./$(zlib) -lz -fsanitize=address
+	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -L./$(zlib) -lz -lm -fsanitize=address
 	#export LD_LIBRARY_PATH=./bin
 
 .PHONY : clean
