@@ -25,6 +25,8 @@ int main(int argc, char *argv[]) {
     int c;
     ConnectionState connection = CLOSE;
 
+    system("ls racine > liste.txt");
+
     while (true) {
         if ((requete = getRequest(8080)) == NULL) {
             return -1;
@@ -83,7 +85,6 @@ int main(int argc, char *argv[]) {
 
             purgeElement(&r);
             purgeElement(&r2);
-            purgeTree(root);
 
             //! Interface debugging du serveur:
             //!================================
@@ -245,6 +246,7 @@ int main(int argc, char *argv[]) {
             }
 
             //!================================
+            purgeTree(root);
         } else {
             red();
             printf("Impossible de parser la requête\n");

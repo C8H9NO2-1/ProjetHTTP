@@ -411,7 +411,7 @@ char *dotRemoval(char *path, int len) {
             if (j > 0) {
                 j--;
             }
-            while (j >= 0 && temp[j] != '/') {
+            while (j > 0 && temp[j] != '/') {
                 j--;
             }
         }

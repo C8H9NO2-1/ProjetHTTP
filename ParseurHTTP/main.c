@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    char name[] = "tests/connection/test_11";
+    char name[] = "get5";
 
     char *req = lireFichier(name);
 

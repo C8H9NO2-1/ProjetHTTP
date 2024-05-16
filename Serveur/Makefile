@@ -1,10 +1,16 @@
 CFLAGS = -Wall
+UNAME = $(shell uname)
 
 vpath %.c src
 
 src = src/
 bin = bin/
-zlib = 1.3.1/
+ifeq ($(UNAME), Linux)
+	zlib = 1.3.1/lib/
+endif
+ifeq ($(UNAME), Darwin)
+	zlib = 1.3.1/
+endif
 exec = prog
 server = server
 objects = $(addprefix $(bin),functions.o api.o pm.o elisa.o colours.o)
