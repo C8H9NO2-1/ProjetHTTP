@@ -15,10 +15,10 @@ int main(int argc, char *argv[]) {
     system("ls racine > liste.txt");
 
     /*char req[] = "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";*/
-    /*char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\n\r\n";*/
-    /*char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: www.wichopool.com\r\nAccept-Encoding: gzip;q=0.9, deflate;q=0.345, compress;q=0, identity;q=0.0\r\nConnection: close\r\n\r\n";*/
+    char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: [::ffff:127.0.0.1]\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\nTransfer-Encoding: deflate, gzip, chunked\r\n\r\n";
+
     /*char req[] = "GET /test/../test1 HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";*/
-    char req[] = "GET /../ParseurHTTP/main.c HTTP/1.1\r\nHost: www.wichopool.com\r\n\r\n";
+    /*char req[] = "GET /../ParseurHTTP/main.c HTTP/1.1\r\nHost: www.wichopool.com\r\n\r\n";*/
 
     printf("%s", req);
     printf("===========\n");
@@ -37,6 +37,21 @@ int main(int argc, char *argv[]) {
         } else {
             printf("Erreur lors de la vérification de la sémantique\n");
         }
+
+        if (semanticCookie(root)){
+            printf("Sémantique du cookie validée\n");
+        }
+        else {
+            printf("Erreur lors de la vérification de la sémantique cookie\n");
+        }
+        listeEncodage *listeCodeAFaire = malloc(sizeof(listeEncodage));
+        if (semanticTransferCodings(root, listeCodeAFaire, version)){
+            printf("Sémantique du transfer codings validée\n");
+        }
+        else {
+            printf("Erreur lors de la vérification de la sémantique transfer-encoding\n");
+        }
+
 
         /*On recupere la request-target (il n'y en a qu'une normalement)*/
         /*De plus, nous sommes certains qu'il y a une start-line grace au parseur*/
