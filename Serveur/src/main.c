@@ -47,6 +47,11 @@ int main(int argc, char *argv[]) {
         listeEncodage *listeCodeAFaire = malloc(sizeof(listeEncodage));
         if (semanticTransferCodings(root, listeCodeAFaire, version)){
             printf("Sémantique du transfer codings validée\n");
+            listeEncodage *temp=listeCodeAFaire  ;
+            while(temp->next!=NULL){
+                printf(" d = %d \n", temp->value);
+                temp=temp->next; 
+            }
         }
         else {
             printf("Erreur lors de la vérification de la sémantique transfer-encoding\n");
