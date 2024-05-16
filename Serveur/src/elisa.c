@@ -84,6 +84,7 @@ bool semanticTransferCodings(void *root, listeEncodage *liste, int version) {
         boucle = false; // permet de faire les vérifications dans la boucle  
         listeEncodage *suite = malloc(sizeof(listeEncodage));
         suite->next = NULL;
+        suite->value = NONE;
         element->next = suite ; 
         element = suite ; 
         tok = tok->next;
@@ -119,3 +120,9 @@ void purgeListeEncodage(listeEncodage **r) {
     }
     *r = NULL;
 }
+
+// void DecodeChunked(char *s, int l){
+//     int length = O;
+
+
+// }

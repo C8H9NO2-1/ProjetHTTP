@@ -3,7 +3,7 @@
 
 typedef enum EncodingState EncodingState;
 enum EncodingState {
-    CHUNKED, COMPRESS, DEFLATE, GZIP
+    CHUNKED, COMPRESS, DEFLATE, GZIP, NONE,
 };
 
 typedef struct listeEncodage {
