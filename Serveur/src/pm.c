@@ -206,7 +206,7 @@ FILE* checkExistence(char *path, int len) {
     int k = 0;
     while (fgets(website, MAX_LENGTH, file) != NULL) {
         k++;
-        // Il faut envoyer le dernier \n du nom du dossier
+        // Il faut enlever le dernier \n du nom du dossier
         int temp = strlen(website);
         website[temp - 1] = '\0';
 

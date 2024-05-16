@@ -145,38 +145,39 @@ int main(int argc, char *argv[]) {
 
             //? Transfert Encoging
             listeEncodage *encoding = malloc(sizeof(listeEncodage));
+            encoding->value = NONE;
+            encoding->next = NULL;
             if (semanticTransferCodings(root, encoding, version)) {
                 green();
                 printf("Les valeurs dans le champ Transfer-Encoding sont bien reconnues\n");
                 reset();
                 listeEncodage *temp = encoding;
-                if (temp != NULL) {
+                if (temp->value != NONE) {
                     printf("Il faut:\n");
-                }
-                while (temp != NULL) {
-                    switch (temp->value) {
-                        case CHUNKED:
-                            printf("-> decoder chunk\n");
-                            break;
-                        case GZIP:
-                            printf("-> decoder gzip\n");
-                            break;
-                        case DEFLATE:
-                            printf("-> decoder deflate\n");
-                            break;
-                        case COMPRESS:
-                            printf("-> decoder compress\n");
-                            break;
+                    while (temp != NULL) {
+                        switch (temp->value) {
+                            case CHUNKED:
+                                printf("-> decoder chunk\n");
+                                break;
+                            case GZIP:
+                                printf("-> decoder gzip\n");
+                                break;
+                            case DEFLATE:
+                                printf("-> decoder deflate\n");
+                                break;
+                            case COMPRESS:
+                                printf("-> decoder compress\n");
+                                break;
+                        }
+                        temp = temp->next;
                     }
-                    temp = temp->next;
+                    purgeListeEncodage(&encoding);
                 }
             } else {
                 red();
                 printf("Les valeurs du champ Transfer-Encoding ne sont pas reconnues\n");
                 reset();
             }
-
-            purgeListeEncodage(&encoding);
 
             //? Accept
             ContentType ressourceType = typeFromPath(valueTarget, lengthTarget);
