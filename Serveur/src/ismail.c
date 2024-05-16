@@ -42,3 +42,9 @@ bool semanticContentLength(void *root,int ContentlengthValue){
     }
     return true;
 }
+
+bool semanticContentType(void * root){
+    
+}
+
+// les contents types qu'on traite  

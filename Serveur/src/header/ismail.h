@@ -3,4 +3,5 @@
 
 
 bool semanticContentLength(void *root,int ContentlengthValue);
+bool semanticContentType(void * root);
 #endif
