@@ -6,7 +6,7 @@ vpath %.c src
 src = src/
 bin = bin/
 ifeq ($(UNAME), Linux)
-	zlib = 1.3.1/lib
+	zlib = 1.3.1/lib/
 endif
 ifeq ($(UNAME), Darwin)
 	zlib = 1.3.1/
