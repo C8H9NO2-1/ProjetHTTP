@@ -1,4 +1,5 @@
 CFLAGS = -Wall
+UNAME = $(shell uname)
 
 vpath %.c src
 
