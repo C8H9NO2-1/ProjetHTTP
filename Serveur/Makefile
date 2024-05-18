@@ -21,14 +21,13 @@ main2 = $(bin)server.o
 all : $(exec)
 
 $(exec) : $(objects) $(main1)
-	gcc -o $(exec) $(objects) $(main1)  -lm -fsanitize=address
-# -L./$(zlib) -lz
+	gcc -o $(exec) $(objects) $(main1) -lm -L./$(zlib) -lz -fsanitize=address 
+
 $(bin)%.o : %.c
 	gcc $(CFLAGS) -c $< $(OUTPUT_OPTION) 
 
 $(server) : $(objects) $(main2)
-	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -lm -fsanitize=address
-	 #-L./$(zlib) -lz
+	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -lm -L./$(zlib) -lz -fsanitize=address
 	#export LD_LIBRARY_PATH=./bin
 
 .PHONY : clean
