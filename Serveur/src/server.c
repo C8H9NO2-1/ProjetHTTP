@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
             root = getRootTree();
 
             Method method;
-            int version;
-            semanticStartLine(root, &method, &version);
+            int version = 0;
+            bool testStartLine = semanticStartLine(root, &method, &version);
 
             /*On recupere la request-target (il n'y en a qu'une normalement)*/
             r = searchTree(root, "request-target");
@@ -83,9 +83,19 @@ int main(int argc, char *argv[]) {
                     connection = CLOSE;
                 }
             }
+            
+            //! On renvoie les potentielles erreurs
+            //!====================================
+
+            if (!testStartLine) {
+                if (version == -1) {
+                    // Dans ce cas, on a une erreur de version
+                }
+            }
 
             purgeElement(&r);
             purgeElement(&r2);
+            purgeElement(&r3);
 
             //! Interface debugging du serveur:
             //!================================
