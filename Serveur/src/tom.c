@@ -47,7 +47,7 @@ bool isIPV6(char *inside){
 
 /* int version contient la "sous version de http", soit si la version est 1.1, il contiendra 1, si c'est 1.0, 0 etc... */
 
-bool semanticHost(void *root, int version){
+bool semanticHost(void *root, int version, int * info){
 
     _Token * host;
     host = searchTree(root, "host");
@@ -58,6 +58,7 @@ bool semanticHost(void *root, int version){
 
         if (version==0){
             purgeElement(&host);
+            info=-1;
             return true;
         }
 
@@ -94,6 +95,7 @@ bool semanticHost(void *root, int version){
         printf("Adresse ipv4 127.0.0.1 dans le champ host \n");
         free(inside);
         purgeElement(&host);
+        info=1;
         return true;
     }
 
@@ -127,6 +129,7 @@ bool semanticHost(void *root, int version){
             free(inside);
             fclose(fichier);
             purgeElement(&host);
+            info=0;
             return true;
         }
     }
@@ -143,6 +146,8 @@ bool semanticHost(void *root, int version){
 
     printf("Adresse IPV6 dans le champ host \n");
 
+    info=1;
+
     return true;
 
     }
@@ -153,7 +158,7 @@ bool semanticHost(void *root, int version){
     return false; 
 }
 
-int main(int argc, char *argv[]) {
+/*int main(int argc, char *argv[]) {
 char req[] = "GET /test/../inDex%2ehtmL HTTP/1.1\r\nHost: [::1]\r\nAccept-Encoding: gzip;q=0.9, deflate;q=0.345, compress;q=0, identity;q=0.0\r\nConnection: close\r\n\r\n";
 
 //	
@@ -164,8 +169,8 @@ void *root;
 
 root = getRootTree();
 
-semanticHost(root,1);
+semanticHost(root,1, NULL);
 
 return 0;
 
-}
+}*/
