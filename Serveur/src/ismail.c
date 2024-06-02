@@ -37,18 +37,20 @@ bool semanticContentLength(void *root){
    length or forwarding the message.*/
 
    // i choose to reject the message 
-    _Token *r,*tok;
-    r=searchTree(root, "Content-Length");
-    tok=r;
+    _Token *tok;
+    tok=searchTree(root, "Content-Length");
     int i=0;
     while(tok !=NULL){
         i++;
         printf("%d\n",i);
         if (i==2){
+            purgeElement(&tok);
             return false;
         }
         tok =tok->next;      
     }
+    purgeElement(&tok);
+
     return true;
 }
 
