@@ -187,3 +187,76 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
     return true;
 
 }
+
+
+bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, char * close , unsigned clientid  ){
+
+    char first[100];
+    if (code==100){
+        if(version==1){
+            strcpy(first,"HTTP/1.1 100 Continue\r\n");
+
+        }
+        else if(version==0){
+            strcpy(first,"HTTP/1.0 100 Continue\r\n");
+
+        }
+        else{
+            printf("Mauvaise version d'HTTP fourni \n");
+            return false;
+        }
+
+    }
+    else if(code==200){
+        if(version==1){
+            strcpy(first,"HTTP/1.1 200 OK\r\n");
+
+        }
+        else if(version==0){
+            strcpy(first,"HTTP/1.0 200 OK\r\n");
+
+        }
+        else{
+            printf("Mauvaise version d'HTTP fourni \n");
+            return false;
+        }
+
+    }
+    else{
+        printf("Mauvais code de réponse fourni \n");
+        return false;
+    }
+
+    char *buff= malloc((log10(clenght)+2)*sizeof(char));
+    sprintf(buff, "%d", clenght);
+    buff[(int)log10(clenght)+1]='\0';
+
+    writeDirectClient(clientid, first, strlen(first));
+    writeDirectClient(clientid, "Content-Type: ", strlen("Content-Type: "));
+    writeDirectClient(clientid, ctype, strlen(ctype));
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, "Content-Length: ", strlen("Content-Length: "));
+    writeDirectClient(clientid, buff, strlen(buff));
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, "Connection: ", strlen("Connection: "));
+    writeDirectClient(clientid, close, strlen(close));
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, "\r\n", 2);
+
+
+    if (file != NULL){
+        char c[1];
+
+        while ((c[0] = (char) fgetc(file)) != EOF){
+            writeDirectClient(clientid, c, 1);
+        }
+
+        fclose(file);
+    }
+
+    endWriteDirectClient(clientid);
+    free(buff);
+
+    return true;
+
+}

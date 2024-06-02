@@ -338,9 +338,9 @@ int main(int argc, char *argv[]) {
 
                 long int length = calulContenLen(file);
                 if (method == GET) {
-                    reponse(200, version, type, length, file, close, requete->clientId);
+                    reponse2(200, version, type, length, file, close, requete->clientId);
                 } else {
-                    reponse(200, version, type, length, NULL, close, requete->clientId);
+                    reponse2(200, version, type, length, NULL, close, requete->clientId);
                 }
             }
             //!================================

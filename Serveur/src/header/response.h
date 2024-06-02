@@ -24,6 +24,7 @@
     /*Code : code d'erreur/de succès , version:version de http, close: Contenu de Connection,clientid: Id du client à contacter  */
     bool error(int code, int version, char * close, unsigned clientid,bool Get);
 
+bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, char * close , unsigned clientid  );
 
 
 #endif
