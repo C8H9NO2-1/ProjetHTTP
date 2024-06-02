@@ -17,5 +17,13 @@
  */
 
 
+    /*Code : code d'erreur/de succès, version:version de http, ctype: contenu de Content-type, clenght:contenu de Content-length,
+     close: Contenu de Connection, filenamne: Nom du fichier à mettre dans la reponse, mettre NULL si pas de fichier, clientid: Id du client à contacter*/
+    bool reponse(int code, int version, char * ctype , int clenght, char * filename, char * close , unsigned clientid  );
+
+    /*Code : code d'erreur/de succès , version:version de http, close: Contenu de Connection,clientid: Id du client à contacter  */
+    bool error(int code, int version, char * close, unsigned clientid);
+
+
 
 #endif

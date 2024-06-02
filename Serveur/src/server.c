@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 
 #include "header/request.h"
+#include "header/response.h"
 #include "header/api.h"
 #include "header/elisa.h"
 #include "header/pm.h"
@@ -254,9 +255,11 @@ int main(int argc, char *argv[]) {
         }
 
 
-        writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
-        writeDirectClient(requete->clientId, REPONSE3, strlen(REPONSE3));
-        writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));
+
+        error(404, 0, "keep-alive", requete->clientId);
+        //writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
+        //writeDirectClient(requete->clientId, REPONSE3, strlen(REPONSE3));
+        //writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));
         /*writeDirectClient(requete->clientId, "\r\n", strlen("\r\n"));*/
         /*while ((c = getchar()) != EOF) {*/
             /*char temp[2]; */
