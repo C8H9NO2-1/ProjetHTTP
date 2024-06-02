@@ -93,6 +93,7 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
         }
 
         fclose(test);
+        content=true;
 
     }
 
@@ -155,7 +156,7 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
         char c[1];
 
         if (file == NULL){
-            printf("Le fichier ne veut pas s'ouvrir");
+            printf("Le fichier ne veut pas s'ouvrir\n");
             return false;
         }
 

@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 
 
         //error(404, 0, "keep-alive", requete->clientId);
-        reponse(200,0,"text/html",strlen("text/html"), "liste.txt" ,"keep-alive", requete->clientId);
+        reponse(200,0,"text/html",50, "liste.txt" ,"keep-alive", requete->clientId);
 
 
         //writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
