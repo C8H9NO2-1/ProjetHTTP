@@ -11,7 +11,7 @@
 #include "header/api.h"
 #include "header/response.h"
 
-bool error(int code, int version, char * close, unsigned clientid){
+bool error(int code, int version, char * close, unsigned clientid, bool Get){
     char first[50];
 
     if(version==1){
@@ -28,36 +28,46 @@ bool error(int code, int version, char * close, unsigned clientid){
     }
 
     char second[100];
+    char third[1000];
 
     switch ( code )
     { 
         case 400:
             strcpy(second,"400 Bad Request\r\n");
+            strcpy(third,"Erreur du coté du client, la requete n'est pas comprise par notre serveur\r\n");
             break;
 
         case 403:
             strcpy(second,"403 Forbidden\r\n");
+            strcpy(third,"Le serveur refuse de répondre à cette requete\r\n");
             break;
         case 404:
             strcpy(second,"404 Not Found\r\n");
+            strcpy(third,"Ressource non trouvé\r\n");
             break;
         case 406:
             strcpy(second,"406 Not Acceptable\r\n");
+            strcpy(third,"Ressource non trouvé sous le format demandé\r\n");
             break;
         case 411:
             strcpy(second,"411 Length Required\r\n");
+            strcpy(third,"Header Content-Length manquant\r\n");
             break;
         case 417:
             strcpy(second,"417 Expectation Failed\r\n");
+            strcpy(third,"On ne peut pas répondre à ce qui est attendu dans le Expect Header\r\n");
             break;
         case 500:
             strcpy(second,"500 Internal Server Error\r\n");
+            strcpy(third,"Erreur du serveur lors du traitement de la requete\r\n");
             break;
         case 501:
             strcpy(second,"501 Not Implemented\r\n");
+            strcpy(third,"Methode non implémenté dans le serveur\r\n");
             break;
         case 505:
             strcpy(second,"505 HTTP Version Not Supported\r\n");
+            strcpy(third,"Version d'HTTP demandé non supporté, seules versions supportés: 1.0 et 1.1\r\n");
             break;
         default:
         printf("Code d'erreur inexistant \n");
@@ -72,7 +82,10 @@ bool error(int code, int version, char * close, unsigned clientid){
     writeDirectClient(clientid, close, strlen(close));
     writeDirectClient(clientid, "\r\n", 2);
     writeDirectClient(clientid, "\r\n", 2);
-    writeDirectClient(clientid, second, strlen(second));
+    if (Get){
+        writeDirectClient(clientid, second, strlen(second));
+        writeDirectClient(clientid, third, strlen(third));
+    }
 
     endWriteDirectClient(clientid);
 
