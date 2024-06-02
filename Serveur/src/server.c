@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
             listeEncodage *encoding = malloc(sizeof(listeEncodage));
             encoding->value = NONE;
             encoding->next = NULL;
-            if (semanticTransferCodings(root, encoding, version)) {
+            /*if (semanticTransferCodings(root, encoding, version)) {
                 green();
                 printf("Les valeurs dans le champ Transfer-Encoding sont bien reconnues\n");
                 reset();
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
                 red();
                 printf("Les valeurs du champ Transfer-Encoding ne sont pas reconnues\n");
                 reset();
-            }
+            }*/
 
             //? Accept
             ContentType ressourceType = typeFromPath(valueTarget, lengthTarget);
@@ -256,7 +256,10 @@ int main(int argc, char *argv[]) {
 
 
 
-        error(404, 0, "keep-alive", requete->clientId);
+        //error(404, 0, "keep-alive", requete->clientId);
+        reponse(200,0,"text/html",strlen("text/html"), "liste.txt" ,"keep-alive", requete->clientId);
+
+
         //writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
         //writeDirectClient(requete->clientId, REPONSE3, strlen(REPONSE3));
         //writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));
@@ -267,7 +270,7 @@ int main(int argc, char *argv[]) {
             /*temp[1] = '\0';*/
             /*writeDirectClient(requete->clientId, temp, 1);*/
         /*}*/
-        endWriteDirectClient(requete->clientId);
+        //endWriteDirectClient(requete->clientId);
         if (connection == CLOSE) {
             requestShutdownSocket(requete->clientId);
         }

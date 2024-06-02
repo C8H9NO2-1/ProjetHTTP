@@ -173,10 +173,10 @@ char* DecodeChunked(char *s, int *l){
 }
 
 
-int main(){
+/*int main(){
     char s[184]="\r\n27\r\nVoici les données du premier morceau a\r\n1C\r\net voici un second morceau b\r\n20\r\net voici deux derniers morceaux\r\n12\r\nsans saut de ligne\r\n0\r\n\r\n";
     int l=184;
     char *message = DecodeChunked(s, &l);
     printf("test : %d \n", l);
     printf("%.*s \n", l, message);
-}
+}*/

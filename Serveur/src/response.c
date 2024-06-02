@@ -48,7 +48,7 @@ bool error(int code, int version, char * close, unsigned clientid){
             strcpy(second,"411 Length Required\r\n");
             break;
         case 417:
-            strcpy(second,"417: Expectation Failed\r\n");
+            strcpy(second,"417 Expectation Failed\r\n");
             break;
         case 500:
             strcpy(second,"500 Internal Server Error\r\n");
@@ -70,7 +70,9 @@ bool error(int code, int version, char * close, unsigned clientid){
     writeDirectClient(clientid, second, strlen(second));
     writeDirectClient(clientid, "Connection: ", strlen("Connection: "));
     writeDirectClient(clientid, close, strlen(close));
-    writeDirectClient(clientid, "\r\n", 4);
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, second, strlen(second));
 
     endWriteDirectClient(clientid);
 
@@ -137,14 +139,14 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
     writeDirectClient(clientid, first, strlen(first));
     writeDirectClient(clientid, "Content-Type: ", strlen("Content-Type: "));
     writeDirectClient(clientid, ctype, strlen(ctype));
-    writeDirectClient(clientid, "\r\n", 4);
+    writeDirectClient(clientid, "\r\n", 2);
     writeDirectClient(clientid, "Content-Length: ", strlen("Content-Length: "));
     writeDirectClient(clientid, buff, strlen(buff));
-    writeDirectClient(clientid, "\r\n", 4);
+    writeDirectClient(clientid, "\r\n", 2);
     writeDirectClient(clientid, "Connection: ", strlen("Connection: "));
     writeDirectClient(clientid, close, strlen(close));
-    writeDirectClient(clientid, "\r\n", 4);
-    writeDirectClient(clientid, "\r\n", 4);
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, "\r\n", 2);
 
 
     if (content){
@@ -161,6 +163,8 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
             writeDirectClient(clientid, c, 1);
         }
 
+        fclose(file);
+
     }
 
     endWriteDirectClient(clientid);
@@ -168,9 +172,4 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
 
     return true;
 
-}
-
-
-int main(){
-    printf("Ceci est un test");
 }
