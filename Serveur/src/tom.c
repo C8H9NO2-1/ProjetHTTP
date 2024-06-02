@@ -58,7 +58,7 @@ bool semanticHost(void *root, int version, int * info){
 
         if (version==0){
             purgeElement(&host);
-            info=-1;
+            *info=-1;
             return true;
         }
 
@@ -95,7 +95,7 @@ bool semanticHost(void *root, int version, int * info){
         printf("Adresse ipv4 127.0.0.1 dans le champ host \n");
         free(inside);
         purgeElement(&host);
-        info=1;
+        *info=1;
         return true;
     }
 
@@ -129,7 +129,7 @@ bool semanticHost(void *root, int version, int * info){
             free(inside);
             fclose(fichier);
             purgeElement(&host);
-            info=0;
+            *info=0;
             return true;
         }
     }
@@ -146,7 +146,7 @@ bool semanticHost(void *root, int version, int * info){
 
     printf("Adresse IPV6 dans le champ host \n");
 
-    info=1;
+    *info=1;
 
     return true;
 
@@ -169,7 +169,9 @@ void *root;
 
 root = getRootTree();
 
-semanticHost(root,1, NULL);
+int * k=-5;
+
+semanticHost(root,1, k);
 
 return 0;
 
