@@ -227,9 +227,16 @@ bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, cha
         return false;
     }
 
-    char *buff= malloc((log10(clenght)+2)*sizeof(char));
-    sprintf(buff, "%d", clenght);
-    buff[(int)log10(clenght)+1]='\0';
+    char *buff = NULL;
+    if (clenght != 0) {
+        buff = malloc((log10(clenght)+2)*sizeof(char));
+        sprintf(buff, "%d", clenght);
+        buff[(int)log10(clenght)+1]='\0';
+    } else {
+        buff = malloc(2 * sizeof(char));
+        buff[0] = '0';
+        buff[1] = '\0';
+    }
 
     writeDirectClient(clientid, first, strlen(first));
     writeDirectClient(clientid, "Content-Type: ", strlen("Content-Type: "));
@@ -245,12 +252,12 @@ bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, cha
 
 
     if (file != NULL){
-        char c[1];
+        char *test = malloc(clenght * sizeof(char));
+        int size = fread(test, 1, clenght, file);
 
-        while ((c[0] = (char) fgetc(file)) != EOF){
-            writeDirectClient(clientid, c, 1);
-        }
+        writeDirectClient(clientid, test, size);
 
+        free(test);
         fclose(file);
     }
 

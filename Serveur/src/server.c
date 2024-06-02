@@ -102,15 +102,15 @@ int main(int argc, char *argv[]) {
                 get = false;
             }
             //? On récupère aussi l'état de la connection
-            char *close = NULL;
+            char close[50];
             if (connection == KEEPALIVE) {
                 const char *temp = "keep-alive";
-                close = malloc(sizeof(char) * strlen(temp));
                 strcpy(close, temp);
+                close[strlen(temp)] = '\0';
             } else {
                 const char *temp = "close";
-                close = malloc(sizeof(char) * strlen(temp));
                 strcpy(close, temp);
+                close[strlen(temp)] = '\0';
             }
             //? Erreur dans la startline
             if (!testStartLine) {
@@ -137,6 +137,7 @@ int main(int argc, char *argv[]) {
             if (!errorSent && file == NULL) {
                 printf("\nErreur 404\n\n");
                 error(404, version, close, requete->clientId, get);
+                errorSent = true;
             }
             
             reset();
@@ -336,7 +337,10 @@ int main(int argc, char *argv[]) {
                     type[strlen(temp)] = '\0';
                 }
 
-                long int length = calulContenLen(file);
+                long int length = 0;
+                if (file != NULL) {
+                    length = calulContenLen(file);
+                }
                 if (method == GET) {
                     reponse2(200, version, type, length, file, close, requete->clientId);
                 } else {
@@ -344,7 +348,6 @@ int main(int argc, char *argv[]) {
                 }
             }
             //!================================
-            free(close);
             purgeTree(root);
         } else {
             red();

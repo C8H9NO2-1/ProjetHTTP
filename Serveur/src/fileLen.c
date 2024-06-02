@@ -28,28 +28,28 @@ long int calulContenLen(FILE *file) {
     return size;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
-        return 1;
-    }
-
-    // Open the file
-    FILE *file = fopen(argv[1], "r");
-    
-
-    // Get the file size
-    long int size = calulContenLen(file);
-    if (size == -1) {
-        fprintf(stderr, "Failed to get file size.\n");
-        fclose(file);
-        return 1;
-    }
-
-    printf("Size of file %s: %ld bytes\n", argv[1], size);
-
-    // Close the file
-    fclose(file);
-
-    return 0;
-}
+/*int main(int argc, char *argv[]) {*/
+/*    if (argc != 2) {*/
+/*        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);*/
+/*        return 1;*/
+/*    }*/
+/**/
+/*    // Open the file*/
+/*    FILE *file = fopen(argv[1], "r");*/
+/**/
+/**/
+/*    // Get the file size*/
+/*    long int size = calulContenLen(file);*/
+/*    if (size == -1) {*/
+/*        fprintf(stderr, "Failed to get file size.\n");*/
+/*        fclose(file);*/
+/*        return 1;*/
+/*    }*/
+/**/
+/*    printf("Size of file %s: %ld bytes\n", argv[1], size);*/
+/**/
+/*    // Close the file*/
+/*    fclose(file);*/
+/**/
+/*    return 0;*/
+/*}*/
