@@ -9,13 +9,15 @@
 #include "header/api.h"
 #include "header/elisa.h"
 #include "header/pm.h"
+#include "header/ismail.h"
 
 int main(int argc, char *argv[]) {
     // Au lancement du serveur, on inspecte la structure de celui-ci
     system("ls racine > liste.txt");
 
     /*char req[] = "GET /index.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";*/
-    char req[] = "GET /../inDex%2ehtmL HTTP/1.1\r\nHost: www.hilopt.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\nConnection: close\r\nTransfer-Encoding: deflate, gzip, chunked\r\n\r\n";
+    char req[] = "GET /../inDex%2ehtmL HTTP/1.1\r\nHost: www.hilopt.com\r\nAccept: text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c\r\n\
+                        Connection: close\r\nContent-length:	 555 \r\nContent-length:	 55\r\n\r\n";
 
     /*char req[] = "GET /test/../test1 HTTP/1.1\r\nHost: www.wichopool.com\r\nConnection: keep-alive\r\n\r\n";*/
     /*char req[] = "GET /../ParseurHTTP/main.c HTTP/1.1\r\nHost: www.wichopool.com\r\n\r\n";*/
@@ -50,6 +52,12 @@ int main(int argc, char *argv[]) {
         }
         else {
             printf("Erreur lors de la vérification de la sémantique transfer-encoding\n");
+        }
+        if (semanticContentLength(root)){
+            printf("semantique du content length validee\n");
+        }
+        else {
+            printf("Erreur lors de la vérification de la sémantique Content length\n");
         }
 
 

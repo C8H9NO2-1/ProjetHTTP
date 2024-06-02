@@ -2,6 +2,6 @@
 #define IS_H
 
 
-bool semanticContentLength(void *root,int ContentlengthValue);
-bool semanticContentType(void * root);
+bool semanticContentLength(void *root);
+// bool semanticContentType(void * root);
 #endif

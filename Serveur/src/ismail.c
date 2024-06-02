@@ -6,14 +6,22 @@
 #include "header/api.h"
 #include "header/ismail.h"
 
-bool Transfer_Encoding =false ;  // in order to know if a header exist or not :how can i know ??
+// bool Transfer_Encoding =false ;  // in order to know if a header exist or not :how can i know ??
                                 // see with elisa if she can give the info 
                                 // or we can define a struct with all name of header of bool type ...
-
-bool semanticContentLength(void *root,int ContentlengthValue){
+bool thereIsTransfer_Encoding(void *root){
+    _Token *r= searchTree(root,"transfer-coding");
+    if (r != NULL){
+        return true;
+        printf("il existe un transfer encoding");
+    }
+    return false;
+}
+bool semanticContentLength(void *root){
     //A sender MUST NOT send a Content-Length header field in any message
     //  that contains a Transfer-Encoding header field.
-    if (Transfer_Encoding){
+    // bool Transfer_Encoding=;
+    if (thereIsTransfer_Encoding(root)){
         return false;
     }
     
@@ -32,9 +40,10 @@ bool semanticContentLength(void *root,int ContentlengthValue){
     _Token *r,*tok;
     r=searchTree(root, "Content-Length");
     tok=r;
-    int i ;
+    int i=0;
     while(tok !=NULL){
         i++;
+        printf("%d\n",i);
         if (i==2){
             return false;
         }
@@ -43,8 +52,8 @@ bool semanticContentLength(void *root,int ContentlengthValue){
     return true;
 }
 
-bool semanticContentType(void * root){
+// bool semanticContentType(void * root){
     
-}
+// }
 
 // les contents types qu'on traite  
