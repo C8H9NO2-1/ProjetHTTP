@@ -316,15 +316,15 @@ int main(int argc, char *argv[]) {
                     strcpy(type, temp);
                     type[strlen(temp)] = '\0';
                 } else if (ressourceType == PNG) {
-                    const char *temp = "img/png";
+                    const char *temp = "image/png";
                     strcpy(type, temp);
                     type[strlen(temp)] = '\0';
                 } else if (ressourceType == JPEG) {
-                    const char *temp = "img/jpeg";
+                    const char *temp = "image/jpeg";
                     strcpy(type, temp);
                     type[strlen(temp)] = '\0';
                 } else if (ressourceType == GIF) {
-                    const char *temp = "img/gif";
+                    const char *temp = "image/gif";
                     strcpy(type, temp);
                     type[strlen(temp)] = '\0';
                 }
