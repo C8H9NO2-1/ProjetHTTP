@@ -34,20 +34,20 @@ bool error(int code, int version, char * close, unsigned clientid, bool Get){
     { 
         case 400:
             strcpy(second,"400 Bad Request\r\n");
-            strcpy(third,"Erreur du coté du client, la requete n'est pas comprise par notre serveur\r\n");
+            strcpy(third,"Erreur du cote du client, la requete n'est pas comprise par notre serveur\r\n");
             break;
 
         case 403:
             strcpy(second,"403 Forbidden\r\n");
-            strcpy(third,"Le serveur refuse de répondre à cette requete\r\n");
+            strcpy(third,"Le serveur refuse de repondre a cette requete\r\n");
             break;
         case 404:
             strcpy(second,"404 Not Found\r\n");
-            strcpy(third,"Ressource non trouvé\r\n");
+            strcpy(third,"Ressource non trouve\r\n");
             break;
         case 406:
             strcpy(second,"406 Not Acceptable\r\n");
-            strcpy(third,"Ressource non trouvé sous le format demandé\r\n");
+            strcpy(third,"Ressource non trouve sous le format demandé\r\n");
             break;
         case 411:
             strcpy(second,"411 Length Required\r\n");
@@ -55,7 +55,7 @@ bool error(int code, int version, char * close, unsigned clientid, bool Get){
             break;
         case 417:
             strcpy(second,"417 Expectation Failed\r\n");
-            strcpy(third,"On ne peut pas répondre à ce qui est attendu dans le Expect Header\r\n");
+            strcpy(third,"On ne peut pas repondre a ce qui est attendu dans le Expect Header\r\n");
             break;
         case 500:
             strcpy(second,"500 Internal Server Error\r\n");
@@ -63,11 +63,11 @@ bool error(int code, int version, char * close, unsigned clientid, bool Get){
             break;
         case 501:
             strcpy(second,"501 Not Implemented\r\n");
-            strcpy(third,"Methode non implémenté dans le serveur\r\n");
+            strcpy(third,"Methode non implementé dans le serveur\r\n");
             break;
         case 505:
             strcpy(second,"505 HTTP Version Not Supported\r\n");
-            strcpy(third,"Version d'HTTP demandé non supporté, seules versions supportés: 1.0 et 1.1\r\n");
+            strcpy(third,"Version d'HTTP demande non supporté, seules versions supportés: 1.0 et 1.1\r\n");
             break;
         default:
         printf("Code d'erreur inexistant \n");
@@ -142,7 +142,7 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
 
     }
     else{
-        printf("Mauvais code de réponse fourni \n");
+        printf("Mauvais code de reponse fourni \n");
         return false;
     }
 
@@ -223,7 +223,7 @@ bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, cha
 
     }
     else{
-        printf("Mauvais code de réponse fourni \n");
+        printf("Mauvais code de reponse fourni \n");
         return false;
     }
 
