@@ -269,6 +269,8 @@ int main(int argc, char *argv[]) {
                         case GIF:
                             printf("image/gif\n");
                             break;
+                        case PHP:
+                            printf("On à affaire à une requête de type PHP\n");
                     }
                     reset();
                 } else {
@@ -306,46 +308,62 @@ int main(int argc, char *argv[]) {
                     }
                     reset();
                 }
-                //? Si tout c'est bien passé on envoie la réponse au client
-                //? On a beaucoup de choses à vérifier
-                //? La connection est déjà faite au moment des erreurs (dans close)
-                //? On récupère ensuite le type du fichier
-                char type[50];
-                if (ressourceType == HTML) {
-                    const char *temp = "text/html";
-                    strcpy(type, temp);
-                    type[strlen(temp)] = '\0';
-                } else if (ressourceType == CSS) {
-                    const char *temp = "text/css";
-                    strcpy(type, temp);
-                    type[strlen(temp)] = '\0';
-                } else if (ressourceType == JAVASCRIPT) {
-                    const char *temp = "text/javascript";
-                    strcpy(type, temp);
-                    type[strlen(temp)] = '\0';
-                } else if (ressourceType == PNG) {
-                    const char *temp = "image/png";
-                    strcpy(type, temp);
-                    type[strlen(temp)] = '\0';
-                } else if (ressourceType == JPEG) {
-                    const char *temp = "image/jpeg";
-                    strcpy(type, temp);
-                    type[strlen(temp)] = '\0';
-                } else if (ressourceType == GIF) {
-                    const char *temp = "image/gif";
-                    strcpy(type, temp);
-                    type[strlen(temp)] = '\0';
+
+                //? On commence par vérifier si on doit traiter une requête PHP
+                bool php = false;
+                if (ressourceType == PHP) {
+                    printf("Il faut traiter le code PHP du fichier\n");
+                    php = true;
                 }
 
-                long int length = 0;
-                if (file != NULL) {
-                    length = calulContenLen(file);
-                }
-                if (method == GET) {
-                    reponse2(200, version, type, length, file, close, requete->clientId);
+                //! Pour le moment on fait comme ça, même si ce n'est pas terrible
+                if (!php) {
+                    //? Si tout c'est bien passé on envoie la réponse au client
+                    //? On a beaucoup de choses à vérifier
+                    //? La connection est déjà faite au moment des erreurs (dans close)
+                    //? On récupère ensuite le type du fichier
+                    char type[50];
+                    if (ressourceType == HTML) {
+                        const char *temp = "text/html";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    } else if (ressourceType == CSS) {
+                        const char *temp = "text/css";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    } else if (ressourceType == JAVASCRIPT) {
+                        const char *temp = "text/javascript";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    } else if (ressourceType == PNG) {
+                        const char *temp = "image/png";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    } else if (ressourceType == JPEG) {
+                        const char *temp = "image/jpeg";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    } else if (ressourceType == GIF) {
+                        const char *temp = "image/gif";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    }
+
+                    long int length = 0;
+                    if (file != NULL) {
+                        length = calulContenLen(file);
+                    }
+                    if (method == GET) {
+                        reponse2(200, version, type, length, file, close, requete->clientId);
+                    } else {
+                        reponse2(200, version, type, length, NULL, close, requete->clientId);
+                    }
                 } else {
-                    reponse2(200, version, type, length, NULL, close, requete->clientId);
+                    //! Si on traite une requête PHP, on envoie une réponse vide au client
+                    //! C'est temporaire
+                    reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);
                 }
+
             }
             //!================================
             purgeTree(root);

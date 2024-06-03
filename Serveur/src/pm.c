@@ -663,6 +663,8 @@ ContentType typeFromPath(char *path, int len) {
         result = JPEG;
     } else if (extensionMatch(temp, ".gif")) {
         result = GIF;
+    } else if (extensionMatch(temp, ".php")) {
+        result = PHP;
     } else {
         // Par défaut on renvoie une page html
         result = HTML;

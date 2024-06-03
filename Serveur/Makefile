@@ -13,7 +13,8 @@ ifeq ($(UNAME), Darwin)
 endif
 exec = prog
 server = server
-objects = $(addprefix $(bin),functions.o api.o pm.o elisa.o ismail.o colours.o response.o tom.o fileLen.o)
+objects = $(addprefix $(bin), functions.o)
+# objects = $(addprefix $(bin),functions.o api.o pm.o elisa.o ismail.o colours.o response.o tom.o fileLen.o)
 #objects = $(addprefix $(bin),functions.o api.o pm.o colours.o)
 main1 = $(bin)main.o
 main2 = $(bin)server.o
