@@ -57,6 +57,7 @@ bool semanticStartLine(void *root, Method *method, int *version) {
         *version = 1; // On considère que la requête a été faite avec HTTP/1.1
     } else {
         printf("Erreur => version non supportée\n");
+        *version = -1;
         b = false;
     }
     purgeElement(&tokenVersion);

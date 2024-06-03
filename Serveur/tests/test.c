@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]) {
     char req1[] = "GET / HTTP/1.0\r\n\r\n";
     char req2[] = "GET /index%2ehtml HTTP/1.1\r\nHost: www.hilopt.com\r\n\r\n";
-    char req3[] = "HEAD /images/logo.png HTTP/1.2\r\nHost: www.paphypu.fr\r\nConnection: close\r\n\r\n";
+    char req3[] = "GET /images/logo.png HTTP/1.2\r\nHost: www.paphypu.fr\r\nConnection: close\r\n\r\n";
     char req4[] = "GET /test1 HTTP/1.0\r\nConnection: keep-alive\r\n\r\n";
     char req5[] = "GET / HTTP/1.1\r\nHost: www.hilopt.com\r\nAccept: text/html;q=0.0\r\n\r\n";
     char req6[] = "HEAD /images/logo.png HTTP/1.0\r\nAccept: text/html, image/png\r\nAccept-Encoding: gzip, identity;q=0\r\n\r\n";
