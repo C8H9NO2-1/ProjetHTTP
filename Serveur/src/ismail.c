@@ -21,9 +21,13 @@ bool semanticContentLength(void *root){
     //A sender MUST NOT send a Content-Length header field in any message
     //  that contains a Transfer-Encoding header field.
     // bool Transfer_Encoding=;
-    if (thereIsTransfer_Encoding(root)){
-        return false;
-    }
+    if (searchTree(root,"Content-Length")!=NULL)
+    {
+        if (thereIsTransfer_Encoding(root)){
+            return false;
+        }
+    } 
+    
     
     /*If a message is received that has multiple Content-Length header
    fields with field-values consisting of the same decimal value, or a
@@ -42,7 +46,7 @@ bool semanticContentLength(void *root){
     int i=0;
     while(tok !=NULL){
         i++;
-        printf("%d\n",i);
+        // printf("%d\n",i);
         if (i==2){
             purgeElement(&tok);
             return false;
