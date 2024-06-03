@@ -19,7 +19,7 @@
 int main(int argc, char *argv[]) {
     message *requete;
 
-    int c;
+    /*int c;*/
     ConnectionState connection = CLOSE;
 
     system("ls racine > liste.txt");
@@ -211,6 +211,9 @@ int main(int argc, char *argv[]) {
                         printf("Il faut:\n");
                         while (temp != NULL) {
                             switch (temp->value) {
+                                case NONE:
+                                    printf("-> Euh\n");
+                                    break;
                                 case CHUNKED:
                                     printf("-> decoder chunk\n");
                                     break;

@@ -134,14 +134,14 @@ char* DecodeChunked(char *s, int *l){
     int max = *l;
     *l=0;
     char message[max];
-    int length = 0;
+    /*int length = 0;*/
     int i=0;
     while (i<max){
         while (i<max && (s[i]<=48 || s[i]>=57)){
             i++;
         }
         int debut = i;
-        while (i<max && (s[i]>=48 && s[i]<=57 || s[i]>=65 && s[i]<=69)){
+        while (i<max && ((s[i]>=48 && s[i]<=57) || (s[i]>=65 && s[i]<=69))){
             i++;
         }
         int fin =i-1;
@@ -162,10 +162,10 @@ char* DecodeChunked(char *s, int *l){
         printf("string : %s \n", message);
     }
     char decode[*l+2];
-    for (int k; k<=*l ; k++){
+    for (int k = 0; k<=*l ; k++){
         decode[k]=message[k];
     }
     printRawString(decode, *l);
     printf("\n");
-    return(decode);
+    return(NULL);
 }
