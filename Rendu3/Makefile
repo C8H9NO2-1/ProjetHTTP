@@ -12,7 +12,7 @@ main = $(bin)server.o
 all : $(server)
 
 $(server) : $(objects) $(main)
-	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -lm -fsanitize=address
+	gcc -o server $(objects) $(main) -L./$(bin) -lrequest -lm -fsanitize=address
 $(bin)%.o : %.c
 	gcc $(CFLAGS) -c $< $(OUTPUT_OPTION) 
 
