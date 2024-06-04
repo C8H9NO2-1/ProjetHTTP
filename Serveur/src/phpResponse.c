@@ -12,8 +12,6 @@ int readPHPResponse(int fd) {
     printf("Lecture de la réponse du processus PHP\n");
     reset();
 
-    //? On lit les données envoyées par le processus PHP
-    char received[FCGI_HEADER_SIZE + FASTCGILENGTH];
 
     int size = read(fd, received, FCGI_HEADER_SIZE + FASTCGILENGTH);
 
@@ -40,27 +38,32 @@ int readPHPResponse(int fd) {
     //! Fin de la partie Test
     //!==============================================================
 
-    //? On écrit dans la structure ce qu'on a reçu pour un traitement
-    //? plus simple des informations
     //! On fait bien attention aux champs short et non char
     //? Tant que l'on a pas lu tout le contenu du packet TCP, on doit
     //? continuer à lire
-    int j = 0;
-    while (j < size) {
-        printf("j => %d\n", j);
+    ListAnswers *answers = NULL;
+    char receivedHeader[FCGI_HEADER_SIZE];
+    //? On lit les données envoyées par le processus PHP
+    //? On commence par lire le contenu du header
+    while (read(fd, receivedHeader, FCGI_HEADER_SIZE) != 0) {
         FCGI_Header answer;
-        answer.version = received[j + 0];
-        answer.type = received[j + 1];
-        answer.requestId = (received[j + 2] << 7) + received[j + 3];
-        answer.contentLength = (received[j + 4] << 7) + received[j + 5];
-        answer.paddingLength = received[j + 6];
-        answer.reserved = received[j + 7];
-        for (int i = 0; i < answer.contentLength; i++) {
-            answer.contentData[j + i] = received[j + i + 8];
-        }
-        printf("%.*s\n", answer.contentLength, answer.contentData);
+        answer.version = receivedHeader[0];
+        answer.type = receivedHeader[1];
+        answer.requestId = (receivedHeader[2] << 7) + receivedHeader[3];
+        answer.contentLength = (receivedHeader[4] << 7) + receivedHeader[5];
+        answer.paddingLength = receivedHeader[6];
+        answer.reserved = receivedHeader[7];
+        printf("%d\n", answer.contentLength);
 
-        j += FCGI_HEADER_SIZE + answer.contentLength + answer.paddingLength;
+        char *receivedContent = malloc(answer.contentLength * sizeof(char));
+
+        read(fd, receivedContent, answer.contentLength);
+
+        for (int i = 0; i < answer.contentLength; i++) {
+            answer.contentData[i] = receivedContent[i];
+        }
+
+        printf("%.*s\n", answer.contentLength, answer.contentData);
     }
 
     return 0;
