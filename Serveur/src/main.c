@@ -20,6 +20,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include "header/phpResponse.h"
+
 static int createSocket(char *ip, int port) {
     int fd;
     struct sockaddr_in serv_addr;
@@ -51,9 +53,7 @@ int main(int argc, char *argv[]) {
 
     printf("%d\n", test);
 
-    while (true) {
-
-    }
+    readPHPResponse(test);
 
     return 0;
 
