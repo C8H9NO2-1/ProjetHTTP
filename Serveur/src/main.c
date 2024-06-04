@@ -23,6 +23,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include "header/phpResponse.h"
+
 static int createSocket(char *ip, int port) {
     int fd;
     struct sockaddr_in serv_addr;
@@ -54,18 +56,22 @@ int main(int argc, char *argv[]) {
 
     //param(NULL, test);
 
-    param("Test", test);
+    param("Test", "Test", test, NULL , "close");
 
-    param(NULL, test);
+    param("Test", NULL, test, NULL , "close");
 
     printf("%d\n", test);
+
     /*int longueurBegin=0;
     int longueurStdin=0;
+    char *chaine = "bonjour";
     FCGI_Header *begin =  beginRequest(&longueurBegin);
-    FCGI_Header *stdin = stdingRequest(&longueurStdin);
+    FCGI_Header *stdin = stdinRequest(&longueurStdin, chaine);
     write(test, begin, longueurBegin);
     write(test, stdin, longueurStdin);
     free(begin);*/
+
+    //readPHPResponse(test);
 
     return 0;
 
