@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
 
     printf("%d\n", test);
 
-    FCGI_BeginRequestBody *begin =  beginRequest();
+    FCGI_Header *begin =  beginRequest();
+    write(test, begin, sizeof(begin));
     free(begin);
 
     while (true) {

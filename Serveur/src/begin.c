@@ -21,14 +21,14 @@
 #include <arpa/inet.h>
 
 FCGI_Header *beginRequest(){
-    beginRequestBody *body = beginRequestBody();
-    beginRequestBody *request = BeginRequestHeader(body);
+    FCGI_BeginRequestBody *body = beginRequestBody();
+    FCGI_Header *request = BeginRequestHeader(body);
     free(body);
     return request;
 }
 
 FCGI_Header *stdinRequest(){
-    beginRequestBody *request = stdinHeader();
+    FCGI_BeginRequestBody *request = stdinHeader();
     return request;
 }
 
@@ -51,7 +51,7 @@ FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin){
     firstRequest->paddingLength=0;
     firstRequest->reserved=0;
     for (int i=0; i<8; i++){
-        firstRequest->contentData[i]=begin[i];
+        firstRequest->contentData[i]=*(begin+i);
     }
     return firstRequest;
 }
