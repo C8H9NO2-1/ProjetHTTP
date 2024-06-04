@@ -27,6 +27,10 @@ FCGI_Header *beginRequest(){
     return request;
 }
 
+FCGI_Header *stdinRequest(){
+    beginRequestBody *request = stdinHeader();
+    return request;
+}
 
 FCGI_BeginRequestBody *beginRequestBody(){
     FCGI_BeginRequestBody *begin = malloc(sizeof(FCGI_BeginRequestBody));
@@ -52,7 +56,7 @@ FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin){
     return firstRequest;
 }
 
-FCGI_Header *fcgistdinHeader(FCGI_BeginRequestBody* begin){
+FCGI_Header *stdinHeader(){
     FCGI_Header *firstRequest = malloc(sizeof(FCGI_Header));
     firstRequest->version = FCGI_VERSION_1;
     firstRequest->type = FCGI_STDIN;
