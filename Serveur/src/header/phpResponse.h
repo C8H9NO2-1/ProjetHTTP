@@ -7,6 +7,6 @@ struct ListAnswers {
 };
 typedef struct ListAnswers ListAnswers;
 
-int readPHPResponse(int fd);
+ListAnswers* readPHPResponse(int fd);
 
 #endif

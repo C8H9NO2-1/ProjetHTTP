@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -7,7 +8,7 @@
 #include "header/phpResponse.h"
 #include "header/colours.h"
 
-int readPHPResponse(int fd) {
+ListAnswers* readPHPResponse(int fd) {
     green();
     printf("Lecture de la réponse du processus PHP\n");
     reset();
@@ -52,6 +53,26 @@ int readPHPResponse(int fd) {
         answer.reserved = receivedHeader[7];
         printf("%d\n", answer.contentLength);
 
+        // Si on a reçu une erreur, il faut en tenir compte
+        // et probablement renvoyer le contenu de l'erreur au client
+        bool errorReceived = false;
+        if (answer.type == FCGI_STDERR) {
+            errorReceived = true;
+            red();
+            printf("Nous avons recu une erreur\n");
+            reset();
+        }
+
+        bool endReceived = false;
+        if (answer.type == FCGI_END_REQUEST) {
+            endReceived = true;
+            green();
+            printf("Nous avons reçu la fin de la requete\n");
+            reset();
+        } else {
+
+        }
+
         char *receivedContent = malloc(answer.contentLength * sizeof(char));
 
         read(fd, receivedContent, answer.contentLength);
@@ -65,8 +86,30 @@ int readPHPResponse(int fd) {
         read(fd, receivedPadding, answer.paddingLength);
         free(receivedPadding);
 
-        printf("%.*s\n", answer.contentLength, answer.contentData);
+        if (errorReceived) {
+            printf("Erreur => %.*s\n", answer.contentLength, answer.contentData);
+        } else if (endReceived) {
+            if (answer.contentData[4] != 0) {
+                red();
+                printf("Erreur, impossible de compléter la requête\n");
+                reset();
+            }
+        } else {
+            printf("%.*s\n", answer.contentLength, answer.contentData);
+        }
+
+        ListAnswers *newAnswer = malloc(sizeof(ListAnswers));
+        newAnswer->answer = answer;
+        newAnswer->next = NULL;
+        // Ce n'est pas plus simple ici mais c'est pour rendre plus
+        // simple la lecture de cette liste par la suite, on insère la
+        // nouvelle réponse à la fin de la liste:
+        ListAnswers *temp = answers;
+        while (temp != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newAnswer;
     }
 
-    return 0;
+    return answers;
 }
