@@ -10,6 +10,8 @@
 #include "header/elisa.h"
 #include "header/pm.h"
 #include "header/ismail.h"
+#include "header/fastcgi.h"
+#include "header/begin.h"
 
 #include <unistd.h>
 #include <time.h>
@@ -50,6 +52,9 @@ int main(int argc, char *argv[]) {
     int test = createSocket("127.0.0.1", 9000);
 
     printf("%d\n", test);
+
+    FCGI_BeginRequestBody *begin =  beginRequest();
+    free(begin);
 
     while (true) {
 
