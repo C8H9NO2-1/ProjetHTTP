@@ -1,10 +1,10 @@
 #ifndef BEGIN_H
 #define BEGIN_H
 
-FCGI_Header *beginRequest();
-FCGI_Header *stdinRequest();
+FCGI_Header *beginRequest(int *l);
+FCGI_Header *stdinRequest(int *l);
 FCGI_BeginRequestBody *beginRequestBody();
-FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin);
-FCGI_Header *stdinHeader();
+FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin, int *l);
+FCGI_Header *stdinHeader(int *l);
 
 #endif

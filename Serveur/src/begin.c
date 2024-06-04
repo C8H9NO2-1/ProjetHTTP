@@ -22,13 +22,13 @@
 
 FCGI_Header *beginRequest(int *l){
     FCGI_BeginRequestBody *body = beginRequestBody();
-    FCGI_Header *request = BeginRequestHeader(body, int *l);
+    FCGI_Header *request = BeginRequestHeader(body,l);
     free(body);
     return request;
 }
 
 FCGI_Header *stdinRequest(int *l){
-    FCGI_Header *request = stdinHeader(int *l);
+    FCGI_Header *request = stdinHeader(l);
     return request;
 }
 
