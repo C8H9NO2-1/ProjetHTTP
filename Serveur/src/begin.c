@@ -53,8 +53,9 @@ FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin, int *l){
     firstRequest->reserved=0;
     firstRequest->contentData[0]=0;
     firstRequest->contentData[1]=begin->role;
+    char *dataPtr = (char *)begin;
     for (int i=2; i<8; i++){
-        firstRequest->contentData[i]=* (char *) (begin+i);
+        firstRequest->contentData[i] = dataPtr[i];
     }
     return firstRequest;
 }
