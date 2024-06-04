@@ -33,8 +33,8 @@ static int createSocket(char *ip, int port) {
     bzero(&serv_addr, sizeof(serv_addr));
 
     serv_addr.sin_family = AF_INET;
-    /*inet_aton(ip, (struct in_addr *)&serv_addr.sin_addr.s_addr);*/
-    inet_aton(ip,(struct sockaddr *)&serv_addr.sin_addr.s_addr);
+    inet_aton(ip, (struct in_addr *)&serv_addr.sin_addr.s_addr);
+    /*inet_aton(ip,(struct sockaddr *)&serv_addr.sin_addr.s_addr);*/
     serv_addr.sin_port = htons(port);
 
     if (connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
