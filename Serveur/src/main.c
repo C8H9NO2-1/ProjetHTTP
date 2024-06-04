@@ -58,8 +58,9 @@ int main(int argc, char *argv[]) {
 
     int longueurBegin=0;
     int longueurStdin=0;
+    char *chaine = "bonjour";
     FCGI_Header *begin =  beginRequest(&longueurBegin);
-    FCGI_Header *stdin = stdinRequest(&longueurStdin, NULL);
+    FCGI_Header *stdin = stdinRequest(&longueurStdin, chaine);
     write(test, begin, longueurBegin);
     write(test, stdin, longueurStdin);
     free(begin);
