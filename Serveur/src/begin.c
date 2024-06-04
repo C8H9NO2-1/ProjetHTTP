@@ -20,15 +20,15 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-FCGI_Header *beginRequest(){
+FCGI_Header *beginRequest(int *l){
     FCGI_BeginRequestBody *body = beginRequestBody();
-    FCGI_Header *request = BeginRequestHeader(body);
+    FCGI_Header *request = BeginRequestHeader(body, int *l);
     free(body);
     return request;
 }
 
-FCGI_Header *stdinRequest(){
-    FCGI_Header *request = stdinHeader();
+FCGI_Header *stdinRequest(int *l){
+    FCGI_Header *request = stdinHeader(int *l);
     return request;
 }
 
@@ -42,7 +42,8 @@ FCGI_BeginRequestBody *beginRequestBody(){
     return begin;
 }
 
-FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin){
+FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin, int *l){
+    *l=8+FCGI_HEADER_SIZE;
     FCGI_Header *firstRequest = malloc(sizeof(FCGI_Header));
     firstRequest->version = FCGI_VERSION_1;
     firstRequest->type = FCGI_BEGIN_REQUEST;
@@ -58,7 +59,8 @@ FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin){
     return firstRequest;
 }
 
-FCGI_Header *stdinHeader(){
+FCGI_Header *stdinHeader(int *l){
+    *l=FCGI_HEADER_SIZE;
     FCGI_Header *firstRequest = malloc(sizeof(FCGI_Header));
     firstRequest->version = FCGI_VERSION_1;
     firstRequest->type = FCGI_STDIN;
