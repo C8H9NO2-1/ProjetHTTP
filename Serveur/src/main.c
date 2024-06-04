@@ -52,20 +52,20 @@ int main(int argc, char *argv[]) {
 
     int test = createSocket("127.0.0.1", 9000);
 
-    param(NULL, test);
+    //param(NULL, test);
 
     param("Test", test);
 
     param(NULL, test);
 
     printf("%d\n", test);
-    int longueurBegin=0;
+    /*int longueurBegin=0;
     int longueurStdin=0;
     FCGI_Header *begin =  beginRequest(&longueurBegin);
     FCGI_Header *stdin = stdingRequest(&longueurStdin);
     write(test, begin, longueurBegin);
-    write(test, stdin, longueurStdin)
-    free(begin);
+    write(test, stdin, longueurStdin);
+    free(begin);*/
 
     return 0;
 
