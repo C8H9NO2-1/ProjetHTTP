@@ -43,18 +43,25 @@ int readPHPResponse(int fd) {
     //? On écrit dans la structure ce qu'on a reçu pour un traitement
     //? plus simple des informations
     //! On fait bien attention aux champs short et non char
-    FCGI_Header answer;
-    answer.version = received[0];
-    answer.type = received[1];
-    answer.requestId = (received[2] << 7) + received[3];
-    answer.contentLength = (received[4] << 7) + received[5];
-    answer.paddingLength = received[6];
-    answer.reserved = received[7];
-    for (int i = 8; i < size; i++) {
-        answer.contentData[i - 8] = received[i];
-    }
+    //? Tant que l'on a pas lu tout le contenu du packet TCP, on doit
+    //? continuer à lire
+    int j = 0;
+    while (j < size) {
+        printf("j => %d\n", j);
+        FCGI_Header answer;
+        answer.version = received[j + 0];
+        answer.type = received[j + 1];
+        answer.requestId = (received[j + 2] << 7) + received[j + 3];
+        answer.contentLength = (received[j + 4] << 7) + received[j + 5];
+        answer.paddingLength = received[j + 6];
+        answer.reserved = received[j + 7];
+        for (int i = 0; i < answer.contentLength; i++) {
+            answer.contentData[j + i] = received[j + i + 8];
+        }
+        printf("%.*s\n", answer.contentLength, answer.contentData);
 
-    printf("%d\n", answer.requestId);
+        j += FCGI_HEADER_SIZE + answer.contentLength + answer.paddingLength;
+    }
 
     return 0;
 }
