@@ -52,6 +52,8 @@ int main(int argc, char *argv[]) {
 
     int test = createSocket("127.0.0.1", 9000);
 
+    param(NULL, test);
+
     param("Test", test);
 
     param(NULL, test);
