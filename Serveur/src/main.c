@@ -54,12 +54,8 @@ int main(int argc, char *argv[]) {
     printf("%d\n", test);
 
     FCGI_Header *begin =  beginRequest();
-    write(test, begin, sizeof(begin));
+    write(test, begin, 16);
     free(begin);
-
-    while (true) {
-
-    }
 
     return 0;
 
