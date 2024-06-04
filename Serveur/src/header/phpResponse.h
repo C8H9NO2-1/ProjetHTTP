@@ -7,6 +7,13 @@ struct ListAnswers {
 };
 typedef struct ListAnswers ListAnswers;
 
+struct PHPResponse {
+    bool error;
+    ContentType type;
+    char *content;
+};
+typedef struct PHPResponse PHPResponse;
+
 ListAnswers* readPHPResponse(int fd);
 
 #endif

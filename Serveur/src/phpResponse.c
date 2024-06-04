@@ -5,8 +5,47 @@
 #include <unistd.h>
 
 #include "header/fastcgi.h"
-#include "header/phpResponse.h"
 #include "header/colours.h"
+#include "header/elisa.h"
+#include "header/pm.h"
+#include "header/phpResponse.h"
+
+PHPResponse getPHPResponse(int fd) {
+    //! Quelques notes sur cette fonction
+    //? -> On pourrait si besoin vérifier l'indentifiant de la requête
+    //? -> Nous ignorons complètement tout ce qui est écrit dans padding
+
+    ListAnswers *listAnswers = readPHPResponse(fd);
+
+    // On créé une structure de la réponse
+    PHPResponse response;
+
+    // On parcourt les différentes réponses données par
+    // le processus PHP
+    ListAnswers *temp = listAnswers;
+    if (temp == NULL) {
+        // Si il y a n'y a rien dans ce cas c'est très bizarre
+        // car nous n'avons rien reçu
+        response.type = PHP;
+        response.content = NULL;
+        return response;
+    }
+
+    while (temp->next != NULL) {
+        //? Si on reçoit une erreur, il faut la transmettre au client
+        // ???
+        if (temp->answer.type == FCGI_STDERR) {
+            response.error = true;
+        } else if (temp->answer.type == FCGI_END_REQUEST) {
+            //! Code pour la fin de la requête
+            //! Il faut récuperer toutes les valeurs nécessaires et peut-être les renvoyer
+            //! Ou du moins vérifier que tout c'est bien déroulé
+        }
+        temp = temp->next;
+    }
+
+    return response;
+}
 
 ListAnswers* readPHPResponse(int fd) {
     green();
@@ -69,8 +108,6 @@ ListAnswers* readPHPResponse(int fd) {
             green();
             printf("Nous avons reçu la fin de la requete\n");
             reset();
-        } else {
-
         }
 
         char *receivedContent = malloc(answer.contentLength * sizeof(char));
@@ -105,10 +142,16 @@ ListAnswers* readPHPResponse(int fd) {
         // simple la lecture de cette liste par la suite, on insère la
         // nouvelle réponse à la fin de la liste:
         ListAnswers *temp = answers;
-        while (temp != NULL) {
-            temp = temp->next;
+        if (temp == NULL) {
+            answers = newAnswer;
+        } else {
+            while (temp->next != NULL) {
+                temp = temp->next;
+            }
+            temp->next = newAnswer;
         }
-        temp->next = newAnswer;
+
+        free(receivedContent);
     }
 
     return answers;
