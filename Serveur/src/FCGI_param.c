@@ -57,7 +57,7 @@ int param(char * Chaine, int desc_ecriture){
 
     if (Chaine==NULL){
         Head.contentLength=0;
-        write(desc_ecriture, Head, sizeof(Head));
+        write(desc_ecriture, Head, FCGI_HEADER_SIZE);
         return 0;
     }
 
