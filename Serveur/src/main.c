@@ -12,6 +12,7 @@
 #include "header/ismail.h"
 #include "header/fastcgi.h"
 #include "header/begin.h"
+#include "header/FCGI_param.h"
 
 #include <unistd.h>
 #include <time.h>
@@ -51,15 +52,11 @@ int main(int argc, char *argv[]) {
 
     int test = createSocket("127.0.0.1", 9000);
 
+    param("Test", test);
+
+    param(NULL, test);
+
     printf("%d\n", test);
-
-    FCGI_Header *begin =  beginRequest();
-    write(test, begin, sizeof(begin));
-    free(begin);
-
-    while (true) {
-
-    }
 
     return 0;
 
