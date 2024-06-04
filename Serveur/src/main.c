@@ -23,6 +23,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#include "header/phpResponse.h"
+
 static int createSocket(char *ip, int port) {
     int fd;
     struct sockaddr_in serv_addr;
@@ -53,6 +55,7 @@ int main(int argc, char *argv[]) {
     int test = createSocket("127.0.0.1", 9000);
 
     printf("%d\n", test);
+
     int longueurBegin=0;
     int longueurStdin=0;
     FCGI_Header *begin =  beginRequest(&longueurBegin);
@@ -60,6 +63,8 @@ int main(int argc, char *argv[]) {
     write(test, begin, longueurBegin);
     write(test, stdin, longueurStdin);
     free(begin);
+
+    readPHPResponse(test);
 
     return 0;
 
