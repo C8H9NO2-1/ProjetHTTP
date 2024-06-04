@@ -10,6 +10,9 @@
 #include "header/elisa.h"
 #include "header/pm.h"
 #include "header/ismail.h"
+#include "header/fastcgi.h"
+#include "header/begin.h"
+#include "header/FCGI_param.h"
 
 #include <unistd.h>
 #include <time.h>
@@ -52,6 +55,14 @@ int main(int argc, char *argv[]) {
     int test = createSocket("127.0.0.1", 9000);
 
     printf("%d\n", test);
+
+    int longueurBegin=0;
+    int longueurStdin=0;
+    FCGI_Header *begin =  beginRequest(&longueurBegin);
+    FCGI_Header *stdin = stdinRequest(&longueurStdin);
+    write(test, begin, longueurBegin);
+    write(test, stdin, longueurStdin);
+    free(begin);
 
     readPHPResponse(test);
 

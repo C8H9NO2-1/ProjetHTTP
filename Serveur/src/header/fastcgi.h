@@ -25,6 +25,7 @@ typedef struct __attribute__((__packed__)) {
  * Value for requestId component of FCGI_Header
  */
 #define FCGI_NULL_REQUEST_ID     0
+#define FCGI_REQUEST_ID          1
 
 /*
  * Values for type component of FCGI_Header
@@ -89,4 +90,3 @@ typedef struct __attribute__((__packed__)) {
 #define FCGI_RESPONDER  1
 #define FCGI_AUTHORIZER 2
 #define FCGI_FILTER     3
-
