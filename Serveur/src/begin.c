@@ -27,8 +27,8 @@ FCGI_Header *beginRequest(int *l){
     return request;
 }
 
-FCGI_Header *stdinRequest(int *l){
-    FCGI_Header *request = stdinHeader(l);
+FCGI_Header *stdinRequest(int *l, char *chaine){
+    FCGI_Header *request = stdinHeader(l, chaine);
     return request;
 }
 
@@ -59,14 +59,20 @@ FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin, int *l){
     return firstRequest;
 }
 
-FCGI_Header *stdinHeader(int *l){
-    *l=FCGI_HEADER_SIZE;
+FCGI_Header *stdinHeader(int *l, char* chaine){
+    *l=FCGI_HEADER_SIZE+strlen(chaine);
     FCGI_Header *firstRequest = malloc(sizeof(FCGI_Header));
     firstRequest->version = FCGI_VERSION_1;
     firstRequest->type = FCGI_STDIN;
     firstRequest->requestId=htons(1);
-    firstRequest->contentLength=htons(0);
+    firstRequest->contentLength=htons(strlen(chaine));
     firstRequest->paddingLength=0;
     firstRequest->reserved=0;
+    int i=0;
+    if (chaine !=NULL){
+        while (chaine[i]!='\0'){
+            firstRequest->contentData[i]=chaine[i];
+        }
+    }
     return firstRequest;
 }
