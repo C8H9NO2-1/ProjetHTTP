@@ -12,9 +12,6 @@ int readPHPResponse(int fd) {
     printf("Lecture de la réponse du processus PHP\n");
     reset();
 
-
-    int size = read(fd, received, FCGI_HEADER_SIZE + FASTCGILENGTH);
-
     //!==============================================================
     //! Cette partie est uniquement nécessaire pour des tests
     /*received[0] = (char) 1;*/
@@ -62,6 +59,11 @@ int readPHPResponse(int fd) {
         for (int i = 0; i < answer.contentLength; i++) {
             answer.contentData[i] = receivedContent[i];
         }
+
+        //! On pense à lire les paddings data
+        char *receivedPadding = malloc(answer.paddingLength * sizeof(char));
+        read(fd, receivedPadding, answer.paddingLength);
+        free(receivedPadding);
 
         printf("%.*s\n", answer.contentLength, answer.contentData);
     }
