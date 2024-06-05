@@ -36,5 +36,6 @@ ContentType typeFromPath(char *path, int len);
 /*bool auxAcceptEncoding(char *header);*/
 /*EncodingState maximumPriority(char *header);*/
 /*float priorityValue(char *str);*/
+char* phpPath(char *path, int lenPath, char *host, int lenHost);
 
 #endif

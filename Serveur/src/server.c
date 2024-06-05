@@ -13,6 +13,7 @@
 #include "header/pm.h"
 #include "header/fileLen.h"
 #include "header/tom.h"
+#include "header/phpServer.h"
 
 #include "header/colours.h"
 
@@ -142,9 +143,6 @@ int main(int argc, char *argv[]) {
             
             reset();
 
-            purgeElement(&r);
-            purgeElement(&r2);
-            purgeElement(&r3);
 
             //? Si on a envoyé une erreur, on ne fait aucune autre vérification
             //! Interface debugging du serveur:
@@ -303,14 +301,22 @@ int main(int argc, char *argv[]) {
                         char *valueBody;
                         valueBody = getElementValue(r->node, &lengthBody);
                         printf("%.*s\n", lengthBody, valueBody);
+                        
+                        purgeElement(&rP);
                     } else {
                         // Sinon on ne passe rien dans les stdin
+                        char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
+                        phpServerResponse(path, 1, "close", GET, requete->clientId, NULL);
                     }
-                    reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);
+                    /*reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);*/
                 }
 
             }
             //!================================
+            purgeElement(&r);
+            purgeElement(&r2);
+            purgeElement(&r3);
+
             purgeTree(root);
         } else {
             red();

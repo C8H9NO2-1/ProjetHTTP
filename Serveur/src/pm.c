@@ -860,3 +860,29 @@ ContentType typeFromPath(char *path, int len) {
 /*    return result;*/
 /*    return 0;*/
 /*}*/
+
+char* phpPath(char *path, int lenPath, char *host, int lenHost) {
+    //! Changement drastique de cette fonction, en se basant sur la RFC 3986
+
+    char *root = "racine/";
+
+    // Il faut normaliser le chemin
+    char *pathNormalized = URINormalization(path, lenPath);
+    int newLenPath = strlen(pathNormalized);
+
+    // Il faut normaliser le champ host
+    char *hostNormalized = URINormalization(host, lenHost);
+    int newLenHost = strlen(hostNormalized);
+
+    int len = strlen(root) + newLenPath + newLenHost;
+    char *fileName = malloc((len + 1) * sizeof(char));
+    strcpy(fileName, root);
+
+    strncat(fileName, hostNormalized, newLenHost);
+    strncat(fileName, pathNormalized, newLenPath);
+
+    free(pathNormalized);
+    free(hostNormalized);
+
+    return fileName;
+}
