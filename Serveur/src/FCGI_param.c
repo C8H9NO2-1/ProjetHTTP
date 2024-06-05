@@ -128,8 +128,16 @@ int param(char * path, int desc_ecriture,  char * connection, Method method){
     FCGI_NameValuePair11 Request;
     create_FCGI_NameValuePair11(&Request, "REQUEST_METHOD", methodee );
 
+    /*Hardcodé par ici*/
+    FCGI_NameValuePair11 Type;
+    create_FCGI_NameValuePair11(&Type, "CONTENT_TYPE", "application/x-www-form-urlencoded" );
+    FCGI_NameValuePair11 Length;
+    create_FCGI_NameValuePair11(&Length, "CONTENT_LENGTH", "60");
+
     int u=0;
     u=add_CDATA(&Host, Head.contentData ,u);
+    u=add_CDATA(&Type, Head.contentData, u);
+    u=add_CDATA(&Length, Head.contentData, u);
     u=add_CDATA(&Connection, Head.contentData ,u);
     u=add_CDATA(&Path, Head.contentData ,u);
     u=add_CDATA(&Signature, Head.contentData ,u);
@@ -171,6 +179,8 @@ int param(char * path, int desc_ecriture,  char * connection, Method method){
     freeFCGI_NameValuePair11(&Script);
     freeFCGI_NameValuePair11(&Request);
     freeFCGI_NameValuePair11(&Query);
+    freeFCGI_NameValuePair11(&Type);
+    freeFCGI_NameValuePair11(&Length);
     free(methodee);
     return 1;
 }
