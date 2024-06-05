@@ -56,9 +56,9 @@ int main(int argc, char *argv[]) {
 
     //param(NULL, test);
 
-    /*param("Test", "Test", test, NULL , "close");*/
+    //param("Test", "Test", test, NULL , "close");
 
-    /*param("Test", NULL, test, NULL , "close");*/
+    //param("Test", NULL, test, NULL , "close");
 
     printf("%d\n", test);
 

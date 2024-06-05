@@ -206,42 +206,6 @@ int main(int argc, char *argv[]) {
                 }
                 reset();
 
-                //? Transfert Encoging
-                listeEncodage *encoding = malloc(sizeof(listeEncodage));
-                encoding->value = NONE;
-                encoding->next = NULL;
-                /*if (semanticTransferCodings(root, encoding, version)) {
-                  green();
-                  printf("Les valeurs dans le champ Transfer-Encoding sont bien reconnues\n");
-                  reset();
-                  listeEncodage *temp = encoding;
-                  if (temp->value != NONE) {
-                  printf("Il faut:\n");
-                  while (temp != NULL) {
-                  switch (temp->value) {
-                  case CHUNKED:
-                  printf("-> decoder chunk\n");
-                  break;
-                  case GZIP:
-                  printf("-> decoder gzip\n");
-                  break;
-                  case DEFLATE:
-                  printf("-> decoder deflate\n");
-                  break;
-                  case COMPRESS:
-                  printf("-> decoder compress\n");
-                  break;
-                  }
-                  temp = temp->next;
-                  }
-                  purgeListeEncodage(&encoding);
-                  }
-                  } else {
-                  red();
-                  printf("Les valeurs du champ Transfer-Encoding ne sont pas reconnues\n");
-                  reset();
-                  }*/
-
                 //? Accept
                 ContentType ressourceType = typeFromPath(valueTarget, lengthTarget);
                 if (acceptHeaderVerification(root, ressourceType)) {
@@ -276,36 +240,6 @@ int main(int argc, char *argv[]) {
                 } else {
                     red();
                     printf("Le client n'accepte pas le type de notre représentation\n");
-                    reset();
-                }
-
-                //? Accept-Encoding
-                EncodingState coding;
-                if (acceptEncodingHeaderVerification(root, &coding)) {
-                    green();
-                    printf("Le client accepte l'encoding de notre représentation (il n'y en a pas)\n");
-                    reset();
-                } else {
-                    red();
-                    printf("Le client n'accepte pas l'encoding de notre représentation\n");
-                    reset();
-                    printf("Cependant, il accepte l'encoding suivant: ");
-                    blue();
-                    switch (coding) {
-                        case GZIP:
-                            printf("gzip\n");
-                            break;
-                        case DEFLATE:
-                            printf("deflate\n");
-                            break;
-                        case COMPRESS:
-                            printf("compress\n");
-                            break;
-                        default:
-                            red();
-                            printf("Erreur lors de la vérification de Accept-Encoding\n");
-                            break;
-                    }
                     reset();
                 }
 
@@ -361,6 +295,17 @@ int main(int argc, char *argv[]) {
                 } else {
                     //! Si on traite une requête PHP, on envoie une réponse vide au client
                     //! C'est temporaire
+                    if (method == POST) {
+                        // On recupere le payload du message
+                        _Token *rP;
+                        rP = searchTree(root, "message-body");
+                        int lengthBody;
+                        char *valueBody;
+                        valueBody = getElementValue(r->node, &lengthBody);
+                        printf("%.*s\n", lengthBody, valueBody);
+                    } else {
+                        // Sinon on ne passe rien dans les stdin
+                    }
                     reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);
                 }
 
@@ -374,23 +319,6 @@ int main(int argc, char *argv[]) {
             reset();
         }
 
-
-
-        //error(404, 0, "keep-alive", requete->clientId);
-        /*reponse(200,0,"text/html",50, "liste.txt" ,"keep-alive", requete->clientId);*/
-
-
-        //writeDirectClient(requete->clientId, REPONSE1, strlen(REPONSE1));
-        //writeDirectClient(requete->clientId, REPONSE3, strlen(REPONSE3));
-        //writeDirectClient(requete->clientId, REPONSE2, strlen(REPONSE2));
-        /*writeDirectClient(requete->clientId, "\r\n", strlen("\r\n"));*/
-        /*while ((c = getchar()) != EOF) {*/
-            /*char temp[2]; */
-            /*temp[0] = (char) c;*/
-            /*temp[1] = '\0';*/
-            /*writeDirectClient(requete->clientId, temp, 1);*/
-        /*}*/
-        //endWriteDirectClient(requete->clientId);
         if (connection == CLOSE) {
             requestShutdownSocket(requete->clientId);
         }
