@@ -25,6 +25,7 @@
 #include <arpa/inet.h>
 #include "header/phpServer.h"
 #include "header/phpResponse.h"
+#include "header/response.h"
 
 static int createSocket(char *ip, int port) {
     int fd;
@@ -51,7 +52,7 @@ static int createSocket(char *ip, int port) {
     return fd;
 }
 
-bool phpServerResponse(char *path, int version, char* connection, Method method , unsigned clientid ,char *chaine ){
+void phpServerResponse(char *path, int version, char* connection, Method method , unsigned clientid ,char *chaine ){
     // chain  pour passer quelque chose dans stdin
     // le debut est similaire a reponse()..
     // apres on envoi au processus php // send to server
@@ -76,7 +77,7 @@ bool phpServerResponse(char *path, int version, char* connection, Method method 
     PHPResponse reponse=getPHPResponse(test);
     
     if (reponse.error ==false){
-        response3(200,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
+        reponse3(200,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
     }else{
         // int taille=reponse.length+1;
         // char erreur[taille];
