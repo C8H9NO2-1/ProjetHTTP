@@ -8,14 +8,14 @@
 #include <arpa/inet.h>
 
 #include "header/fastcgi.h"
-#include "header/FCGI_param.h"
 #include "header/pm.h"
+#include "header/FCGI_param.h"
+
 
 
 void freeFCGI_NameValuePair11(FCGI_NameValuePair11 * AH){
     free(AH->nameData);
     free(AH->valueData);
-    free(AH);
 }
 
 int create_FCGI_NameValuePair11(FCGI_NameValuePair11  * OH, char * Name, char * Value){
@@ -23,8 +23,8 @@ int create_FCGI_NameValuePair11(FCGI_NameValuePair11  * OH, char * Name, char * 
     //printf("Voici name len : %d \n", OH->nameLengthB0);
     OH->valueLengthB0= strlen(Value) ;
     //printf("Voici value len : %d \n", OH->valueLengthB0);
-    OH->nameData= malloc(OH->nameLengthB0*sizeof(char));
-    OH->valueData= malloc(OH->valueLengthB0*sizeof(char));
+    OH->nameData= malloc((OH->nameLengthB0 +1)*sizeof(char));
+    OH->valueData= malloc((OH->valueLengthB0 +1) *sizeof(char));
     strcpy(OH->nameData , Name);
     //printf("Voici le nom de la data : %s \n", OH->nameData);
     strcpy(OH->valueData, Value);
@@ -63,7 +63,7 @@ int add_CDATA(FCGI_NameValuePair11 * UH, char * su, int i){
 }
 
 
-int param(char * PHP, char * path, int desc_ecriture,  char * connection, Method method){
+int param(char * path, int desc_ecriture,  char * connection, Method method){
 
     FCGI_Header Head;
     Head.version=FCGI_VERSION_1;
@@ -72,7 +72,7 @@ int param(char * PHP, char * path, int desc_ecriture,  char * connection, Method
     Head.paddingLength=0;
     Head.reserved=0;
 
-    if (PHP==NULL){
+    if (path==NULL){
         //printf("hello\n");
         Head.contentLength=0;
         write(desc_ecriture, &Head, FCGI_HEADER_SIZE);
@@ -80,15 +80,15 @@ int param(char * PHP, char * path, int desc_ecriture,  char * connection, Method
     }
 
 
-    char methodee=malloc(6*sizeof(char));
+    char * methodee=malloc(6*sizeof(char));
 
     if(method==GET){
         strcpy( methodee , "GET");
     }
-    else if (methodee == HEAD){
+    else if (method == HEAD){
         strcpy(methodee , "HEAD");
     }
-    else if (methodee == POST){
+    else if (method == POST){
         strcpy(methodee, "POST");
     }
 
@@ -118,12 +118,13 @@ int param(char * PHP, char * path, int desc_ecriture,  char * connection, Method
     create_FCGI_NameValuePair11(&PORT, "SERVER_PORT", "8080");
     FCGI_NameValuePair11 RADDR;
     create_FCGI_NameValuePair11(&RADDR, "REMOTE_ADDR", "127.0.0.1");
-    char finscript[100]="127.0.0.1:8080//";
+    char finscript[100];
+    getcwd(finscript, 100);
     strcat(finscript, path );
     FCGI_NameValuePair11 Script;
     create_FCGI_NameValuePair11(&Script, "SCRIPT_FILENAME", finscript);
     FCGI_NameValuePair11 Query;
-    create_FCGI_NameValuePair11(&Query,"","");
+    create_FCGI_NameValuePair11(&Query,"QUERY_STRING","");
     FCGI_NameValuePair11 Request;
     create_FCGI_NameValuePair11(&Request, "REQUEST_METHOD", methodee );
 
