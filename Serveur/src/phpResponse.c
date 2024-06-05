@@ -33,15 +33,34 @@ PHPResponse getPHPResponse(int fd) {
 
     while (temp->next != NULL) {
         //? Si on reçoit une erreur, il faut la transmettre au client
-        // ???
         if (temp->answer.type == FCGI_STDERR) {
             response.error = true;
         } else if (temp->answer.type == FCGI_END_REQUEST) {
             //! Code pour la fin de la requête
             //! Il faut récuperer toutes les valeurs nécessaires et peut-être les renvoyer
             //! Ou du moins vérifier que tout c'est bien déroulé
+            FCGI_EndRequestBody endRequest;
+            endRequest.appStatus = (temp->answer.contentData[0] << 24);
+            endRequest.appStatus += (temp->answer.contentData[1] << 16);
+            endRequest.appStatus += (temp->answer.contentData[2] << 8);
+            endRequest.appStatus += temp->answer.contentData[3];
+            printf("App Status => %d\n", endRequest.appStatus);
+            endRequest.protocolStatus = temp->answer.contentData[4];
+            
+            if (endRequest.protocolStatus != FCGI_REQUEST_COMPLETE) {
+                red();
+                printf("La requête n'a pas pu être complété par le processus\n");
+                reset();
+            }
         }
         temp = temp->next;
+    }
+
+    //? On libère la mémoire
+    while (listAnswers != NULL) {
+        temp = listAnswers->next;
+        free(listAnswers);
+        listAnswers = temp;
     }
 
     return response;
@@ -80,14 +99,15 @@ ListAnswers* readPHPResponse(int fd) {
     //? continuer à lire
     ListAnswers *answers = NULL;
     char receivedHeader[FCGI_HEADER_SIZE];
+    bool done = false; // Ce booléen sera vrai si la réponse est finie
     //? On lit les données envoyées par le processus PHP
     //? On commence par lire le contenu du header
-    while (read(fd, receivedHeader, FCGI_HEADER_SIZE) != 0) {
+    while (!done && read(fd, receivedHeader, FCGI_HEADER_SIZE) != 0) {
         FCGI_Header answer;
         answer.version = receivedHeader[0];
         answer.type = receivedHeader[1];
-        answer.requestId = (receivedHeader[2] << 7) + receivedHeader[3];
-        answer.contentLength = (receivedHeader[4] << 7) + receivedHeader[5];
+        answer.requestId = (receivedHeader[2] << 8) + receivedHeader[3];
+        answer.contentLength = (receivedHeader[4] << 8) + receivedHeader[5];
         answer.paddingLength = receivedHeader[6];
         answer.reserved = receivedHeader[7];
         printf("%d\n", answer.contentLength);
@@ -126,11 +146,8 @@ ListAnswers* readPHPResponse(int fd) {
         if (errorReceived) {
             printf("Erreur => %.*s\n", answer.contentLength, answer.contentData);
         } else if (endReceived) {
-            if (answer.contentData[4] != 0) {
-                red();
-                printf("Erreur, impossible de compléter la requête\n");
-                reset();
-            }
+            printf("Fin de la requête\n");
+            done = true;
         } else {
             printf("%.*s\n", answer.contentLength, answer.contentData);
         }
