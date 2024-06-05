@@ -61,7 +61,7 @@ FCGI_Header *BeginRequestHeader(FCGI_BeginRequestBody* begin, int *l){
 }
 
 FCGI_Header *stdinHeader(int *l, char* chaine){
-    *l=FCGI_HEADER_SIZE+strlen(chaine);
+    /**l=FCGI_HEADER_SIZE+strlen(chaine);*/
     FCGI_Header *firstRequest = malloc(sizeof(FCGI_Header));
     firstRequest->version = FCGI_VERSION_1;
     firstRequest->type = FCGI_STDIN;

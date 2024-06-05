@@ -88,8 +88,7 @@ bool phpServerResponse(char *path, int version, char* connection, Method method 
         }
         writeDirectClient(clientid,"h",1);
         writeDirectClient(clientid,reponse.content,reponse.contentLength);
-
-
+        endWriteDirectClient(clientid);
     }
 
     

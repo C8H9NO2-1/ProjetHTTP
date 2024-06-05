@@ -864,7 +864,7 @@ ContentType typeFromPath(char *path, int len) {
 char* phpPath(char *path, int lenPath, char *host, int lenHost) {
     //! Changement drastique de cette fonction, en se basant sur la RFC 3986
 
-    char *root = "racine/";
+    char *root = "/racine/";
 
     // Il faut normaliser le chemin
     char *pathNormalized = URINormalization(path, lenPath);

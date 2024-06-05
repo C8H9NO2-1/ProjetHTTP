@@ -301,6 +301,12 @@ int main(int argc, char *argv[]) {
                         char *valueBody;
                         valueBody = getElementValue(r->node, &lengthBody);
                         printf("%.*s\n", lengthBody, valueBody);
+
+                        char *valueBodyCopy = malloc((lengthBody + 1) * sizeof(char));
+                        strncpy(valueBodyCopy, valueBody, lengthBody);
+
+                        char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
+                        phpServerResponse(path, 1, "close", POST, requete->clientId, valueBodyCopy);
                         
                         purgeElement(&rP);
                     } else {
