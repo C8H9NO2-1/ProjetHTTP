@@ -105,7 +105,7 @@ PHPResponse getPHPResponse(int fd) {
         listAnswers = temp;
     }
 
-    response.length -= tempLength;
+    response.contentLength = response.length - tempLength;
 
     return response;
 }

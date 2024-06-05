@@ -706,7 +706,7 @@ ContentType typeFromPath(char *path, int len) {
 /*        s = getElementValue(token->node, &l);*/
 /*        if (compareCaseInsensitive(s, comp, len)) {*/
 /*            found = true;*/
-/*            /*printf("=> %.*s\n", l, s);*/*/
+/*            /*printf("=> %.*s\n", l, s);*/
 /*            char *header = malloc((l + 1) * sizeof(char));*/
 /*            sprintf(header, "%.*s", l, s);*/
 /**/

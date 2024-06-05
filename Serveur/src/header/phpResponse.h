@@ -10,6 +10,7 @@ typedef struct ListAnswers ListAnswers;
 struct PHPResponse {
     bool error;
     char *content;
+    int contentLength;
     int length;
 };
 typedef struct PHPResponse PHPResponse;
