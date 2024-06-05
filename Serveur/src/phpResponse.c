@@ -19,6 +19,10 @@ PHPResponse getPHPResponse(int fd) {
 
     // On créé une structure de la réponse
     PHPResponse response;
+    response.content = NULL;
+    response.length = 0;
+    response.type = PHP;
+    response.error = false;
 
     // On parcourt les différentes réponses données par
     // le processus PHP
@@ -26,16 +30,17 @@ PHPResponse getPHPResponse(int fd) {
     if (temp == NULL) {
         // Si il y a n'y a rien dans ce cas c'est très bizarre
         // car nous n'avons rien reçu
-        response.type = PHP;
-        response.content = NULL;
         return response;
     }
 
+    int i = 1;
     while (temp->next != NULL) {
         //? Si on reçoit une erreur, il faut la transmettre au client
         if (temp->answer.type == FCGI_STDERR) {
             response.error = true;
-        } else if (temp->answer.type == FCGI_END_REQUEST) {
+        } 
+
+        if (temp->answer.type == FCGI_END_REQUEST) {
             //! Code pour la fin de la requête
             //! Il faut récuperer toutes les valeurs nécessaires et peut-être les renvoyer
             //! Ou du moins vérifier que tout c'est bien déroulé
@@ -51,6 +56,32 @@ PHPResponse getPHPResponse(int fd) {
                 red();
                 printf("La requête n'a pas pu être complété par le processus\n");
                 reset();
+                response.error = true;
+            }
+        } else {
+            // Si c'est une réponse sans type particulier
+            if (i == 1) {
+                // Si c'est la première réponse, on récupère le contenu
+                temp->answer.contentData[temp->answer.contentLength] = '\0';
+                response.type = getPHPContentType(temp->answer.contentData);
+            } else {
+                // Sinon on écrit le contenu de la réponse dans content
+                char *toBeDeleted = response.content;
+                response.content = malloc((response.length + 
+                            temp->answer.contentLength) * sizeof(char));
+                // On recopie ce qu'on a déjà écrit
+                strncpy(response.content, toBeDeleted, response.length);
+
+                // On écrit ensuite le reste
+                strncat(response.content,
+                        temp->answer.contentData, 
+                        temp->answer.contentLength);
+
+                // On recalcule ensuite la nouvelle longueur
+                response.length += temp->answer.contentLength;
+
+                // On supprime le texte précédemment stockée dans la réponse
+                free(toBeDeleted);
             }
         }
         temp = temp->next;
@@ -172,4 +203,27 @@ ListAnswers* readPHPResponse(int fd) {
     }
 
     return answers;
+}
+
+ContentType getPHPContentType(char *content) {
+    // On cherche chaque contenu dans la chaine passée
+    if (strstr(content, "text/html") != NULL) {
+        return HTML;
+    } else if (strstr(content, "text/css") != NULL) {
+        return CSS;
+    } else if (strstr(content, "text/javascript") != NULL) {
+        return JAVASCRIPT;
+    } else if (strstr(content, "image/png") != NULL) {
+        return PNG;
+    } else if (strstr(content, "image/jpeg") != NULL ||
+            strstr(content, "image/jpg") != NULL) {
+        return JPEG;
+    } else if (strstr(content, "image/gif") != NULL) {
+        return GIF;
+    } else {
+        red();
+        printf("Erreur dans le type de renvoi de la réponse\n");
+        reset();
+        return PHP;
+    }
 }
