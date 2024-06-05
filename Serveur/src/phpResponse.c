@@ -1,21 +1,106 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "header/fastcgi.h"
-#include "header/phpResponse.h"
 #include "header/colours.h"
+#include "header/elisa.h"
+#include "header/pm.h"
+#include "header/phpResponse.h"
 
-int readPHPResponse(int fd) {
+PHPResponse getPHPResponse(int fd) {
+    //! Quelques notes sur cette fonction
+    //? -> On pourrait si besoin vérifier l'indentifiant de la requête
+    //? -> Nous ignorons complètement tout ce qui est écrit dans padding
+
+    ListAnswers *listAnswers = readPHPResponse(fd);
+
+    // On créé une structure de la réponse
+    PHPResponse response;
+    response.content = NULL;
+    response.length = 0;
+    response.type = PHP;
+    response.error = false;
+
+    // On parcourt les différentes réponses données par
+    // le processus PHP
+    ListAnswers *temp = listAnswers;
+    if (temp == NULL) {
+        // Si il y a n'y a rien dans ce cas c'est très bizarre
+        // car nous n'avons rien reçu
+        return response;
+    }
+
+    int i = 1;
+    while (temp->next != NULL) {
+        //? Si on reçoit une erreur, il faut la transmettre au client
+        if (temp->answer.type == FCGI_STDERR) {
+            response.error = true;
+        } 
+
+        if (temp->answer.type == FCGI_END_REQUEST) {
+            //! Code pour la fin de la requête
+            //! Il faut récuperer toutes les valeurs nécessaires et peut-être les renvoyer
+            //! Ou du moins vérifier que tout c'est bien déroulé
+            FCGI_EndRequestBody endRequest;
+            endRequest.appStatus = (temp->answer.contentData[0] << 24);
+            endRequest.appStatus += (temp->answer.contentData[1] << 16);
+            endRequest.appStatus += (temp->answer.contentData[2] << 8);
+            endRequest.appStatus += temp->answer.contentData[3];
+            printf("App Status => %d\n", endRequest.appStatus);
+            endRequest.protocolStatus = temp->answer.contentData[4];
+            
+            if (endRequest.protocolStatus != FCGI_REQUEST_COMPLETE) {
+                red();
+                printf("La requête n'a pas pu être complété par le processus\n");
+                reset();
+                response.error = true;
+            }
+        } else {
+            // Si c'est une réponse sans type particulier
+            if (i == 1) {
+                // Si c'est la première réponse, on récupère le contenu
+                temp->answer.contentData[temp->answer.contentLength] = '\0';
+                response.type = getPHPContentType(temp->answer.contentData);
+            } else {
+                // Sinon on écrit le contenu de la réponse dans content
+                char *toBeDeleted = response.content;
+                response.content = malloc((response.length + 
+                            temp->answer.contentLength) * sizeof(char));
+                // On recopie ce qu'on a déjà écrit
+                strncpy(response.content, toBeDeleted, response.length);
+
+                // On écrit ensuite le reste
+                strncat(response.content,
+                        temp->answer.contentData, 
+                        temp->answer.contentLength);
+
+                // On recalcule ensuite la nouvelle longueur
+                response.length += temp->answer.contentLength;
+
+                // On supprime le texte précédemment stockée dans la réponse
+                free(toBeDeleted);
+            }
+        }
+        temp = temp->next;
+    }
+
+    //? On libère la mémoire
+    while (listAnswers != NULL) {
+        temp = listAnswers->next;
+        free(listAnswers);
+        listAnswers = temp;
+    }
+
+    return response;
+}
+
+ListAnswers* readPHPResponse(int fd) {
     green();
     printf("Lecture de la réponse du processus PHP\n");
     reset();
-
-    //? On lit les données envoyées par le processus PHP
-    char received[FCGI_HEADER_SIZE + FASTCGILENGTH];
-
-    int size = read(fd, received, FCGI_HEADER_SIZE + FASTCGILENGTH);
 
     //!==============================================================
     //! Cette partie est uniquement nécessaire pour des tests
@@ -40,28 +125,105 @@ int readPHPResponse(int fd) {
     //! Fin de la partie Test
     //!==============================================================
 
-    //? On écrit dans la structure ce qu'on a reçu pour un traitement
-    //? plus simple des informations
     //! On fait bien attention aux champs short et non char
     //? Tant que l'on a pas lu tout le contenu du packet TCP, on doit
     //? continuer à lire
-    int j = 0;
-    while (j < size) {
-        printf("j => %d\n", j);
+    ListAnswers *answers = NULL;
+    char receivedHeader[FCGI_HEADER_SIZE];
+    bool done = false; // Ce booléen sera vrai si la réponse est finie
+    //? On lit les données envoyées par le processus PHP
+    //? On commence par lire le contenu du header
+    while (!done && read(fd, receivedHeader, FCGI_HEADER_SIZE) != 0) {
         FCGI_Header answer;
-        answer.version = received[j + 0];
-        answer.type = received[j + 1];
-        answer.requestId = (received[j + 2] << 7) + received[j + 3];
-        answer.contentLength = (received[j + 4] << 7) + received[j + 5];
-        answer.paddingLength = received[j + 6];
-        answer.reserved = received[j + 7];
-        for (int i = 0; i < answer.contentLength; i++) {
-            answer.contentData[j + i] = received[j + i + 8];
-        }
-        printf("%.*s\n", answer.contentLength, answer.contentData);
+        answer.version = receivedHeader[0];
+        answer.type = receivedHeader[1];
+        answer.requestId = (receivedHeader[2] << 8) + receivedHeader[3];
+        answer.contentLength = (receivedHeader[4] << 8) + receivedHeader[5];
+        answer.paddingLength = receivedHeader[6];
+        answer.reserved = receivedHeader[7];
+        printf("%d\n", answer.contentLength);
 
-        j += FCGI_HEADER_SIZE + answer.contentLength + answer.paddingLength;
+        // Si on a reçu une erreur, il faut en tenir compte
+        // et probablement renvoyer le contenu de l'erreur au client
+        bool errorReceived = false;
+        if (answer.type == FCGI_STDERR) {
+            errorReceived = true;
+            red();
+            printf("Nous avons recu une erreur\n");
+            reset();
+        }
+
+        bool endReceived = false;
+        if (answer.type == FCGI_END_REQUEST) {
+            endReceived = true;
+            green();
+            printf("Nous avons reçu la fin de la requete\n");
+            reset();
+        }
+
+        char *receivedContent = malloc(answer.contentLength * sizeof(char));
+
+        read(fd, receivedContent, answer.contentLength);
+
+        for (int i = 0; i < answer.contentLength; i++) {
+            answer.contentData[i] = receivedContent[i];
+        }
+
+        //! On pense à lire les paddings data
+        char *receivedPadding = malloc(answer.paddingLength * sizeof(char));
+        read(fd, receivedPadding, answer.paddingLength);
+        free(receivedPadding);
+
+        if (errorReceived) {
+            printf("Erreur => %.*s\n", answer.contentLength, answer.contentData);
+        } else if (endReceived) {
+            printf("Fin de la requête\n");
+            done = true;
+        } else {
+            printf("%.*s\n", answer.contentLength, answer.contentData);
+        }
+
+        ListAnswers *newAnswer = malloc(sizeof(ListAnswers));
+        newAnswer->answer = answer;
+        newAnswer->next = NULL;
+        // Ce n'est pas plus simple ici mais c'est pour rendre plus
+        // simple la lecture de cette liste par la suite, on insère la
+        // nouvelle réponse à la fin de la liste:
+        ListAnswers *temp = answers;
+        if (temp == NULL) {
+            answers = newAnswer;
+        } else {
+            while (temp->next != NULL) {
+                temp = temp->next;
+            }
+            temp->next = newAnswer;
+        }
+
+        free(receivedContent);
     }
 
-    return 0;
+    return answers;
+}
+
+ContentType getPHPContentType(char *content) {
+    // On cherche chaque contenu dans la chaine passée
+    if (strstr(content, "text/html") != NULL) {
+        return HTML;
+    } else if (strstr(content, "text/css") != NULL) {
+        return CSS;
+    } else if (strstr(content, "text/javascript") != NULL) {
+        return JAVASCRIPT;
+    } else if (strstr(content, "image/png") != NULL) {
+        return PNG;
+    } else if (strstr(content, "image/jpeg") != NULL ||
+            strstr(content, "image/jpg") != NULL) {
+        return JPEG;
+    } else if (strstr(content, "image/gif") != NULL) {
+        return GIF;
+    } else {
+        red();
+        printf("Erreur dans le type de renvoi de la réponse\n");
+        reset();
+        return PHP;
+    }
 }
