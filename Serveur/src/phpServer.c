@@ -89,20 +89,16 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
         // char erreur[taille];
         // erreur =reponse.content;
         
-        char version[8]="ttp/1.1";
+        char version[8]="TTP/1.1";
         for (int i=0; i<7;i++ ){
             reponse.content[i]=version[i];
         }
-        writeDirectClient(clientid,"h",1);
+        writeDirectClient(clientid,"H",1);
         writeDirectClient(clientid,reponse.content,reponse.contentLength);
         endWriteDirectClient(clientid);
     }
 
     
-    free(begin);
-
-    
-
     //sendToClient
 
 }

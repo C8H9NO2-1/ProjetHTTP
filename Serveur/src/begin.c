@@ -74,9 +74,9 @@ FCGI_Header *stdinHeader(int *l, char* chaine){
             firstRequest->contentData[i]=chaine[i];
             i++;
         }
-        firstRequest->contentData[i]='\0';
-        *l=FCGI_HEADER_SIZE+i+1;
-        firstRequest->contentLength=htons(i+1);
+        /*firstRequest->contentData[i]='\0';*/
+        *l=FCGI_HEADER_SIZE+i;
+        firstRequest->contentLength=htons(i);
     }
     else {
         *l=FCGI_HEADER_SIZE;
