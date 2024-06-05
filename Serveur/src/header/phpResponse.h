@@ -11,9 +11,14 @@ struct PHPResponse {
     bool error;
     ContentType type;
     char *content;
+    int length;
 };
 typedef struct PHPResponse PHPResponse;
 
+PHPResponse getPHPResponse(int fd);
+
 ListAnswers* readPHPResponse(int fd);
+
+ContentType getPHPContentType(char *content);
 
 #endif

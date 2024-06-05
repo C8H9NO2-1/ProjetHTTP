@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
     write(test, begin, longueurBegin);
     write(test, stdin, longueurStdin);
     free(begin);
+    free(stdin);
 
     //readPHPResponse(test);
 
