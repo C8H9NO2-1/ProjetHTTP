@@ -141,7 +141,7 @@ bool reponse(int code, int version, char * ctype , int clenght, char * filename,
         }
 
     } else if (code == 302) {
-        strcpy(first,"HTTP/1.1 200 OK\r\n");
+        strcpy(first,"HTTP/1.1 302 Found\r\n");
     }
     else{
         printf("Mauvais code de reponse fourni \n");
@@ -224,7 +224,7 @@ bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, cha
         }
 
     } else if (code == 302) {
-        strcpy(first,"HTTP/1.1 200 OK\r\n");
+        strcpy(first,"HTTP/1.1 302 Found\r\n");
     }
     else{
         printf("Mauvais code de reponse fourni \n");
@@ -305,7 +305,7 @@ bool reponse3(int code, int version, int clenght, char *chaine, int lenchaine ,c
         }
 
     } else if (code == 302) {
-        strcpy(first,"HTTP/1.1 200 OK\r\n");
+        strcpy(first,"HTTP/1.1 302 Found\r\n");
     } else {
         printf("Mauvais code de reponse fourni \n");
         return false;
