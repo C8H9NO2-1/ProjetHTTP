@@ -7,11 +7,11 @@ typedef struct {
 
 
 /*Le int dec_ecriture est un descripteur en écriture qui sera utilisé pour envoyer le FCGI PARAM,
-Le char * PHP contient le nom du document php à envoyer (le nom sans le path) Exemple: toto.php
 Le char * path contient le chemin du dossier dans lequel est contenu le document php : Exemple : header/dossier/info.php
 Le char * connection contient ce qu'il faut mettre dans le Champ HTTP_CONNECTION
+La method correspond à la method demandé par le client (GET/HEAD/POST)
 */
-int param(char * PHP, char * path, int desc_ecriture, char * connection);
+int param(char * path, int desc_ecriture, char * connection, Method method);
 
 
 /*Nous sert à free les FCGI_NameValuePair11*/
