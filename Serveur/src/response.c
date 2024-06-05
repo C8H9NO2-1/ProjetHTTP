@@ -267,3 +267,70 @@ bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, cha
     return true;
 
 }
+
+bool reponse3(int code, int version, int clenght, char *chaine, int lenchaine ,char * close , unsigned clientid  ){
+
+    char first[100];
+    if (code==100){
+        if(version==1){
+            strcpy(first,"HTTP/1.1 100 Continue\r\n");
+
+        }
+        else if(version==0){
+            strcpy(first,"HTTP/1.0 100 Continue\r\n");
+
+        }
+        else{
+            printf("Mauvaise version d'HTTP fourni \n");
+            return false;
+        }
+
+    }
+    else if(code==200){
+        if(version==1){
+            strcpy(first,"HTTP/1.1 200 OK\r\n");
+
+        }
+        else if(version==0){
+            strcpy(first,"HTTP/1.0 200 OK\r\n");
+
+        }
+        else{
+            printf("Mauvaise version d'HTTP fourni \n");
+            return false;
+        }
+
+    }
+    else{
+        printf("Mauvais code de reponse fourni \n");
+        return false;
+    }
+
+
+    char *buff = NULL;
+    if (clenght != 0) {
+        buff = malloc((log10(clenght)+2)*sizeof(char));
+        sprintf(buff, "%d", clenght);
+        buff[(int)log10(clenght)+1]='\0';
+    } else {
+        buff = malloc(2 * sizeof(char));
+        buff[0] = '0';
+        buff[1] = '\0';
+    }
+
+    writeDirectClient(clientid, first, strlen(first));
+    writeDirectClient(clientid, "Content-Length: ", strlen("Content-Length: "));
+    writeDirectClient(clientid, buff, strlen(buff));
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, "Connection: ", strlen("Connection: "));
+    writeDirectClient(clientid, close, strlen(close));
+    writeDirectClient(clientid, "\r\n", 2);
+    writeDirectClient(clientid, chaine , lenchaine );
+
+
+    endWriteDirectClient(clientid);
+    free(buff);
+
+    return true;
+
+}

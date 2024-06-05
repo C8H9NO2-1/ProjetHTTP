@@ -27,4 +27,7 @@
 bool reponse2(int code, int version, char * ctype , int clenght, FILE *file, char * close , unsigned clientid  );
 
 
+bool reponse3(int code, int version, int clenght, char *chaine, int lenchaine ,char * close , unsigned clientid  );
+
+
 #endif
