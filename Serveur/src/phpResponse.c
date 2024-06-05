@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "header/pm.h"
 #include "header/fastcgi.h"
 #include "header/colours.h"
 #include "header/phpResponse.h"
@@ -31,6 +32,7 @@ PHPResponse getPHPResponse(int fd) {
     }
 
     int i = 1;
+    int tempLength = 0;
     while (temp->next != NULL) {
         //? Si on reçoit une erreur, il faut la transmettre au client
         if (temp->answer.type == FCGI_STDERR) {
@@ -57,10 +59,14 @@ PHPResponse getPHPResponse(int fd) {
             // Si c'est une réponse sans type particulier
             // On doit bien vérifier les headers
             char *toBeDeleted = response.content;
-            response.content = malloc((response.length + 
-                        temp->answer.contentLength) * sizeof(char));
+            response.content = malloc((response.length
+                        + temp->answer.contentLength
+                        + 1) * sizeof(char));
+            response.content[response.length] = '\0';
             // On recopie ce qu'on a déjà écrit
-            strncpy(response.content, toBeDeleted, response.length);
+            if (toBeDeleted != NULL) {
+                strncpy(response.content, toBeDeleted, response.length);
+            }
 
             // On écrit ensuite le reste
             strncat(response.content,
@@ -76,7 +82,7 @@ PHPResponse getPHPResponse(int fd) {
                             && temp->answer.contentData[j + 1] == 10
                             && temp->answer.contentData[j + 2] == 13
                             && temp->answer.contentData[j + 3] == 10) {
-                        response.length -= j + 4;
+                        tempLength = j + 4;
                         break;
                     }
                     j++;
@@ -85,7 +91,9 @@ PHPResponse getPHPResponse(int fd) {
             }
 
             // On supprime le texte précédemment stockée dans la réponse
-            free(toBeDeleted);
+            if (toBeDeleted != NULL) {
+                free(toBeDeleted);
+            }
         }
         temp = temp->next;
     }
@@ -96,6 +104,8 @@ PHPResponse getPHPResponse(int fd) {
         free(listAnswers);
         listAnswers = temp;
     }
+
+    response.length -= tempLength;
 
     return response;
 }
@@ -132,7 +142,7 @@ ListAnswers* readPHPResponse(int fd) {
     //? Tant que l'on a pas lu tout le contenu du packet TCP, on doit
     //? continuer à lire
     ListAnswers *answers = NULL;
-    char receivedHeader[FCGI_HEADER_SIZE];
+    unsigned char receivedHeader[FCGI_HEADER_SIZE];
     bool done = false; // Ce booléen sera vrai si la réponse est finie
     //? On lit les données envoyées par le processus PHP
     //? On commence par lire le contenu du header
@@ -159,12 +169,13 @@ ListAnswers* readPHPResponse(int fd) {
         bool endReceived = false;
         if (answer.type == FCGI_END_REQUEST) {
             endReceived = true;
+            done = true;
             green();
             printf("Nous avons reçu la fin de la requete\n");
             reset();
         }
 
-        char *receivedContent = malloc(answer.contentLength * sizeof(char));
+        unsigned char *receivedContent = malloc(answer.contentLength * sizeof(char));
 
         read(fd, receivedContent, answer.contentLength);
 
@@ -173,7 +184,7 @@ ListAnswers* readPHPResponse(int fd) {
         }
 
         //! On pense à lire les paddings data
-        char *receivedPadding = malloc(answer.paddingLength * sizeof(char));
+        unsigned char *receivedPadding = malloc(answer.paddingLength * sizeof(char));
         read(fd, receivedPadding, answer.paddingLength);
         free(receivedPadding);
 
@@ -181,7 +192,6 @@ ListAnswers* readPHPResponse(int fd) {
             printf("Erreur => %.*s\n", answer.contentLength, answer.contentData);
         } else if (endReceived) {
             printf("Fin de la requête\n");
-            done = true;
         } else {
             printf("%.*s\n", answer.contentLength, answer.contentData);
         }
