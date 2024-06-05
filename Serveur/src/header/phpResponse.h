@@ -9,8 +9,8 @@ typedef struct ListAnswers ListAnswers;
 
 struct PHPResponse {
     bool error;
-    ContentType type;
     char *content;
+    int contentLength;
     int length;
 };
 typedef struct PHPResponse PHPResponse;
@@ -18,7 +18,5 @@ typedef struct PHPResponse PHPResponse;
 PHPResponse getPHPResponse(int fd);
 
 ListAnswers* readPHPResponse(int fd);
-
-ContentType getPHPContentType(char *content);
 
 #endif
