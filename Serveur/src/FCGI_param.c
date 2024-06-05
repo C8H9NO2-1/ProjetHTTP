@@ -9,12 +9,13 @@
 
 #include "header/fastcgi.h"
 #include "header/FCGI_param.h"
-#include "header/api.h"
+#include "header/pm.h"
 
 
 void freeFCGI_NameValuePair11(FCGI_NameValuePair11 * AH){
     free(AH->nameData);
     free(AH->valueData);
+    free(AH);
 }
 
 int create_FCGI_NameValuePair11(FCGI_NameValuePair11  * OH, char * Name, char * Value){
@@ -62,7 +63,7 @@ int add_CDATA(FCGI_NameValuePair11 * UH, char * su, int i){
 }
 
 
-int param(char * PHP, char * path, int desc_ecriture, void * root, char * connection){
+int param(char * PHP, char * path, int desc_ecriture,  char * connection, Method method){
 
     FCGI_Header Head;
     Head.version=FCGI_VERSION_1;
@@ -79,54 +80,30 @@ int param(char * PHP, char * path, int desc_ecriture, void * root, char * connec
     }
 
 
+    char methodee=malloc(6*sizeof(char));
+
+    if(method==GET){
+        strcpy( methodee , "GET");
+    }
+    else if (methodee == HEAD){
+        strcpy(methodee , "HEAD");
+    }
+    else if (methodee == POST){
+        strcpy(methodee, "POST");
+    }
+
     /*Début des problèmes/Headers HTTP*/
 
     FCGI_NameValuePair11 Host;
     create_FCGI_NameValuePair11(&Host,"HTTP_HOST", "127.0.0.1" );
 
-    FCGI_NameValuePair11 User_Agent;
-    _Token * user;
-    user = searchTree(root, "User-Agent");
-
-    if(user!=NULL){
-
-        int l;
-        char *s=getElementValue(user->node,&l);
-
-        if (s[11]==' '){
-            char d[l-12];
-            int p=12;
-
-            while(p<l){
-                d[p-12]= s[p];
-                p++;
-            }
-
-            create_FCGI_NameValuePair11(&User_Agent, "HTTP_USER_AGENT", d);
-            
-        }
-        else{
-
-            char d[l-11];
-            int p=11;
-            
-            while(p<l){
-                d[p-11]= s[p];
-                p++;
-            }
-
-            create_FCGI_NameValuePair11(&User_Agent, "HTTP_USER_AGENT", d);
-
-        }
-
-    }
-
+    
     FCGI_NameValuePair11 Connection;
     create_FCGI_NameValuePair11(&Connection,"HTTP_CONNECTION", connection );
     FCGI_NameValuePair11 Path;
     create_FCGI_NameValuePair11(&Path,"PATH", getenv("PATH") );
     FCGI_NameValuePair11 Signature;
-    create_FCGI_NameValuePair11(&Signature,"SERVER_SIGNATURE", "<address>IRC_LES_GOATS Server at 127.0.0.1 Port 8080</address>");
+    create_FCGI_NameValuePair11(&Signature,"SERVER_SIGNATURE", "<address>IRC_LES_GOATS Server at 127.0.0.1 Port 8080</address>\n");
 
     //Continuer les headers HTTP
 
@@ -141,12 +118,17 @@ int param(char * PHP, char * path, int desc_ecriture, void * root, char * connec
     create_FCGI_NameValuePair11(&PORT, "SERVER_PORT", "8080");
     FCGI_NameValuePair11 RADDR;
     create_FCGI_NameValuePair11(&RADDR, "REMOTE_ADDR", "127.0.0.1");
+    char finscript[100]="127.0.0.1:8080//";
+    strcat(finscript, path );
+    FCGI_NameValuePair11 Script;
+    create_FCGI_NameValuePair11(&Script, "SCRIPT_FILENAME", finscript);
+    FCGI_NameValuePair11 Query;
+    create_FCGI_NameValuePair11(&Query,"","");
+    FCGI_NameValuePair11 Request;
+    create_FCGI_NameValuePair11(&Request, "REQUEST_METHOD", methodee );
 
     int u=0;
     u=add_CDATA(&Host, Head.contentData ,u);
-    if(user!=NULL){
-        u=add_CDATA(&User_Agent, Head.contentData, u);
-    }
     u=add_CDATA(&Connection, Head.contentData ,u);
     u=add_CDATA(&Path, Head.contentData ,u);
     u=add_CDATA(&Signature, Head.contentData ,u);
@@ -155,6 +137,9 @@ int param(char * PHP, char * path, int desc_ecriture, void * root, char * connec
     u=add_CDATA(&ADDR, Head.contentData ,u);
     u=add_CDATA(&PORT, Head.contentData ,u);
     u=add_CDATA(&RADDR, Head.contentData ,u);
+    u=add_CDATA(&Script, Head.contentData, u);
+    u=add_CDATA(&Request, Head.contentData, u);
+    u=add_CDATA(&Query, Head.contentData, u);
     Head.contentLength=htons(u);
     //printf("Ceci est égal à u: %d \n", u);
 
@@ -162,10 +147,18 @@ int param(char * PHP, char * path, int desc_ecriture, void * root, char * connec
     write(desc_ecriture, &Head, u + FCGI_HEADER_SIZE);
 
 
+
+    FCGI_Header Head2;
+    Head2.version=FCGI_VERSION_1;
+    Head2.requestId=htons(FCGI_REQUEST_ID);
+    Head2.type=FCGI_PARAMS;
+    Head2.paddingLength=0;
+    Head2.reserved=0;
+    Head2.contentLength=0;
+    write(desc_ecriture, &Head2, FCGI_HEADER_SIZE);
+
+
     freeFCGI_NameValuePair11(&Host);
-    if(user!=NULL){
-        freeFCGI_NameValuePair11(&User_Agent);
-    }
     freeFCGI_NameValuePair11(&Connection);
     freeFCGI_NameValuePair11(&Path);
     freeFCGI_NameValuePair11(&Signature);
@@ -174,5 +167,9 @@ int param(char * PHP, char * path, int desc_ecriture, void * root, char * connec
     freeFCGI_NameValuePair11(&ADDR);
     freeFCGI_NameValuePair11(&PORT);
     freeFCGI_NameValuePair11(&RADDR);
+    freeFCGI_NameValuePair11(&Script);
+    freeFCGI_NameValuePair11(&Request);
+    freeFCGI_NameValuePair11(&Query);
+    free(methodee);
     return 1;
 }
