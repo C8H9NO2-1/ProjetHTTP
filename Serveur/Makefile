@@ -13,22 +13,21 @@ ifeq ($(UNAME), Darwin)
 endif
 exec = prog
 server = server
-objects = $(addprefix $(bin),functions.o api.o pm.o elisa.o ismail.o colours.o)
-#objects = $(addprefix $(bin),functions.o api.o pm.o)
+# objects = $(addprefix $(bin), functions.o)
+objects = $(addprefix $(bin),functions.o api.o pm.o elisa.o ismail.o colours.o response.o tom.o fileLen.o)
+#objects = $(addprefix $(bin),functions.o api.o pm.o colours.o)
 main1 = $(bin)main.o
 main2 = $(bin)server.o
 
 all : $(exec)
 
 $(exec) : $(objects) $(main1)
-	gcc -o $(exec) $(objects) $(main1)  -lm -L./$(zlib) -lz 
-# -fsanitize=address
+	gcc -o $(exec) $(objects) $(main1)  -lm -L./$(zlib) -lz -fsanitize=address
 $(bin)%.o : %.c
 	gcc $(CFLAGS) -c $< $(OUTPUT_OPTION) 
 
 $(server) : $(objects) $(main2)
-	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -lm -L./$(zlib) -lz 
-# -fsanitize=address
+	gcc -o server $(objects) $(main2) -L./$(bin) -lrequest -lm -L./$(zlib) -lz -fsanitize=address
 
 	#export LD_LIBRARY_PATH=./bin
 

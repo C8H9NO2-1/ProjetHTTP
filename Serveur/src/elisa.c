@@ -121,8 +121,51 @@ void purgeListeEncodage(listeEncodage **r) {
     *r = NULL;
 }
 
-// void DecodeChunked(char *s, int l){
-//     int length = O;
+void printRawString(const char *str, int l) {
+    int i=0;
+    while (i<l) {
+        putchar(str[i]);
+        printf("%c \n", str[i]);
+        i++;
+    }
+}
 
-
-// }
+char* DecodeChunked(char *s, int *l){
+    int max = *l;
+    *l=0;
+    char message[max];
+    int length = 0;
+    int i=0;
+    while (i<max){
+        while (i<max && (s[i]<=48 || s[i]>=57)){
+            i++;
+        }
+        int debut = i;
+        while (i<max && (s[i]>=48 && s[i]<=57 || s[i]>=65 && s[i]<=69)){
+            i++;
+        }
+        int fin =i-1;
+        int taille = fin - debut;
+        char size[taille+2] ;
+        for (int j=debut ; j<fin+1 ; j++){
+            size[j-debut]=s[j];
+        } 
+        int size_chunked = (int)strtol(size, NULL, 16);
+        if (size_chunked==0){
+            break;
+        }
+        debut = i+2;
+        for (i=debut; i<size_chunked+debut; i++){
+            message[i-debut+*l]=s[i];
+        }
+        *l=*l+size_chunked;
+        printf("string : %s \n", message);
+    }
+    char decode[*l+2];
+    for (int k; k<=*l ; k++){
+        decode[k]=message[k];
+    }
+    printRawString(decode, *l);
+    printf("\n");
+    return(decode);
+}
