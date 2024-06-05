@@ -21,8 +21,6 @@
 #define REPONSE2 "\r\n<html><head><title>Test</title></head><body><p>This is a test</p></body></html>"
 #define REPONSE3 "Connection: close\r\n"
 
-//! Pour exécuter: cat ... | ./server
-
 int main(int argc, char *argv[]) {
     message *requete;
 
@@ -69,6 +67,17 @@ int main(int argc, char *argv[]) {
             if (testHost && dns == 0) { //TODO Il faudra bien prendre en compte le fait que le header peut être le nom d'un site ou une adresse ip (dans le cas d'une @ip, il faut aller dans le else)
                 valueHost = getElementValue(r2->node, &lengthHost);
                 if (lengthTarget == 1 && valueTarget[0] == '/') {
+                    //! Si on est sur le site PHP, il faut donner un fichier
+                    //! par défaut différent de index.html que l'on veut
+                    //! protéger
+                    if (strncmp(valueHost, "www.testphp.fr", lengthHost) == 0) {
+                        file = NULL;
+                        const char *temp = "/main.php";
+                        const int lengthTemp = strlen(temp);
+                        valueTarget = malloc(lengthTemp * sizeof(char));
+                        strncpy(valueTarget, temp, lengthTemp);
+                        lengthTarget = lengthTemp;
+                    }
                     file = defaultPath(valueHost, lengthHost);
                 } else {
                      file = checkExistenceWithHost(valueTarget, lengthTarget, valueHost, lengthHost);
@@ -206,6 +215,9 @@ int main(int argc, char *argv[]) {
 
                 //? Accept
                 ContentType ressourceType = typeFromPath(valueTarget, lengthTarget);
+                if (file == NULL) {
+                    ressourceType = PHP;
+                }
                 if (acceptHeaderVerification(root, ressourceType)) {
                     green();
                     printf("Le client accepte le type de notre représentation\n");

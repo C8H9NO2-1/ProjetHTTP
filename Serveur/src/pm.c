@@ -271,12 +271,7 @@ FILE* defaultPath(char *host, int len) {
     char *base = "racine/";
     int lenBase = strlen(base);
 
-    char defaultFile[100];
-    if (strncmp(host, "www.testphp.com", len) == 0) {
-        strcpy(defaultFile, "/main.php");
-    } else {
-        strcpy(defaultFile, "/index.html");
-    }
+    char defaultFile[] = "/index.html";
     int lenFile = strlen(defaultFile);
 
     // On normalise le champ host
