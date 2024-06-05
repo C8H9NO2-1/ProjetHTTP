@@ -127,9 +127,12 @@ int param(char * path, int desc_ecriture,  char * connection, Method method){
     create_FCGI_NameValuePair11(&Query,"QUERY_STRING","");
     FCGI_NameValuePair11 Request;
     create_FCGI_NameValuePair11(&Request, "REQUEST_METHOD", methodee );
+    FCGI_NameValuePair11 Type;
+    create_FCGI_NameValuePair11(&Type, "CONTENT_TYPE", "application/x-www-form-urlencoded" );
 
     int u=0;
     u=add_CDATA(&Host, Head.contentData ,u);
+    u=add_CDATA(&Type, Head.contentData, u);
     u=add_CDATA(&Connection, Head.contentData ,u);
     u=add_CDATA(&Path, Head.contentData ,u);
     u=add_CDATA(&Signature, Head.contentData ,u);
@@ -171,6 +174,7 @@ int param(char * path, int desc_ecriture,  char * connection, Method method){
     freeFCGI_NameValuePair11(&Script);
     freeFCGI_NameValuePair11(&Request);
     freeFCGI_NameValuePair11(&Query);
+    freeFCGI_NameValuePair11(&Type);
     free(methodee);
     return 1;
 }
