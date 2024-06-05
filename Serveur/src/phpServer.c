@@ -65,12 +65,18 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
     // char *chaine = "bonjour";
     FCGI_Header *begin =  beginRequest(&longueurBegin);
     write(test, begin, longueurBegin);
+    free(begin);
 
     param(path,test,connection,method);
     
-    if (chaine !=NULL){
-          FCGI_Header *stdin = stdinRequest(&longueurStdin, chaine);
-          write(test, stdin, longueurStdin);
+    FCGI_Header *stdin = stdinRequest(&longueurStdin, chaine);
+    write(test, stdin, longueurStdin);
+    free(stdin);
+
+    if (chaine != NULL) {
+        stdin = stdinRequest(&longueurStdin, NULL);
+        write(test, stdin, longueurStdin);
+        free(stdin);
     }
   
 

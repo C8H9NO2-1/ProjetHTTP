@@ -299,7 +299,7 @@ int main(int argc, char *argv[]) {
                         rP = searchTree(root, "message-body");
                         int lengthBody;
                         char *valueBody;
-                        valueBody = getElementValue(r->node, &lengthBody);
+                        valueBody = getElementValue(rP->node, &lengthBody);
                         printf("%.*s\n", lengthBody, valueBody);
 
                         char *valueBodyCopy = malloc((lengthBody + 1) * sizeof(char));
