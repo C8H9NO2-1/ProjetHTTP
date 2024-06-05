@@ -83,7 +83,11 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
     PHPResponse reponse=getPHPResponse(test);
     
     if (reponse.error ==false){
-        reponse3(200,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
+        if (method == POST) {
+            reponse3(302,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
+        } else {
+            reponse3(200,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
+        }
     }else{
         // int taille=reponse.length+1;
         // char erreur[taille];

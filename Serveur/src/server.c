@@ -304,6 +304,7 @@ int main(int argc, char *argv[]) {
 
                         char *valueBodyCopy = malloc((lengthBody + 1) * sizeof(char));
                         strncpy(valueBodyCopy, valueBody, lengthBody);
+                        valueBodyCopy[lengthBody] = '\0';
 
                         char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
                         phpServerResponse(path, 1, "close", POST, requete->clientId, valueBodyCopy);
