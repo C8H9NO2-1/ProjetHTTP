@@ -63,7 +63,7 @@ int add_CDATA(FCGI_NameValuePair11 * UH, char * su, int i){
 }
 
 
-int param(char * path, int desc_ecriture,  char * connection, Method method){
+int param(char * path, int desc_ecriture,  char * connection, Method method, char* content_type, int content_len ){
 
     FCGI_Header Head;
     Head.version=FCGI_VERSION_1;
@@ -130,14 +130,27 @@ int param(char * path, int desc_ecriture,  char * connection, Method method){
 
     /*Hardcodé par ici*/
     FCGI_NameValuePair11 Type;
-    create_FCGI_NameValuePair11(&Type, "CONTENT_TYPE", "application/x-www-form-urlencoded" );
+
+    if(content_type != NULL){
+        char * contant = malloc ((content_len+1)*sizeof(char));
+        strncat(contant , content_type , content_len);
+        contant[content_len ]='\0';
+        create_FCGI_NameValuePair11(&Type, "CONTENT_TYPE", contant );
+        free(contant);
+    }
+
     FCGI_NameValuePair11 Length;
-    create_FCGI_NameValuePair11(&Length, "CONTENT_LENGTH", "60");
+    if(content_type != NULL){
+        char K = content_len;
+        create_FCGI_NameValuePair11(&Length, "CONTENT_LENGTH", &K);
+    }
 
     int u=0;
     u=add_CDATA(&Host, Head.contentData ,u);
-    u=add_CDATA(&Type, Head.contentData, u);
-    u=add_CDATA(&Length, Head.contentData, u);
+    if(content_type != NULL){
+        u=add_CDATA(&Type, Head.contentData, u);
+        u=add_CDATA(&Length, Head.contentData, u);
+    }
     u=add_CDATA(&Connection, Head.contentData ,u);
     u=add_CDATA(&Path, Head.contentData ,u);
     u=add_CDATA(&Signature, Head.contentData ,u);
@@ -179,8 +192,10 @@ int param(char * path, int desc_ecriture,  char * connection, Method method){
     freeFCGI_NameValuePair11(&Script);
     freeFCGI_NameValuePair11(&Request);
     freeFCGI_NameValuePair11(&Query);
-    freeFCGI_NameValuePair11(&Type);
-    freeFCGI_NameValuePair11(&Length);
+    if(content_type != NULL){
+        freeFCGI_NameValuePair11(&Type);
+        freeFCGI_NameValuePair11(&Length);
+    }
     free(methodee);
     return 1;
 }

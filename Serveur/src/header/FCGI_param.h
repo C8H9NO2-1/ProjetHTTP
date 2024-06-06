@@ -10,8 +10,10 @@ typedef struct {
 Le char * path contient le chemin du dossier dans lequel est contenu le document php : Exemple : header/dossier/info.php
 Le char * connection contient ce qu'il faut mettre dans le Champ HTTP_CONNECTION
 La method correspond à la method demandé par le client (GET/HEAD/POST)
+Le char * content_type contient le type du content, mettre NULL si  vous ne voulez pas mettre le header
+Le int content len contient la taille du content, ignoré si content_type == NULL
 */
-int param(char * path, int desc_ecriture, char * connection, Method method);
+int param(char * path, int desc_ecriture, char * connection, Method method, char* content_type, int content_len );
 
 
 /*Nous sert à free les FCGI_NameValuePair11*/
