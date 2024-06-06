@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
             return -1;
         }
 
-        printf("###########################################\n");
+        printf("\n\n###########################################\n");
         printf("Demande reçue depuis le client %d\n", requete->clientId);
         printf("Client [%d] [%s:%d]\n", requete->clientId, inet_ntoa(requete->clientAddress->sin_addr), htons(requete->clientAddress->sin_port));
         printf("Contenu de la demande %.*s\n\n", requete->len, requete->buf);
