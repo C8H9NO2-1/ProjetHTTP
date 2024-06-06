@@ -63,6 +63,7 @@ int main(int argc, char *argv[]) {
             char *valueHost = NULL;
             int dns = -1; // On veut savoir si c'est le nom d'un site web ou une @IP
             bool testHost = semanticHost(root, version, &dns);
+            bool isDefault = false;
             if (testHost && dns == 0) { //TODO Il faudra bien prendre en compte le fait que le header peut être le nom d'un site ou une adresse ip (dans le cas d'une @ip, il faut aller dans le else)
                 valueHost = getElementValue(r2->node, &lengthHost);
                 if (lengthTarget == 1 && valueTarget[0] == '/') {
@@ -78,6 +79,7 @@ int main(int argc, char *argv[]) {
                         lengthTarget = lengthTemp;
                     }
                     file = defaultPath(valueHost, lengthHost);
+                    isDefault = true;
                 } else {
                      file = checkExistenceWithHost(valueTarget, lengthTarget, valueHost, lengthHost);
                 }
@@ -216,6 +218,9 @@ int main(int argc, char *argv[]) {
                 ContentType ressourceType = typeFromPath(valueTarget, lengthTarget);
                 if (file == NULL) {
                     ressourceType = PHP;
+                }
+                if (isDefault) {
+                    ressourceType = HTML;
                 }
 
                 //? On commence par vérifier si on doit traiter une requête PHP
