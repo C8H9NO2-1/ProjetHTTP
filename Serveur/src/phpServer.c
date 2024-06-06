@@ -5,7 +5,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <math.h>
 
 #include "header/pm.h"
 
@@ -30,7 +29,7 @@
 static int createSocket(char *ip, int port) {
     int fd;
     struct sockaddr_in serv_addr;
-    int enable = 1;
+    /*int enable = 1;*/
 
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket creation failed\n");
