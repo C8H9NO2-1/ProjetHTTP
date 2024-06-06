@@ -668,8 +668,8 @@ ContentType typeFromPath(char *path, int len) {
     } else if (extensionMatch(temp, ".ico")) {
         result = ICO;
     } else {
-        // Par défaut on renvoie une page html
-        result = HTML;
+        // Par défaut on renvoie un flux d'octet
+        result = DEFAULT;
     }
 
     free(temp);

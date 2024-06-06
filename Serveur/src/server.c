@@ -297,6 +297,10 @@ int main(int argc, char *argv[]) {
                         const char *temp = "image/vnd.microsoft.icon";
                         strcpy(type, temp);
                         type[strlen(temp)] = '\0';
+                    } else if (ressourceType == DEFAULT) {
+                        const char *temp = "application/octet-stream";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
                     }
 
                     long int length = 0;
