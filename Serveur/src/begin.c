@@ -4,10 +4,6 @@
 #include <stdbool.h>
 
 #include "header/request.h"
-#include "header/api.h"
-#include "header/elisa.h"
-#include "header/pm.h"
-#include "header/ismail.h"
 #include "header/fastcgi.h"
 #include "header/begin.h"
 

@@ -46,7 +46,7 @@ PHPResponse getPHPResponse(int fd) {
             endRequest.appStatus += (temp->answer.contentData[1] << 16);
             endRequest.appStatus += (temp->answer.contentData[2] << 8);
             endRequest.appStatus += temp->answer.contentData[3];
-            printf("App Status => %d\n", endRequest.appStatus);
+            /*printf("App Status => %d\n", endRequest.appStatus);*/
             endRequest.protocolStatus = temp->answer.contentData[4];
             
             if (endRequest.protocolStatus != FCGI_REQUEST_COMPLETE) {
@@ -115,29 +115,6 @@ ListAnswers* readPHPResponse(int fd) {
     printf("Lecture de la réponse du processus PHP\n");
     reset();
 
-    //!==============================================================
-    //! Cette partie est uniquement nécessaire pour des tests
-    /*received[0] = (char) 1;*/
-    /*received[1] = (char) FCGI_STDOUT;*/
-    /*received[2] = (char) 3;*/
-    /*received[3] = (char) 7;*/
-    /*received[4] = (char) 0;*/
-    /*received[5] = (char) 8;*/
-    /*received[6] = (char) 0;*/
-    /*received[7] = (char) 0;*/
-    /**/
-    /*received[8] = 8;*/
-    /*received[9] = 9;*/
-    /*received[10] = 10;*/
-    /*received[11] = 11;*/
-    /*received[12] = 12;*/
-    /*received[13] = 13;*/
-    /*received[14] = 14;*/
-    /*received[15] = 15;*/
-
-    //! Fin de la partie Test
-    //!==============================================================
-
     //! On fait bien attention aux champs short et non char
     //? Tant que l'on a pas lu tout le contenu du packet TCP, on doit
     //? continuer à lire
@@ -147,7 +124,6 @@ ListAnswers* readPHPResponse(int fd) {
     //? On lit les données envoyées par le processus PHP
     //? On commence par lire le contenu du header
     while (!done && read(fd, receivedHeader, FCGI_HEADER_SIZE) != 0) {
-        printf("Hello\n");
         FCGI_Header answer;
         answer.version = receivedHeader[0];
         answer.type = receivedHeader[1];
@@ -155,7 +131,6 @@ ListAnswers* readPHPResponse(int fd) {
         answer.contentLength = (receivedHeader[4] << 8) + receivedHeader[5];
         answer.paddingLength = receivedHeader[6];
         answer.reserved = receivedHeader[7];
-        printf("%d\n", answer.contentLength);
 
         // Si on a reçu une erreur, il faut en tenir compte
         // et probablement renvoyer le contenu de l'erreur au client
@@ -190,11 +165,13 @@ ListAnswers* readPHPResponse(int fd) {
         free(receivedPadding);
 
         if (errorReceived) {
+            red();
             printf("Erreur => %.*s\n", answer.contentLength, answer.contentData);
+            reset();
         } else if (endReceived) {
+            cyan();
             printf("Fin de la requête\n");
-        } else {
-            printf("%.*s\n", answer.contentLength, answer.contentData);
+            reset();
         }
 
         ListAnswers *newAnswer = malloc(sizeof(ListAnswers));
