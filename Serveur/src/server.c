@@ -218,42 +218,6 @@ int main(int argc, char *argv[]) {
                 if (file == NULL) {
                     ressourceType = PHP;
                 }
-                if (acceptHeaderVerification(root, ressourceType)) {
-                    green();
-                    printf("Le client accepte le type de notre représentation\n");
-                    reset();
-                    printf("Celle-ci est: ");
-                    blue();
-                    switch (ressourceType) {
-                        case HTML:
-                            printf("text/html\n");
-                            break;
-                        case CSS:
-                            printf("text/css\n");
-                            break;
-                        case JAVASCRIPT:
-                            printf("text/javascript\n");
-                            break;
-                        case PNG:
-                            printf("image/png\n");
-                            break;
-                        case JPEG:
-                            printf("image/jpeg\n");
-                            break;
-                        case GIF:
-                            printf("image/gif\n");
-                            break;
-                        case PHP:
-                            printf("On à affaire à une requête de type PHP\n");
-                        case ICO:
-                            printf("image/vnd.microsoft.icon\n");
-                    }
-                    reset();
-                } else {
-                    red();
-                    printf("Le client n'accepte pas le type de notre représentation\n");
-                    reset();
-                }
 
                 //? On commence par vérifier si on doit traiter une requête PHP
                 bool php = false;
