@@ -125,7 +125,7 @@ bool semanticHost(void *root, int version, int * info){
         //printf("Bon, là c'est ça: %s \n", lire);
 
         if(strcmp( inside, lire )==0){
-            printf("Adresse dns dans le champ host \n");
+            /*printf("Adresse dns dans le champ host \n");*/
             free(inside);
             fclose(fichier);
             purgeElement(&host);
@@ -144,7 +144,7 @@ bool semanticHost(void *root, int version, int * info){
 
     purgeElement(&host);
 
-    printf("Adresse IPV6 dans le champ host \n");
+    /*printf("Adresse IPV6 dans le champ host \n");*/
 
     *info=1;
 

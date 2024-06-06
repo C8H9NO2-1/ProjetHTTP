@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         printf("Client [%d] [%s:%d]\n", requete->clientId, inet_ntoa(requete->clientAddress->sin_addr), htons(requete->clientAddress->sin_port));
         printf("Contenu de la demande %.*s\n\n", requete->len, requete->buf);
 
-        printf("===========\n");
+        printf("========== Traitement de la requête par le serveur ==========\n");
 
         if (parseur(requete->buf, requete->len) != 0) {
             _Token *r, *r2;
@@ -158,8 +158,6 @@ int main(int argc, char *argv[]) {
             //! Interface debugging du serveur:
             //!================================
             if (!errorSent) {
-                printf("\n\n==========\n");
-
                 //? Méthode
                 printf("Méthode demandée par le client: ");
                 green();
@@ -226,7 +224,9 @@ int main(int argc, char *argv[]) {
                 //? On commence par vérifier si on doit traiter une requête PHP
                 bool php = false;
                 if (ressourceType == PHP) {
-                    printf("Il faut traiter le code PHP du fichier\n");
+                    yellow();
+                    printf("Il faut faire appel au processus PHP\n");
+                    reset();
                     php = true;
                 }
 
@@ -290,7 +290,6 @@ int main(int argc, char *argv[]) {
                         int lengthBody;
                         char *valueBody;
                         valueBody = getElementValue(rP->node, &lengthBody);
-                        printf("%.*s\n", lengthBody, valueBody);
 
                         char *valueBodyCopy = malloc((lengthBody + 1) * sizeof(char));
                         strncpy(valueBodyCopy, valueBody, lengthBody);
@@ -302,7 +301,6 @@ int main(int argc, char *argv[]) {
                         int lengthContentType;
                         char *valueContentType;
                         valueContentType = getElementValue(rCT->node, &lengthContentType);
-                        /*printf("%.*s\n", lengthContentType, valueContentType);*/
 
                         // On récupère le Content-Length header
                         _Token *rCL;
@@ -310,7 +308,6 @@ int main(int argc, char *argv[]) {
                         int lengthContentLength;
                         char *valueContentLength;
                         valueContentLength = getElementValue(rCL->node, &lengthContentLength);
-                        /*printf("%.*s\n", lengthContentLength, valueContentLength);*/
 
                         // On récupère le Cookie-header
                         if (!semanticCookie(root)) {
@@ -350,7 +347,6 @@ int main(int argc, char *argv[]) {
                             lengthCookie = 0;
                         } else {
                             valueCookie = getElementValue(rC->node, &lengthCookie);
-                            printf("%.*s\n", lengthCookie, valueCookie);
                         }
                         char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
                         phpServerResponse(path, 1, "close", method, requete->clientId, NULL, NULL, 0, NULL, 0, valueCookie, lengthCookie);
