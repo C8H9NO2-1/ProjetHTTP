@@ -153,7 +153,7 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
     FCGI_NameValuePair11 Cookie_Header;
     if(cookie != NULL){
         char * contac = malloc ((cookie_len+1)*sizeof(char));
-        strncpy(contac , content_len , cookie_len);
+        strncpy(contac , cookie , cookie_len);
         contac[cookie_len ]='\0';
         create_FCGI_NameValuePair11(&Cookie_Header, "HTTP_COOKIE", contac);
         free(contac);

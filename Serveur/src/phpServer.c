@@ -103,7 +103,7 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
         endWriteDirectClient(clientid);
     }
 
-    
+    close(test);
     //sendToClient
 
 }
