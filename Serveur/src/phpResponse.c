@@ -147,6 +147,7 @@ ListAnswers* readPHPResponse(int fd) {
     //? On lit les données envoyées par le processus PHP
     //? On commence par lire le contenu du header
     while (!done && read(fd, receivedHeader, FCGI_HEADER_SIZE) != 0) {
+        printf("Hello\n");
         FCGI_Header answer;
         answer.version = receivedHeader[0];
         answer.type = receivedHeader[1];

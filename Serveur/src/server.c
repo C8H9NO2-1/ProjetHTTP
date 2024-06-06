@@ -318,14 +318,39 @@ int main(int argc, char *argv[]) {
                         strncpy(valueBodyCopy, valueBody, lengthBody);
                         valueBodyCopy[lengthBody] = '\0';
 
-                        char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                        phpServerResponse(path, 1, "close", POST, requete->clientId, valueBodyCopy);
+                        // On récupère le Content-Type header
+                        _Token *rCT;
+                        rCT = searchTree(root, "Content-Type");
+                        int lengthContentType;
+                        char *valueContentType;
+                        valueContentType = getElementValue(rCT->node, &lengthContentType);
+                        printf("%.*s\n", lengthContentType, valueContentType);
+
+                        // On récupère le Content-Length header
+                        _Token *rCL;
+                        rCL = searchTree(root, "Content-Length");
+                        int lengthContentLength;
+                        char *valueContentLength;
+                        valueContentLength = getElementValue(rCL->node, &lengthContentLength);
+                        printf("%.*s\n", lengthContentLength, valueContentLength);
+
+                        if (lengthContentType == 0) {
+                            error(400, 1, close, requete->clientId, true);
+                        } else if (lengthContentLength == 0) {
+                            error(411, 1, close, requete->clientId, true);
+                        } else {
+                            char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
+                            phpServerResponse(path, 1, close, method, requete->clientId, valueBodyCopy, valueContentLength, lengthContentLength,
+                                    valueContentType, lengthContentType);
+                        }
                         
                         purgeElement(&rP);
+                        purgeElement(&rCT);
+                        purgeElement(&rCL);
                     } else {
                         // Sinon on ne passe rien dans les stdin
                         char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                        phpServerResponse(path, 1, "close", GET, requete->clientId, NULL);
+                        phpServerResponse(path, 1, close, method, requete->clientId, NULL, NULL, 0, NULL, 0);
                     }
                     /*reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);*/
                 }
