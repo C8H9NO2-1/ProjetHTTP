@@ -341,7 +341,7 @@ int main(int argc, char *argv[]) {
                             reset();
                         }
                         _Token *rC;
-                        rC = searchTree(root, "cookie-value");
+                        rC = searchTree(root, "cookie-pair");
                         int lengthCookie;
                         char *valueCookie;
                         valueCookie = getElementValue(rC->node, &lengthCookie);
@@ -364,7 +364,7 @@ int main(int argc, char *argv[]) {
                         // Sinon on ne passe rien dans les stdin
 
                         _Token *rC;
-                        rC = searchTree(root, "cookie-value");
+                        rC = searchTree(root, "cookie-pair");
                         int lengthCookie;
                         char *valueCookie;
                         if (rC == NULL) {
