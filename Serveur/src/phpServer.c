@@ -53,7 +53,7 @@ static int createSocket(char *ip, int port) {
 }
 
 void phpServerResponse(char *path, int version, char* connection, Method method , unsigned clientid ,char *chaine, char *contentLength, int length1,
-        char *contentType, int length2) {
+        char *contentType, int length2, char *cookie, int length3) {
     // chain  pour passer quelque chose dans stdin
     // le debut est similaire a reponse()..
     // apres on envoi au processus php // send to server
@@ -68,7 +68,7 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
     write(test, begin, longueurBegin);
     free(begin);
 
-    param(path,test,connection,method, contentType, length2, contentLength, length1);
+    param(path,test,connection,method, contentType, length2, contentLength, length1, cookie, length3);
     
     FCGI_Header *stdin = stdinRequest(&longueurStdin, chaine);
     write(test, stdin, longueurStdin);

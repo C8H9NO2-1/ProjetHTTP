@@ -334,6 +334,19 @@ int main(int argc, char *argv[]) {
                         valueContentLength = getElementValue(rCL->node, &lengthContentLength);
                         /*printf("%.*s\n", lengthContentLength, valueContentLength);*/
 
+                        // On récupère le Cookie-header
+                        if (!semanticCookie(root)) {
+                            red();
+                            printf("Erreur => Cookie header faux\n");
+                            reset();
+                        }
+                        _Token *rC;
+                        rC = searchTree(root, "cookie-value");
+                        int lengthCookie;
+                        char *valueCookie;
+                        valueCookie = getElementValue(rC->node, &lengthCookie);
+                        printf("%.*s\n", lengthCookie, valueCookie);
+
                         if (lengthContentType == 0) {
                             error(400, 1, close, requete->clientId, true);
                         } else if (lengthContentLength == 0) {
@@ -341,7 +354,7 @@ int main(int argc, char *argv[]) {
                         } else {
                             char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
                             phpServerResponse(path, 1, close, method, requete->clientId, valueBodyCopy, valueContentLength, lengthContentLength,
-                                    valueContentType, lengthContentType);
+                                    valueContentType, lengthContentType, valueCookie, lengthCookie);
                         }
                         
                         purgeElement(&rP);
@@ -350,7 +363,7 @@ int main(int argc, char *argv[]) {
                     } else {
                         // Sinon on ne passe rien dans les stdin
                         char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                        phpServerResponse(path, 1, close, method, requete->clientId, NULL, NULL, 0, NULL, 0);
+                        phpServerResponse(path, 1, close, method, requete->clientId, NULL, NULL, 0, NULL, 0, NULL, 0);
                     }
                     /*reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);*/
                 }
