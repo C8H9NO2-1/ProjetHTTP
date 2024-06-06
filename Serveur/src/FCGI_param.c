@@ -63,7 +63,7 @@ int add_CDATA(FCGI_NameValuePair11 * UH, char * su, int i){
 }
 
 
-int param(char * path, int desc_ecriture,  char * connection, Method method, char* content_type, int content_type_len, char * content_len, int content_len_len ){
+int param(char * path, int desc_ecriture,  char * connection, Method method, char* content_type, int content_type_len, char * content_len, int content_len_len, char * cookie , int cookie_len ){
 
     FCGI_Header Head;
     Head.version=FCGI_VERSION_1;
@@ -149,15 +149,28 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
 
     }
 
+
+    FCGI_NameValuePair11 Cookie_Header;
+    if(cookie != NULL){
+        char * contac = malloc ((cookie_len+1)*sizeof(char));
+        strncpy(contac , content_len , cookie_len);
+        contac[cookie_len ]='\0';
+        create_FCGI_NameValuePair11(&Cookie_Header, "HTTP_COOKIE", contac);
+        free(contac);
+    }
+
     int u=0;
     u=add_CDATA(&Host, Head.contentData ,u);
     if(content_type != NULL){
         u=add_CDATA(&Type, Head.contentData, u);
     }
-    if(content_len){
+    if(content_len != NULL){
         u=add_CDATA(&Length, Head.contentData, u);
     }
     u=add_CDATA(&Connection, Head.contentData ,u);
+    if(cookie != NULL){
+        u=add_CDATA(&Cookie_Header, Head.contentData, u);
+    }
     u=add_CDATA(&Path, Head.contentData ,u);
     u=add_CDATA(&Signature, Head.contentData ,u);
     u=add_CDATA(&Software, Head.contentData ,u);
@@ -201,8 +214,11 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
     if(content_type != NULL){
         freeFCGI_NameValuePair11(&Type);
     }
-    if(content_len){
+    if(content_len != NULL){
         freeFCGI_NameValuePair11(&Length);
+    }
+    if(cookie != NULL){
+        freeFCGI_NameValuePair11(&Cookie_Header);
     }
     free(methodee);
     return 1;
