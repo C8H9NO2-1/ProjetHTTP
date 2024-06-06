@@ -63,7 +63,7 @@ int add_CDATA(FCGI_NameValuePair11 * UH, char * su, int i){
 }
 
 
-int param(char * path, int desc_ecriture,  char * connection, Method method, char* content_type, int content_len ){
+int param(char * path, int desc_ecriture,  char * connection, Method method, char* content_type, int content_type_len, char * content_len, int content_len_len ){
 
     FCGI_Header Head;
     Head.version=FCGI_VERSION_1;
@@ -132,23 +132,29 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
     FCGI_NameValuePair11 Type;
 
     if(content_type != NULL){
-        char * contant = malloc ((content_len+1)*sizeof(char));
-        strncat(contant , content_type , content_len);
-        contant[content_len ]='\0';
+        char * contant = malloc ((content_type_len+1)*sizeof(char));
+        strncat(contant , content_type , content_type_len);
+        contant[content_type_len ]='\0';
         create_FCGI_NameValuePair11(&Type, "CONTENT_TYPE", contant );
         free(contant);
     }
 
     FCGI_NameValuePair11 Length;
-    if(content_type != NULL){
-        char K = content_len;
-        create_FCGI_NameValuePair11(&Length, "CONTENT_LENGTH", &K);
+    if(content_len != NULL){
+        char * conta = malloc ((content_len_len+1)*sizeof(char));
+        strncat(conta , content_len , content_len_len);
+        conta[content_len_len ]='\0';
+        create_FCGI_NameValuePair11(&Length, "CONTENT_LENGTH", conta);
+        free(conta);
+
     }
 
     int u=0;
     u=add_CDATA(&Host, Head.contentData ,u);
     if(content_type != NULL){
         u=add_CDATA(&Type, Head.contentData, u);
+    }
+    if(content_len){
         u=add_CDATA(&Length, Head.contentData, u);
     }
     u=add_CDATA(&Connection, Head.contentData ,u);
@@ -194,6 +200,8 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
     freeFCGI_NameValuePair11(&Query);
     if(content_type != NULL){
         freeFCGI_NameValuePair11(&Type);
+    }
+    if(content_len){
         freeFCGI_NameValuePair11(&Length);
     }
     free(methodee);

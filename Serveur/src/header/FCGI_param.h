@@ -11,9 +11,10 @@ Le char * path contient le chemin du dossier dans lequel est contenu le document
 Le char * connection contient ce qu'il faut mettre dans le Champ HTTP_CONNECTION
 La method correspond à la method demandé par le client (GET/HEAD/POST)
 Le char * content_type contient le type du content, mettre NULL si  vous ne voulez pas mettre le header
-Le int content len contient la taille du content, ignoré si content_type == NULL
+Le int content_type_len contient la taille du content, ignoré si content_type == NULL
+IDEM pour content_len et content_len_len
 */
-int param(char * path, int desc_ecriture, char * connection, Method method, char* content_type, int content_len );
+int param(char * path, int desc_ecriture, char * connection, Method method, char* content_type, int content_type_len, char * content_len, int content_len_len );
 
 
 /*Nous sert à free les FCGI_NameValuePair11*/
