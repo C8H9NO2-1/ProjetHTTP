@@ -4,7 +4,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "header/pm.h"
 #include "header/fastcgi.h"
 #include "header/colours.h"
 #include "header/phpResponse.h"
@@ -21,6 +20,7 @@ PHPResponse getPHPResponse(int fd) {
     response.content = NULL;
     response.length = 0;
     response.error = false;
+    response.contentLength = 0;
 
     // On parcourt les différentes réponses données par
     // le processus PHP

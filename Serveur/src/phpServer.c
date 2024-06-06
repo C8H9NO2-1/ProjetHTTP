@@ -12,6 +12,7 @@
 #include "header/FCGI_param.h"
 #include "header/fastcgi.h"
 #include "header/begin.h"
+#include "header/colours.h"
 
 
 #include <unistd.h>
@@ -98,7 +99,7 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
             reponse.content[i]=version[i];
         }
         writeDirectClient(clientid,"H",1);
-        writeDirectClient(clientid,reponse.content,reponse.contentLength);
+        writeDirectClient(clientid,reponse.content,reponse.length);
         endWriteDirectClient(clientid);
     }
 
