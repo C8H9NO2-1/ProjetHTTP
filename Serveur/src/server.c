@@ -77,9 +77,10 @@ int main(int argc, char *argv[]) {
                         valueTarget = malloc(lengthTemp * sizeof(char));
                         strncpy(valueTarget, temp, lengthTemp);
                         lengthTarget = lengthTemp;
+                    } else {
+                        isDefault = true;
                     }
                     file = defaultPath(valueHost, lengthHost);
-                    isDefault = true;
                 } else {
                      file = checkExistenceWithHost(valueTarget, lengthTarget, valueHost, lengthHost);
                 }

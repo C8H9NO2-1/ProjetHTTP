@@ -19,7 +19,7 @@ if (isset($_SESSION['identity'])) {
         <?php if ($identity==null): ?>
         <a href="login.php">Connexion</a>
         <?php else: ?>
-        <strong>Bienvenue, <?= $identity ?></strong> <a href="index.html"></a> <a href="logout.php">Déconnexion</a>
+        <strong>Bienvenue, <?= $identity ?></strong> <a href="index.html">Site web</a> <a href="logout.php">Déconnexion</a>
         <?php endif; ?>
         
         <p>
