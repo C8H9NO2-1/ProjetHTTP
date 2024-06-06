@@ -245,6 +245,8 @@ int main(int argc, char *argv[]) {
                             break;
                         case PHP:
                             printf("On à affaire à une requête de type PHP\n");
+                        case ICO:
+                            printf("image/vnd.microsoft.icon\n");
                     }
                     reset();
                 } else {
@@ -289,6 +291,10 @@ int main(int argc, char *argv[]) {
                         type[strlen(temp)] = '\0';
                     } else if (ressourceType == GIF) {
                         const char *temp = "image/gif";
+                        strcpy(type, temp);
+                        type[strlen(temp)] = '\0';
+                    } else if (ressourceType == ICO) {
+                        const char *temp = "image/vnd.microsoft.icon";
                         strcpy(type, temp);
                         type[strlen(temp)] = '\0';
                     }

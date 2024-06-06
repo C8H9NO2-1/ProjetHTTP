@@ -665,6 +665,8 @@ ContentType typeFromPath(char *path, int len) {
         result = GIF;
     } else if (extensionMatch(temp, ".php")) {
         result = PHP;
+    } else if (extensionMatch(temp, ".ico")) {
+        result = ICO;
     } else {
         // Par défaut on renvoie une page html
         result = HTML;

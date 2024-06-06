@@ -13,7 +13,7 @@ enum ConnectionState {
 
 typedef enum ContentType ContentType;
 enum ContentType {
-    HTML, CSS, JAVASCRIPT, PNG, JPEG, GIF, PHP
+    HTML, CSS, JAVASCRIPT, PNG, JPEG, GIF, PHP, ICO
 };
 
 bool semanticStartLine(void *root, Method *method, int *version);
