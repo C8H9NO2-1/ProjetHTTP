@@ -24,7 +24,6 @@
 int main(int argc, char *argv[]) {
     message *requete;
 
-    int c;
     ConnectionState connection = CLOSE;
 
     system("ls racine > liste.txt");
