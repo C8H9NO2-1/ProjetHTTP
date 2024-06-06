@@ -84,7 +84,7 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
     PHPResponse reponse=getPHPResponse(test);
     
     if (reponse.error ==false){
-        if (method == POST) {
+        if (strstr(reponse.content, "Status: 302 Found") != NULL) {
             reponse3(302,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
         } else {
             reponse3(200,1,reponse.contentLength,reponse.content,reponse.length,connection,clientid);
