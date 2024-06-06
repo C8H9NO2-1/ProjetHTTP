@@ -21,7 +21,35 @@
 #define REPONSE2 "\r\n<html><head><title>Test</title></head><body><p>This is a test</p></body></html>"
 #define REPONSE3 "Connection: close\r\n"
 
+static int createSocket(char *ip, int port) {
+    int fd;
+    struct sockaddr_in serv_addr;
+    int enable = 1;
+
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("socket creation failed\n");
+        return (-1);
+    }
+
+    bzero(&serv_addr, sizeof(serv_addr));
+
+    serv_addr.sin_family = AF_INET;
+    inet_aton(ip, (struct in_addr *)&serv_addr.sin_addr.s_addr);
+    /*inet_aton(ip,(struct sockaddr *)&serv_addr.sin_addr.s_addr);*/
+    serv_addr.sin_port = htons(port);
+
+    if (connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        perror("connect failed\n");
+        return (-1);
+    }
+
+    return fd;
+}
+
 int main(int argc, char *argv[]) {
+    //! On commence par ouvrir une socket avec le processus PHP
+    int test = createSocket("127.0.0.1", 9000);
+
     message *requete;
 
     int c;
@@ -353,8 +381,8 @@ int main(int argc, char *argv[]) {
                             error(411, 1, close, requete->clientId, true);
                         } else {
                             char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                            phpServerResponse(path, 1, "close", method, requete->clientId, valueBodyCopy, valueContentLength, lengthContentLength,
-                                    valueContentType, lengthContentType, valueCookie, lengthCookie);
+                            phpServerResponse(test, path, 1, "keep-alive", method, requete->clientId, valueBodyCopy, valueContentLength,
+                                    lengthContentLength, valueContentType, lengthContentType, valueCookie, lengthCookie);
                         }
                         
                         purgeElement(&rP);
@@ -375,7 +403,7 @@ int main(int argc, char *argv[]) {
                             printf("%.*s\n", lengthCookie, valueCookie);
                         }
                         char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                        phpServerResponse(path, 1, "close", method, requete->clientId, NULL, NULL, 0, NULL, 0, valueCookie, lengthCookie);
+                        phpServerResponse(test, path, 1, "keep-alive", method, requete->clientId, NULL, NULL, 0, NULL, 0, valueCookie, lengthCookie);
                     }
                     /*reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);*/
                 }

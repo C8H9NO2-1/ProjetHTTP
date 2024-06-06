@@ -52,13 +52,13 @@ static int createSocket(char *ip, int port) {
     return fd;
 }
 
-void phpServerResponse(char *path, int version, char* connection, Method method , unsigned clientid ,char *chaine, char *contentLength, int length1,
+void phpServerResponse(int test, char *path, int version, char* connection, Method method , unsigned clientid ,char *chaine, char *contentLength, int length1,
         char *contentType, int length2, char *cookie, int length3) {
     // chain  pour passer quelque chose dans stdin
     // le debut est similaire a reponse()..
     // apres on envoi au processus php // send to server
     
-    int test= createSocket("127.0.0.1",9000);
+    /*int test= createSocket("127.0.0.1",9000);*/
 
 
     int longueurBegin=0;
@@ -103,7 +103,7 @@ void phpServerResponse(char *path, int version, char* connection, Method method 
         endWriteDirectClient(clientid);
     }
 
-    close(test);
+    /*close(test);*/
     //sendToClient
 
 }
