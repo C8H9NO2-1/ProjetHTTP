@@ -320,11 +320,11 @@ int main(int argc, char *argv[]) {
 
                         // On récupère le Content-Type header
                         _Token *rCT;
-                        rCT = searchTree(root, "Content-Type");
+                        rCT = searchTree(root, "media-type");
                         int lengthContentType;
                         char *valueContentType;
                         valueContentType = getElementValue(rCT->node, &lengthContentType);
-                        printf("%.*s\n", lengthContentType, valueContentType);
+                        /*printf("%.*s\n", lengthContentType, valueContentType);*/
 
                         // On récupère le Content-Length header
                         _Token *rCL;
@@ -332,7 +332,7 @@ int main(int argc, char *argv[]) {
                         int lengthContentLength;
                         char *valueContentLength;
                         valueContentLength = getElementValue(rCL->node, &lengthContentLength);
-                        printf("%.*s\n", lengthContentLength, valueContentLength);
+                        /*printf("%.*s\n", lengthContentLength, valueContentLength);*/
 
                         if (lengthContentType == 0) {
                             error(400, 1, close, requete->clientId, true);

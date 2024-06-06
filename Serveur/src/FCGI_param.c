@@ -133,7 +133,7 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
 
     if(content_type != NULL){
         char * contant = malloc ((content_type_len+1)*sizeof(char));
-        strncat(contant , content_type , content_type_len);
+        strncpy(contant , content_type , content_type_len);
         contant[content_type_len ]='\0';
         create_FCGI_NameValuePair11(&Type, "CONTENT_TYPE", contant );
         free(contant);
@@ -142,7 +142,7 @@ int param(char * path, int desc_ecriture,  char * connection, Method method, cha
     FCGI_NameValuePair11 Length;
     if(content_len != NULL){
         char * conta = malloc ((content_len_len+1)*sizeof(char));
-        strncat(conta , content_len , content_len_len);
+        strncpy(conta , content_len , content_len_len);
         conta[content_len_len ]='\0';
         create_FCGI_NameValuePair11(&Length, "CONTENT_LENGTH", conta);
         free(conta);
