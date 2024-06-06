@@ -130,7 +130,7 @@ void printRawString(const char *str, int l) {
     }
 }
 
-char* DecodeChunked(char *s, int *l){
+/*char* DecodeChunked(char *s, int *l){
     int max = *l;
     *l=0;
     char message[max];
@@ -141,7 +141,7 @@ char* DecodeChunked(char *s, int *l){
             i++;
         }
         int debut = i;
-        while (i<max && (s[i]>=48 && s[i]<=57 || s[i]>=65 && s[i]<=69)){
+        while (i<max && ((s[i]>=48 && s[i]<=57) || s[i]>=65 && s[i]<=69)){
             i++;
         }
         int fin =i-1;
@@ -168,4 +168,4 @@ char* DecodeChunked(char *s, int *l){
     printRawString(decode, *l);
     printf("\n");
     return(decode);
-}
+}*/
