@@ -19,7 +19,7 @@ objects = $(addprefix $(bin),functions.o api.o pm.o elisa.o ismail.o colours.o r
 main1 = $(bin)main.o
 main2 = $(bin)server.o
 
-all : $(exec)
+all : $(server)
 
 $(exec) : $(objects) $(main1)
 	gcc -o $(exec) $(objects) $(main1)  -lm -L./$(zlib) -lz -fsanitize=address
