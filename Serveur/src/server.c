@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
                             error(411, 1, close, requete->clientId, true);
                         } else {
                             char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                            phpServerResponse(path, 1, "close", method, requete->clientId, valueBodyCopy, valueContentLength, lengthContentLength,
+                            phpServerResponse(path, 1, close, method, requete->clientId, valueBodyCopy, valueContentLength, lengthContentLength,
                                     valueContentType, lengthContentType, valueCookie, lengthCookie);
                         }
                         
@@ -350,7 +350,7 @@ int main(int argc, char *argv[]) {
                             valueCookie = getElementValue(rC->node, &lengthCookie);
                         }
                         char *path = phpPath(valueTarget, lengthTarget, valueHost, lengthHost);
-                        phpServerResponse(path, 1, "close", method, requete->clientId, NULL, NULL, 0, NULL, 0, valueCookie, lengthCookie);
+                        phpServerResponse(path, 1, close, method, requete->clientId, NULL, NULL, 0, NULL, 0, valueCookie, lengthCookie);
                     }
                     /*reponse2(200, version, "text/html", 0, NULL, close, requete->clientId);*/
                 }

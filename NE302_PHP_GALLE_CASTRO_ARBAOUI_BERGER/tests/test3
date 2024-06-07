@@ -1,0 +1,4 @@
+GET /images/logo.png HTTP/1.2
+Host: www.paphypu.fr
+Connection: close
+
